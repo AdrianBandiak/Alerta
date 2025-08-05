@@ -1,12 +1,16 @@
 <resources>
     <string name="app_name">Alerta</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="content_desc_logo">Alerta logo</string>
+    <string name="register_title">Create an account</string>
+    <string name="register_subtitle">Enter your email and password to sign up for this app</string>
+    <string name="hint_email">email@domain.com</string>
+    <string name="hint_password">********</string>
+    <string name="register_button_text">Continue</string>
+
+    <string name="fill_all_fields">Please fill in all fields</string>
+    <string name="invalid_email">Invalid email address</string>
+    <string name="invalid_password">Password must be at least 6 characters and contain letters and digits</string>
+    <string name="account_created">Account successfully created</string>
+    <string name="data_save_error">Error saving user data</string>
+    <string name="registration_failed">Registration failed: %1$s</string>
 </resources>

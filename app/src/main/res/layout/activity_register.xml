@@ -1,46 +1,94 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layoutRegister"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
-    tools:context=".RegisterActivity">
+    android:background="#FAFAFA">
 
-    <TextView
-        android:id="@+id/textViewRegisterTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alerta - Rejestracja"
-        android:textSize="24sp"
-        android:textColor="#8000FF"
-        android:layout_marginBottom="32dp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/editTextEmail"
+    <ImageView
+        android:id="@+id/backgroundWave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:src="@drawable/backgorund_2"
+        android:scaleType="fitXY"
+        android:layout_gravity="top"
+        android:adjustViewBounds="true" />
 
-    <EditText
-        android:id="@+id/editTextPassword"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Hasło"
-        android:inputType="textPassword"
-        android:layout_marginTop="16dp" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/buttonRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ZAREJESTRUJ"
-        android:backgroundTint="#8000FF"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="24dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="32dp">
 
-</LinearLayout>
+            <ImageView
+                android:id="@+id/logoImage"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="96dp"
+                android:src="@drawable/logo_alerta"
+                android:contentDescription="@string/content_desc_logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register_title"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter"
+                android:layout_marginTop="24dp" />
+
+            <TextView
+                android:layout_width="279dp"
+                android:layout_height="wrap_content"
+                android:text="@string/register_subtitle"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:letterSpacing="0"
+                android:textColor="#212121"
+                android:textAlignment="center"
+                android:fontFamily="@font/inter" />
+
+            <EditText
+                android:id="@+id/emailInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress"
+                android:layout_marginTop="16dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:hint="@string/hint_password"
+                android:inputType="textPassword"
+                android:layout_marginTop="12dp"
+                android:textSize="12sp"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/registerButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="@string/register_button_text"
+                android:textAllCaps="false"
+                android:backgroundTint="#E53935"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="24dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

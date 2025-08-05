@@ -3,9 +3,10 @@ package com.abandiak.alerta;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,13 +14,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText editTextEmail, editTextPassword;
-    private Button buttonRegister;
+    private EditText emailInput, passwordInput;
+    private Button registerButton;
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
+    private static final String TAG = "RegisterActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,22 +32,32 @@ public class RegisterActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        editTextEmail = findViewById(R.id.editTextEmail);
-        editTextPassword = findViewById(R.id.editTextPassword);
-        buttonRegister = findViewById(R.id.buttonRegister);
+        emailInput = findViewById(R.id.emailInput);
+        passwordInput = findViewById(R.id.passwordInput);
+        registerButton = findViewById(R.id.registerButton);
 
-        buttonRegister.setOnClickListener(v -> {
-            String email = editTextEmail.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
+        registerButton.setOnClickListener(v -> {
+            String email = emailInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
+                showCustomToast(getString(R.string.fill_all_fields));
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showCustomToast(getString(R.string.invalid_email));
+                return;
+            }
+
+            if (!isValidPassword(password)) {
+                showCustomToast(getString(R.string.invalid_password));
                 return;
             }
 
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        String userId = auth.getCurrentUser().getUid();
+                        String userId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
                         HashMap<String, Object> userMap = new HashMap<>();
                         userMap.put("email", email);
                         userMap.put("role", "user");
@@ -52,17 +65,47 @@ public class RegisterActivity extends AppCompatActivity {
                         firestore.collection("users").document(userId)
                                 .set(userMap)
                                 .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Konto utworzone!", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(this, LoginActivity.class));
+                                    showCustomToast(getString(R.string.account_created));
+                                    Log.d(TAG, "Redirecting to LoginActivity");
+                                    Intent intent = new Intent(this, LoginActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
                                     finish();
                                 })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(this, "Błąd zapisu danych", Toast.LENGTH_SHORT).show()
-                                );
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Firestore error: ", e);
+                                    showCustomToast(getString(R.string.data_save_error));
+                                });
                     })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Rejestracja nieudana: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Registration failed: ", e);
+                        showCustomToast(getString(R.string.registration_failed, e.getMessage()));
+                    });
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.(pl|com|[a-z]{2,3})";
+        return email.matches(emailPattern);
+    }
+
+    private boolean isValidPassword(String password) {
+        return password.length() >= 6 && password.matches("^(?=.*[a-zA-Z])(?=.*\\d).+$");
+    }
+
+    private void showCustomToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_custom, findViewById(android.R.id.content), false);
+
+        TextView text = layout.findViewById(R.id.toast_text);
+        ImageView icon = layout.findViewById(R.id.toast_icon);
+
+        text.setText(message);
+        icon.setImageResource(R.drawable.logo_alerta);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
     }
 }
