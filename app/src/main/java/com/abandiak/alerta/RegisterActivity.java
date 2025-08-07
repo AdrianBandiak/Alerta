@@ -1,9 +1,11 @@
 package com.abandiak.alerta;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
@@ -18,7 +20,7 @@ import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailInput, passwordInput;
+    private EditText emailInput, passwordInput, confirmPasswordInput;
     private Button registerButton;
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
@@ -34,13 +36,15 @@ public class RegisterActivity extends AppCompatActivity {
 
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
+        confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
         registerButton = findViewById(R.id.registerButton);
 
         registerButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
+            String confirmPassword = confirmPasswordInput.getText().toString().trim();
 
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
                 showCustomToast(getString(R.string.fill_all_fields));
                 return;
             }
@@ -52,6 +56,11 @@ public class RegisterActivity extends AppCompatActivity {
 
             if (!isValidPassword(password)) {
                 showCustomToast(getString(R.string.invalid_password));
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                showCustomToast(getString(R.string.passwords_do_not_match));
                 return;
             }
 
@@ -106,6 +115,18 @@ public class RegisterActivity extends AppCompatActivity {
         Toast toast = new Toast(getApplicationContext());
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 100);
         toast.show();
+
+        try {
+            @SuppressLint("SoonBlockedPrivateApi") Object toastTN = toast.getClass().getDeclaredField("mTN").get(toast);
+            Object params = toastTN.getClass().getDeclaredMethod("getWindowParams").invoke(toastTN);
+            if (params instanceof android.view.WindowManager.LayoutParams) {
+                ((android.view.WindowManager.LayoutParams) params).windowAnimations = R.style.ToastAnimation;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
+

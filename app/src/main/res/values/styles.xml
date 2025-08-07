@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    </style>
+
+    <style name="ToastAnimation">
+        <item name="android:windowEnterAnimation">@anim/toast_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/toast_fade_out</item>
+    </style>
+</resources>
