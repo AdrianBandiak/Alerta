@@ -1,13 +1,18 @@
 package com.abandiak.alerta;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,34 +37,99 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin = findViewById(R.id.buttonLogin);
         textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
 
+        String baseText = "Don't have an account? ";
+        String boldText = "Register";
+
+        SpannableString spannable = new SpannableString(baseText + boldText);
+        spannable.setSpan(
+                new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                baseText.length(),
+                baseText.length() + boldText.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        spannable.setSpan(
+                new android.text.style.ForegroundColorSpan(0xFFE53935),
+                baseText.length(),
+                baseText.length() + boldText.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        textViewRegisterLink.setText(spannable);
+
         buttonLogin.setOnClickListener(view -> {
             String email = editTextEmail.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(this, "Wprowadź email i hasło", Toast.LENGTH_SHORT).show();
+                showCustomToast("Please enter email and password.");
+                return;
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                showCustomToast("Invalid email format.");
                 return;
             }
 
             firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(this, "Zalogowano", Toast.LENGTH_SHORT).show();
+                            showCustomToast("Login successful.");
                             startActivity(new Intent(this, HomeActivity.class));
                             finish();
                         } else {
-                            Toast.makeText(this, "Logowanie nieudane: " +
-                                    task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            showCustomToast("Login failed: Invalid credentials.");
                         }
                     });
         });
 
-        textViewRegisterLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-            }
+        textViewRegisterLink.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
+
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in_translate);
+
+        ImageView logo = findViewById(R.id.logoImage);
+
+        logo.setVisibility(View.VISIBLE);
+        editTextEmail.setVisibility(View.VISIBLE);
+        editTextPassword.setVisibility(View.VISIBLE);
+        buttonLogin.setVisibility(View.VISIBLE);
+        textViewRegisterLink.setVisibility(View.VISIBLE);
+
+        logo.startAnimation(fadeIn);
+        editTextEmail.startAnimation(fadeIn);
+        editTextPassword.startAnimation(fadeIn);
+        buttonLogin.startAnimation(fadeIn);
+        textViewRegisterLink.startAnimation(fadeIn);
+    }
+
+
+    private void showCustomToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_custom, findViewById(android.R.id.content), false);
+
+        TextView text = layout.findViewById(R.id.toast_text);
+        ImageView icon = layout.findViewById(R.id.toast_icon);
+
+        text.setText(message);
+        icon.setImageResource(R.drawable.logo_alerta);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 100);
+        toast.show();
+
+        try {
+            @SuppressLint("SoonBlockedPrivateApi") Object toastTN = toast.getClass().getDeclaredField("mTN").get(toast);
+            Object params = toastTN.getClass().getDeclaredMethod("getWindowParams").invoke(toastTN);
+            if (params instanceof android.view.WindowManager.LayoutParams) {
+                ((android.view.WindowManager.LayoutParams) params).windowAnimations = R.style.ToastAnimation;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
