@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAFAFA">
@@ -26,9 +27,9 @@
 
             <ImageView
                 android:id="@+id/logoImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginTop="48dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="24dp"
                 android:src="@drawable/logo_alerta"
                 android:contentDescription="@string/content_desc_logo" />
 
@@ -36,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/register_title"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:fontFamily="@font/inter"
@@ -48,76 +49,73 @@
                 android:text="@string/register_subtitle"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:letterSpacing="0"
                 android:textColor="#212121"
                 android:textAlignment="center"
                 android:fontFamily="@font/inter" />
 
-            <TextView
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/label_email"
-                android:textSize="12sp"
-                android:textColor="#000000"
-                android:fontFamily="@font/inter"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                app:startIconDrawable="@drawable/ic_email"
+                app:startIconTint="#9E9E9E">
 
-            <EditText
-                android:id="@+id/emailInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_email"
-                android:inputType="textEmailAddress"
-                android:textSize="12sp"
-                android:fontFamily="@font/inter"
-                android:background="@drawable/edit_text_background"
-                android:padding="12dp"
-                android:elevation="1dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_email"
+                    android:inputType="textEmailAddress"
+                    android:textSize="12sp"
+                    android:textColorHint="#9E9E9E"
+                    android:fontFamily="@font/inter" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/label_password"
-                android:textSize="12sp"
-                android:textColor="#000000"
-                android:fontFamily="@font/inter"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp"
+                app:startIconDrawable="@drawable/ic_password_lock"
+                app:startIconTint="#9E9E9E"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#9E9E9E">
 
-            <EditText
-                android:id="@+id/passwordInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_password"
-                android:inputType="textPassword"
-                android:textSize="12sp"
-                android:fontFamily="@font/inter"
-                android:background="@drawable/edit_text_background"
-                android:padding="12dp"
-                android:elevation="1dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_password"
+                    android:inputType="textPassword"
+                    android:textSize="12sp"
+                    android:textColorHint="#9E9E9E"
+                    android:fontFamily="@font/inter" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
+            <!-- Confirm Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/label_confirm_password"
-                android:textSize="12sp"
-                android:textColor="#000000"
-                android:fontFamily="@font/inter"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp"
+                app:startIconDrawable="@drawable/ic_password_lock"
+                app:startIconTint="#9E9E9E"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#9E9E9E">
 
-            <EditText
-                android:id="@+id/confirmPasswordInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_password"
-                android:inputType="textPassword"
-                android:textSize="12sp"
-                android:fontFamily="@font/inter"
-                android:background="@drawable/edit_text_background"
-                android:padding="12dp"
-                android:elevation="1dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirmPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/label_confirm_password"
+                    android:inputType="textPassword"
+                    android:textSize="12sp"
+                    android:textColorHint="#9E9E9E"
+                    android:fontFamily="@font/inter" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/registerButton"

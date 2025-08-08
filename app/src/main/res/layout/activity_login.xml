@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAFAFA">
@@ -24,54 +25,71 @@
             android:gravity="center_horizontal"
             android:padding="32dp">
 
+            <!-- Logo -->
             <ImageView
                 android:id="@+id/logoImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginTop="96dp"
-                android:visibility="invisible"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="24dp"
                 android:src="@drawable/logo_alerta"
                 android:contentDescription="@string/content_desc_logo" />
 
+            <!-- Tytuł -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_in"
-                android:textColor="#333333"
                 android:textSize="20sp"
-                android:fontFamily="@font/inter"
+                android:textColor="#000000"
                 android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                />
-
-            <EditText
-                android:id="@+id/editTextEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/email"
-                android:inputType="textEmailAddress"
-                android:layout_marginTop="24dp"
-                android:textSize="12sp"
-                android:elevation="1dp"
                 android:fontFamily="@font/inter"
-                android:background="@drawable/edit_text_background"
-                android:padding="12dp" />
+                android:layout_marginTop="24dp" />
 
-            <EditText
-                android:id="@+id/editTextPassword"
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/password"
-                android:inputType="textPassword"
+                android:layout_marginTop="24dp"
+                app:startIconDrawable="@drawable/ic_email"
+                app:startIconTint="#9E9E9E"
+                app:endIconMode="clear_text"
+                app:endIconTint="#9E9E9E">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:textSize="12sp"
+                    android:textColorHint="#9E9E9E"
+                    android:fontFamily="@font/inter" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:textSize="12sp"
-                android:elevation="1dp"
-                android:fontFamily="@font/inter"
-                android:background="@drawable/edit_text_background"
-                android:visibility="invisible"
-                android:padding="12dp" />
+                app:startIconDrawable="@drawable/ic_password_lock"
+                app:startIconTint="#9E9E9E"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#9E9E9E">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:textSize="12sp"
+                    android:textColorHint="#9E9E9E"
+                    android:fontFamily="@font/inter" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Przycisk logowania -->
             <Button
                 android:id="@+id/buttonLogin"
                 android:layout_width="match_parent"
@@ -83,9 +101,9 @@
                 android:elevation="1dp"
                 android:backgroundTint="#E53935"
                 android:textStyle="bold"
-                android:visibility="invisible"
                 android:textColor="#FFFFFF" />
 
+            <!-- Link do rejestracji -->
             <TextView
                 android:id="@+id/textViewRegisterLink"
                 android:layout_width="wrap_content"
@@ -93,9 +111,7 @@
                 android:textColor="#000000"
                 android:textSize="14sp"
                 android:layout_marginTop="16dp"
-                android:visibility="invisible"
                 android:fontFamily="@font/inter" />
-
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
