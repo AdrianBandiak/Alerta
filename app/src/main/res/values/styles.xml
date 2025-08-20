@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Alerta" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#E53935</item>
+        <item name="colorPrimaryContainer">#FFCDD2</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="TextAppearance.Alerta.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/inter</item>
+    </style>
+    <style name="TextAppearance.Alerta.SubBarTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">@font/inter</item>
+    </style>
+
+    <style name="AlertaNavIndicatorNone">
+        <item name="android:width">0dp</item>
+        <item name="android:height">0dp</item>
+        <item name="android:color">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:alpha">0</item>
+    </style>
+
+</resources>

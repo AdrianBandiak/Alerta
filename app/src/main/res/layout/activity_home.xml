@@ -1,6 +1,451 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            style="@style/Widget.Material3.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/menu_top_appbar"
+            app:contentInsetStartWithNavigation="0dp">
+
+            <LinearLayout
+                android:id="@+id/brandContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/brandLogo"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/logo_alerta"
+                    android:contentDescription="@string/content_desc_logo"/>
+
+                <TextView
+                    android:id="@+id/brandTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/app_name"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"/>
+            </LinearLayout>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOnline"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:text="@string/status_online"
+                android:textSize="11sp"
+                app:chipMinHeight="22dp"
+                app:chipIcon="@drawable/ic_online_dot"
+                app:chipIconTint="@color/alerta_primary"
+                app:chipIconSize="14dp"
+                app:chipStartPadding="6dp"
+                app:chipEndPadding="6dp"
+                app:iconStartPadding="4dp"
+                app:chipBackgroundColor="#1FE53935"
+                app:chipStrokeColor="@color/alerta_primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/alerta_primary"/>
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/subBar"
+            style="@style/Widget.Material3.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="44dp"
+            app:contentInsetStartWithNavigation="0dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/textLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_location_placeholder"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/bullet_dot"
+                    android:textColor="#99000000"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/textTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/home_time_placeholder"
+                    android:textColor="#99000000"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"/>
+            </LinearLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true"
+        android:paddingStart="@dimen/space_lg"
+        android:paddingEnd="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:id="@+id/content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAlert"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardBackgroundColor="#FFFDE7"
+                app:strokeColor="#FBC02D"
+                app:strokeWidth="1dp"
+                android:contentDescription="@string/content_desc_alert_banner">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_md">
+
+                    <TextView
+                        android:id="@+id/textAlertTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/alert_banner_title"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:id="@+id/textAlertSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/alert_banner_subtitle"
+                        android:textColor="#424242"
+                        android:textSize="13sp"
+                        android:layout_marginTop="@dimen/space_xs"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchStub"
+                style="@style/Widget.Material3.CardView.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_default"
+                android:layout_marginTop="@dimen/space_md"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:strokeColor="#424242"
+                app:strokeWidth="1dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingEnd="@dimen/space_md">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="@color/hint_grey"
+                        android:contentDescription="@string/content_desc_search_icon"/>
+
+                    <TextView
+                        android:id="@+id/searchHint"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/search_hint"
+                        android:textColor="@color/hint_grey"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMap"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/map_height"
+                android:layout_marginTop="@dimen/space_md"
+                app:cardCornerRadius="@dimen/radius_md"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:contentDescription="@string/content_desc_map_card">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <FrameLayout
+                        android:id="@+id/mapContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#FFF0F0F0"
+                        android:contentDescription="@string/content_desc_map_container"/>
+
+                    <LinearLayout
+                        android:id="@+id/map_quick_actions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:orientation="vertical"
+                        android:layout_margin="@dimen/space_md"
+                        android:gravity="end">
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnAddMarkerFab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:fabSize="mini"
+                            app:fabCustomSize="36dp"
+                            app:maxImageSize="18dp"
+                            android:contentDescription="@string/cd_add_marker"
+                            app:srcCompat="@drawable/ic_add"
+                            app:tint="@color/alerta_primary"
+                            app:backgroundTint="@color/white"/>
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnLayersFab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:fabSize="mini"
+                            app:fabCustomSize="36dp"
+                            app:maxImageSize="18dp"
+                            android:layout_marginTop="@dimen/space_sm"
+                            android:contentDescription="@string/cd_layers"
+                            app:srcCompat="@drawable/ic_layers"/>
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnOfflineFab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:fabSize="mini"
+                            app:fabCustomSize="36dp"
+                            app:maxImageSize="18dp"
+                            android:layout_marginTop="@dimen/space_sm"
+                            android:contentDescription="@string/cd_offline"
+                            app:srcCompat="@drawable/ic_download"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardLegend"
+                        style="@style/Widget.Material3.CardView.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:layout_margin="@dimen/space_md"
+                        app:cardCornerRadius="@dimen/radius_sm">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/space_sm">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/legend_red_critical"
+                                android:textColor="#D32F2F"
+                                android:textStyle="bold"
+                                android:textSize="12sp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/legend_yellow_hazard"
+                                android:textColor="#F9A825"
+                                android:textSize="12sp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/legend_blue_info"
+                                android:textColor="#1976D2"
+                                android:textSize="12sp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReportIncident"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_default"
+                android:layout_marginTop="@dimen/space_md"
+                android:text="@string/btn_report_incident"
+                app:icon="@drawable/ic_alert_triangle_cutout"
+                app:iconPadding="8dp"
+                app:backgroundTint="@color/alerta_primary"
+                android:textColor="@color/white"
+                app:iconTint="@null"/>
+
+            <LinearLayout
+                android:id="@+id/quick_actions_secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCreateTask"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height_default"
+                    android:layout_weight="1"
+                    android:text="@string/btn_create_task"
+                    app:icon="@drawable/ic_task"
+                    app:iconPadding="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnJoinTeam"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height_default"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:text="@string/btn_join_team"
+                    app:icon="@drawable/ic_team"
+                    app:iconPadding="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/labelMyTasks"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/section_my_tasks_today"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/btnViewAllTasks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_view_all"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:drawableEnd="@drawable/ic_chevron_right"
+                    android:drawablePadding="4dp"
+                    app:drawableTint="@color/text_secondary"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerTasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:contentDescription="@string/cd_list_my_tasks_today"
+                tools:listitem="@layout/item_task_home"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/labelFeed"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/section_activity_feed"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/btnViewAllFeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_view_all"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:drawableEnd="@drawable/ic_chevron_right"
+                    android:drawablePadding="4dp"
+                    app:drawableTint="@color/text_secondary"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerFeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:contentDescription="@string/cd_recent_activity_feed"
+                tools:listitem="@layout/item_feed_home"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:menu="@menu/menu_bottom_nav"
+        app:itemIconTint="@color/bottom_nav_icon_tint"
+        app:itemTextColor="@color/bottom_nav_text_tint"
+        app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
+        app:itemRippleColor="@color/bottom_nav_ripple"
+        android:background="@color/white"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

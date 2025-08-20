@@ -1,6 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Alerta</string>
     <string name="content_desc_logo">Alerta logo</string>
+
     <string name="register_title">Create an account</string>
     <string name="register_subtitle">Enter your email and password to sign up for this app</string>
     <string name="hint_email">email@domain.com</string>
@@ -22,5 +24,35 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="sign_in">Sign in to your account</string>
-
+    <string name="status_online">ONLINE</string>
+    <string name="home_location_placeholder">Kraków (PL)</string>
+    <string name="home_time_placeholder">Tue 14:32</string>
+    <string name="bullet_dot">•</string>
+    <string name="content_desc_alert_banner">Regional alert banner</string>
+    <string name="alert_banner_title">⚠ Regional alert: Power outage in District 3</string>
+    <string name="alert_banner_subtitle">Tap to view details &amp; safety tips</string>
+    <string name="content_desc_search_icon">Search</string>
+    <string name="search_hint">Search locations, events, tasks…</string>
+    <string name="content_desc_map_card">Map with live incidents</string>
+    <string name="content_desc_map_container">Map container</string>
+    <string name="cd_add_marker">Add marker</string>
+    <string name="cd_layers">Layers</string>
+    <string name="cd_offline">Offline</string>
+    <string name="legend_red_critical">• Red = CRITICAL</string>
+    <string name="legend_yellow_hazard">• Yellow = HAZARD</string>
+    <string name="legend_blue_info">• Blue = INFO</string>
+    <string name="btn_report_incident">Report incident</string>
+    <string name="btn_create_task">Create task</string>
+    <string name="btn_join_team">Join team</string>
+    <string name="section_my_tasks_today">My tasks (today)</string>
+    <string name="section_activity_feed">Activity feed</string>
+    <string name="action_view_all">View all</string>
+    <string name="cd_list_my_tasks_today">List of my tasks for today</string>
+    <string name="cd_recent_activity_feed">Recent activity feed</string>
+    <string name="cd_task_icon">Task icon</string>
+    <string name="cd_mark_task_done">Mark task done</string>
+    <string name="cd_feed_icon">Feed icon</string>
+    <string name="sample_task_title">[#T-104] Distribute water packs (Team A)</string>
+    <string name="sample_task_time">14:45</string>
+    <string name="sample_feed_text">Fire Dept closed road at Wawelska (15:05)</string>
 </resources>

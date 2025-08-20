@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA">
+    android:background="@color/background">
 
     <ImageView
         android:id="@+id/backgroundWave"
@@ -19,13 +20,13 @@
         android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/login_root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
             android:padding="32dp">
 
-            <!-- Logo -->
             <ImageView
                 android:id="@+id/logoImage"
                 android:layout_width="160dp"
@@ -34,27 +35,25 @@
                 android:src="@drawable/logo_alerta"
                 android:contentDescription="@string/content_desc_logo" />
 
-            <!-- Tytuł -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_in"
                 android:textSize="20sp"
-                android:textColor="#000000"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold"
                 android:fontFamily="@font/inter"
                 android:layout_marginTop="24dp" />
 
-            <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:startIconDrawable="@drawable/ic_email"
-                app:startIconTint="#9E9E9E"
+                app:startIconTint="@color/hint_grey"
                 app:endIconMode="clear_text"
-                app:endIconTint="#9E9E9E">
+                app:endIconTint="@color/hint_grey">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextEmail"
@@ -63,20 +62,19 @@
                     android:hint="@string/email"
                     android:inputType="textEmailAddress"
                     android:textSize="12sp"
-                    android:textColorHint="#9E9E9E"
+                    android:textColorHint="@color/hint_grey"
                     android:fontFamily="@font/inter" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Password -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:startIconDrawable="@drawable/ic_password_lock"
-                app:startIconTint="#9E9E9E"
+                app:startIconTint="@color/hint_grey"
                 app:endIconMode="password_toggle"
-                app:endIconTint="#9E9E9E">
+                app:endIconTint="@color/hint_grey">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextPassword"
@@ -85,11 +83,10 @@
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:textSize="12sp"
-                    android:textColorHint="#9E9E9E"
+                    android:textColorHint="@color/hint_grey"
                     android:fontFamily="@font/inter" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Przycisk logowania -->
             <Button
                 android:id="@+id/buttonLogin"
                 android:layout_width="match_parent"
@@ -99,16 +96,15 @@
                 android:fontFamily="@font/inter"
                 android:layout_marginTop="24dp"
                 android:elevation="1dp"
-                android:backgroundTint="#E53935"
+                android:backgroundTint="@color/alerta_primary"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/white" />
 
-            <!-- Link do rejestracji -->
             <TextView
                 android:id="@+id/textViewRegisterLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/inter" />
