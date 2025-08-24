@@ -1,7 +1,9 @@
 package com.abandiak.alerta;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -19,6 +21,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -31,18 +38,48 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         super.onCreate(savedInstanceState);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        }
+
         setContentView(R.layout.activity_login);
+
+        LinearLayout root = findViewById(R.id.login_root);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    bars.top + v.getPaddingTop(),
+                    v.getPaddingRight(),
+                    bars.bottom + v.getPaddingBottom()
+            );
+            return WindowInsetsCompat.CONSUMED;
+        });
+
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), root);
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(true);
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        // Bindy
         textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         ImageView logo = findViewById(R.id.logoImage);
-        LinearLayout root = findViewById(R.id.login_root);
 
         String baseText = "Don't have an account? ";
         String boldText = "Register";
@@ -54,7 +91,6 @@ public class LoginActivity extends AppCompatActivity {
         spannable.setSpan(new ForegroundColorSpan(red), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         textViewRegisterLink.setText(spannable);
 
-        // Logika logowania
         buttonLogin.setOnClickListener(view -> {
             String email = editTextEmail.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();

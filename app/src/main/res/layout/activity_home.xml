@@ -5,15 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/background"
-        android:theme="@style/ThemeOverlay.Material3.ActionBar">
+        android:theme="@style/ThemeOverlay.Alerta.Toolbar">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
@@ -21,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/menu_top_appbar"
-            app:contentInsetStartWithNavigation="0dp">
+            app:contentInsetStartWithNavigation="0dp"
+            tools:ignore="ExtraText">
 
             <LinearLayout
                 android:id="@+id/brandContainer"
@@ -50,12 +50,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOnline"
-                style="@style/Widget.Material3.Chip.Assist"
+                style="@style/Alerta.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
                 android:text="@string/status_online"
-                android:textSize="11sp"
+                android:textColor="@color/alerta_primary"
+                android:textAppearance="@style/TextAppearance.Alerta.Chip"
                 app:chipMinHeight="22dp"
                 app:chipIcon="@drawable/ic_online_dot"
                 app:chipIconTint="@color/alerta_primary"
@@ -65,8 +66,7 @@
                 app:iconStartPadding="4dp"
                 app:chipBackgroundColor="#1FE53935"
                 app:chipStrokeColor="@color/alerta_primary"
-                app:chipStrokeWidth="1dp"
-                android:textColor="@color/alerta_primary"/>
+                app:chipStrokeWidth="1dp"/>
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -131,7 +131,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAlert"
-                style="@style/Widget.Material3.CardView.Elevated"
+                style="@style/Alerta.Card.Elevated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_md"
@@ -169,13 +169,11 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/searchStub"
-                style="@style/Widget.Material3.CardView.Outlined"
+                style="@style/Alerta.Card.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_default"
                 android:layout_marginTop="@dimen/space_md"
                 app:cardCornerRadius="@dimen/radius_md"
-                app:strokeColor="#424242"
-                app:strokeWidth="1dp"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -208,7 +206,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardMap"
-                style="@style/Widget.Material3.CardView.Elevated"
+                style="@style/Alerta.Card.Elevated"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/map_height"
                 android:layout_marginTop="@dimen/space_md"
@@ -275,7 +273,7 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardLegend"
-                        style="@style/Widget.Material3.CardView.Elevated"
+                        style="@style/Alerta.Card.Elevated"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|start"
