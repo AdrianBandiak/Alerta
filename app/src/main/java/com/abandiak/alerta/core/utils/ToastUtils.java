@@ -1,4 +1,4 @@
-package com.abandiak.alerta;
+package com.abandiak.alerta.core.utils;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -8,7 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.abandiak.alerta.R;
+
 public final class ToastUtils {
+    private static Toast current;
+
     private ToastUtils() { }
 
     public static void show(Context context, String message) {
@@ -20,10 +24,13 @@ public final class ToastUtils {
         text.setText(message);
         icon.setImageResource(R.drawable.logo_alerta);
 
-        Toast toast = new Toast(context.getApplicationContext());
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.setView(layout);
-        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 100);
-        toast.show();
+        if (current != null) {
+            current.cancel();
+        }
+        current = new Toast(context.getApplicationContext());
+        current.setDuration(Toast.LENGTH_SHORT);
+        current.setView(layout);
+        current.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 100);
+        current.show();
     }
 }

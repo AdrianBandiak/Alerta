@@ -1,4 +1,4 @@
-package com.abandiak.alerta;
+package com.abandiak.alerta.app.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +10,15 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.abandiak.alerta.R;
+import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -37,9 +42,9 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton = findViewById(R.id.registerButton);
 
         registerButton.setOnClickListener(v -> {
-            String email = emailInput.getText().toString().trim();
-            String password = passwordInput.getText().toString().trim();
-            String confirmPassword = confirmPasswordInput.getText().toString().trim();
+            String email = safeText(emailInput).toLowerCase(Locale.US);
+            String password = safeText(passwordInput);
+            String confirmPassword = safeText(confirmPasswordInput);
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
                 ToastUtils.show(this, getString(R.string.fill_all_fields));
@@ -61,23 +66,27 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            registerButton.setEnabled(false);
+
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
                         if (authResult.getUser() == null) {
                             Log.e(TAG, "User is null after registration");
                             ToastUtils.show(this, getString(R.string.data_save_error));
+                            registerButton.setEnabled(true);
                             return;
                         }
                         String userId = authResult.getUser().getUid();
                         HashMap<String, Object> userMap = new HashMap<>();
                         userMap.put("email", email);
                         userMap.put("role", "user");
+                        userMap.put("createdAt", System.currentTimeMillis());
 
                         firestore.collection("users").document(userId)
-                                .set(userMap)
+                                .set(userMap, SetOptions.merge())
                                 .addOnSuccessListener(unused -> {
                                     ToastUtils.show(this, getString(R.string.account_created));
-                                    Intent intent = new Intent(this, LoginActivity.class);
+                                    Intent intent = new Intent(this, HomeActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
@@ -85,11 +94,13 @@ public class RegisterActivity extends AppCompatActivity {
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "Firestore error: ", e);
                                     ToastUtils.show(this, getString(R.string.data_save_error));
+                                    registerButton.setEnabled(true);
                                 });
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "Registration failed: ", e);
                         ToastUtils.show(this, getString(R.string.registration_failed, e.getMessage()));
+                        registerButton.setEnabled(true);
                     });
         });
     }
@@ -99,6 +110,10 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isValidPassword(String password) {
-        return password.length() >= 6 && password.matches("^(?=.*[a-zA-Z])(?=.*\\d).+$");
+        return password.length() >= 8 && password.matches("^(?=.*[a-zA-Z])(?=.*\\d).+$");
+    }
+
+    private static String safeText(EditText e) {
+        return e.getText() == null ? "" : e.getText().toString().trim();
     }
 }

@@ -1,4 +1,4 @@
-package com.abandiak.alerta;
+package com.abandiak.alerta.app.auth;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,13 +27,17 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import com.abandiak.alerta.R;
+import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.core.utils.ToastUtils;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
     private TextView textViewRegisterLink;
     private FirebaseAuth firebaseAuth;
-    private TextView editTextEmail, editTextPassword;
+    private TextInputEditText editTextEmail, editTextPassword;
     private Button buttonLogin;
 
     @Override
@@ -92,8 +96,8 @@ public class LoginActivity extends AppCompatActivity {
         textViewRegisterLink.setText(spannable);
 
         buttonLogin.setOnClickListener(view -> {
-            String email = editTextEmail.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
+            String email = safeText(editTextEmail);
+            String password = safeText(editTextPassword);
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
                 ToastUtils.show(this, "Please enter email and password.");
@@ -104,15 +108,17 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
+            buttonLogin.setEnabled(false);
+
             firebaseAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            ToastUtils.show(this, "Login successful.");
-                            startActivity(new Intent(this, HomeActivity.class));
-                            finish();
-                        } else {
-                            ToastUtils.show(this, "Login failed: Invalid credentials.");
-                        }
+                    .addOnSuccessListener(authResult -> {
+                        ToastUtils.show(this, "Login successful.");
+                        startActivity(new Intent(this, HomeActivity.class));
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        ToastUtils.show(this, "Login failed: Invalid credentials.");
+                        buttonLogin.setEnabled(true);
                     });
         });
 
@@ -125,5 +131,9 @@ public class LoginActivity extends AppCompatActivity {
         logo.setVisibility(View.VISIBLE);
         root.setVisibility(View.VISIBLE);
         root.startAnimation(fadeIn);
+    }
+
+    private static String safeText(TextInputEditText edit) {
+        return edit.getText() == null ? "" : edit.getText().toString().trim();
     }
 }

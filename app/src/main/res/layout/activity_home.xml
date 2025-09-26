@@ -227,50 +227,6 @@
                         android:background="#FFF0F0F0"
                         android:contentDescription="@string/content_desc_map_container"/>
 
-                    <LinearLayout
-                        android:id="@+id/map_quick_actions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:orientation="vertical"
-                        android:layout_margin="@dimen/space_md"
-                        android:gravity="end">
-
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/btnAddMarkerFab"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:fabSize="mini"
-                            app:fabCustomSize="36dp"
-                            app:maxImageSize="18dp"
-                            android:contentDescription="@string/cd_add_marker"
-                            app:srcCompat="@drawable/ic_add"
-                            app:tint="@color/alerta_primary"
-                            app:backgroundTint="@color/white"/>
-
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/btnLayersFab"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:fabSize="mini"
-                            app:fabCustomSize="36dp"
-                            app:maxImageSize="18dp"
-                            android:layout_marginTop="@dimen/space_sm"
-                            android:contentDescription="@string/cd_layers"
-                            app:srcCompat="@drawable/ic_layers"/>
-
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/btnOfflineFab"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:fabSize="mini"
-                            app:fabCustomSize="36dp"
-                            app:maxImageSize="18dp"
-                            android:layout_marginTop="@dimen/space_sm"
-                            android:contentDescription="@string/cd_offline"
-                            app:srcCompat="@drawable/ic_download"/>
-                    </LinearLayout>
-
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardLegend"
                         style="@style/Alerta.Card.Elevated"
