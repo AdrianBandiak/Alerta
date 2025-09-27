@@ -6,56 +6,45 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
 public class IncidentItem implements ClusterItem {
-    private final LatLng position;
+
+    private final String id;
     private final String title;
     private final String snippet;
-    private final String id;
+    private final LatLng position;
     private final String type;
-    @Nullable
-    private final Float zIndex;
+    @Nullable private final String photoUrl;
 
-    public IncidentItem(String id, String title, String snippet, double lat, double lng, String type) {
+    public IncidentItem(String id,
+                        String title,
+                        String snippet,
+                        double lat,
+                        double lng,
+                        String type,
+                        @Nullable String photoUrl) {
         this.id = id;
         this.title = title;
         this.snippet = snippet;
         this.position = new LatLng(lat, lng);
         this.type = type;
-
-        if ("CRITICAL".equals(type)) {
-            this.zIndex = 2f;
-        } else if ("HAZARD".equals(type)) {
-            this.zIndex = 1f;
-        } else {
-            this.zIndex = 0f;
-        }
+        this.photoUrl = photoUrl;
     }
 
-    @Override
-    public LatLng getPosition() {
-        return position;
+    public IncidentItem(String id,
+                        String title,
+                        String snippet,
+                        double lat,
+                        double lng,
+                        String type) {
+        this(id, title, snippet, lat, lng, type, null);
     }
 
-    @Override
-    public String getTitle() {
-        return title;
-    }
+    @Override public LatLng getPosition() { return position; }
+    @Override public String getTitle()    { return title; }
+    @Override public String getSnippet()  { return snippet; }
+    @Override public Float getZIndex()    { return 0f; }
 
-    @Override
-    public String getSnippet() {
-        return snippet;
-    }
-
-    @Override
+    public String getId()       { return id; }
+    public String getType()     { return type; }
     @Nullable
-    public Float getZIndex() {
-        return zIndex;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
+    public String getPhotoUrl() { return photoUrl; }
 }

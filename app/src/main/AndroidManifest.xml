@@ -3,10 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.abandiak.alerta">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:targetApi="33" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
@@ -23,6 +37,16 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.Alerta">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -46,27 +70,21 @@
         <activity
             android:name=".app.map.MapActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.tasks.TasksActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.teams.TeamsActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.more.MoreActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.home.HomeActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.auth.RegisterActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.auth.LoginActivity"
             android:exported="true">

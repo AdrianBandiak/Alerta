@@ -5,29 +5,36 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.app.map.cluster.IncidentItem;
+import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
-import com.abandiak.alerta.app.map.cluster.IncidentItem;
-import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
 import com.abandiak.alerta.core.utils.ToastUtils;
+import com.abandiak.alerta.data.model.Incident;
 import com.abandiak.alerta.data.repository.IncidentRepository;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,6 +44,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,6 +53,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -62,7 +74,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fused;
 
     private final ActivityResultLauncher<String[]> locationPermsLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onPermissionsResult);
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onLocationPermissionsResult);
+
+    private final ActivityResultLauncher<String> storagePermLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (!granted) ToastUtils.show(this, "Storage permission denied");
+            });
+
+    private final ActivityResultLauncher<String> cameraPermLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) launchCamera();
+                else ToastUtils.show(this, "Camera permission denied");
+            });
+
+    private Uri pickedPhotoUri = null;
+    private Uri cameraOutputUri = null;
+
+    private final ActivityResultLauncher<String> pickImage =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) pickedPhotoUri = uri;
+            });
+
+    private final ActivityResultLauncher<Uri> takePicture =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
+                if (Boolean.TRUE.equals(success)) {
+                    pickedPhotoUri = cameraOutputUri;
+                } else {
+                    pickedPhotoUri = null;
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,10 +143,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment frag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (frag != null) frag.getMapAsync(this);
 
-        findViewById(R.id.filter_all).setOnClickListener(v -> setFilter("ALL"));
-        findViewById(R.id.filter_info).setOnClickListener(v -> setFilter("INFO"));
-        findViewById(R.id.filter_hazard).setOnClickListener(v -> setFilter("HAZARD"));
-        findViewById(R.id.filter_critical).setOnClickListener(v -> setFilter("CRITICAL"));
+        ChipGroup chips = findViewById(R.id.chips_filters);
+        chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds == null || checkedIds.isEmpty()) return;
+            int id = checkedIds.get(0);
+
+            if (id == R.id.chip_all) {
+                setFilter("ALL");
+            } else if (id == R.id.chip_info) {
+                setFilter("INFO");
+            } else if (id == R.id.chip_hazard) {
+                setFilter("HAZARD");
+            } else if (id == R.id.chip_critical) {
+                setFilter("CRITICAL");
+            }
+        });
 
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
         fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
@@ -125,6 +176,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setOnCameraIdleListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
 
+        clusterManager.setOnClusterItemClickListener(item -> {
+            showIncidentDetails(item);
+            return true;
+        });
 
         ensureLocationPermission();
         subscribeIncidents();
@@ -144,7 +199,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         clusterManager.clearItems();
         clusterManager.cluster();
 
-        registration = incidentRepo.listenIncidents(currentRegion, "ALL".equals(currentType) ? null : currentType,
+        registration = incidentRepo.listenVisibleIncidentsForCurrentUser(
+                "ALL".equals(currentType) ? null : currentType,
+                /*regionBucket*/ null,
+                /*region*/ currentRegion,
                 (QuerySnapshot snapshots, com.google.firebase.firestore.FirebaseFirestoreException e) -> {
                     if (e != null) {
                         ToastUtils.show(this, "Error loading incidents: " + e.getMessage());
@@ -154,24 +212,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     clusterManager.clearItems();
                     for (DocumentSnapshot d : snapshots.getDocuments()) {
-                        String id = d.getId();
-                        String title = d.getString("title");
-                        String desc = d.getString("description");
-                        String type = d.getString("type");
-                        Double lat = d.getDouble("lat");
-                        Double lng = d.getDouble("lng");
+                        String id     = d.getId();
+                        String title  = d.getString("title");
+                        String desc   = d.getString("description");
+                        String type   = d.getString("type");
+                        Double lat    = d.getDouble("lat");
+                        Double lng    = d.getDouble("lng");
+                        String photo  = d.getString("photoUrl");
                         if (title == null || type == null || lat == null || lng == null) continue;
-                        clusterManager.addItem(new IncidentItem(
-                                id, title, desc == null ? "" : desc, lat, lng, type
-                        ));
+
+                        IncidentItem item = new IncidentItem(
+                                id,
+                                title,
+                                desc == null ? "" : desc,
+                                lat,
+                                lng,
+                                type,
+                                photo
+                        );
+                        clusterManager.addItem(item);
                     }
                     clusterManager.cluster();
                 });
     }
 
-
     private void openCreateIncidentSheet() {
         if (map == null) return;
+
+        pickedPhotoUri = null;
 
         final BottomSheetDialog dialog = new BottomSheetDialog(this);
         final View sheet = LayoutInflater.from(this).inflate(R.layout.dialog_incident_create, null, false);
@@ -180,9 +248,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final TextInputEditText inputTitle = sheet.findViewById(R.id.input_title);
         final TextInputEditText inputDescription = sheet.findViewById(R.id.input_description);
         final AutoCompleteTextView inputType = sheet.findViewById(R.id.input_type);
+        final TextView coordsValue = sheet.findViewById(R.id.coords_value);
+        final View btnAddPhoto = sheet.findViewById(R.id.btn_add_photo);
+        final ImageView imgPreview = sheet.findViewById(R.id.img_preview);
 
         String[] types = new String[]{"INFO", "HAZARD", "CRITICAL"};
         inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+
+        LatLng target = map.getCameraPosition().target;
+        if (coordsValue != null) {
+            coordsValue.setText(String.format(Locale.US, "lat: %.6f, lng: %.6f", target.latitude, target.longitude));
+        }
+
+        if (btnAddPhoto != null) {
+            btnAddPhoto.setOnClickListener(v -> showPhotoSourceChooser(imgPreview));
+        }
 
         sheet.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
         sheet.findViewById(R.id.btn_save).setOnClickListener(v -> {
@@ -195,17 +275,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
 
-            LatLng target = map.getCameraPosition().target;
-
-            String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null
+            LatLng t = map.getCameraPosition().target;
+            String uid = FirebaseAuth.getInstance().getCurrentUser() != null
                     ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
 
-            com.abandiak.alerta.data.model.Incident inc =
-                    new com.abandiak.alerta.data.model.Incident(
-                            title, desc, type, target.latitude, target.longitude, currentRegion, uid
-                    );
+            Incident inc = new Incident(title, desc, type, t.latitude, t.longitude, currentRegion, uid);
+            Map<String, Object> data = inc.toMap();
+            if (pickedPhotoUri != null) {
+                data.put("photoUrl", pickedPhotoUri.toString());
+            }
 
-            incidentRepo.createIncident(inc.toMap())
+            incidentRepo.createIncident(data)
                     .addOnSuccessListener(ref -> {
                         ToastUtils.show(this, "Incident created");
                         dialog.dismiss();
@@ -215,9 +295,119 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     });
         });
 
+        if (imgPreview != null && pickedPhotoUri != null) {
+            imgPreview.setImageURI(pickedPhotoUri);
+            imgPreview.setVisibility(View.VISIBLE);
+        }
+
         dialog.show();
     }
 
+    private void showPhotoSourceChooser(ImageView preview) {
+        String[] items = new String[] { "Take photo", "Pick from gallery" };
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.incident_attach_photo)
+                .setItems(items, (d, which) -> {
+                    if (which == 0) requestCameraThenLaunch(preview);
+                    else requestStorageThenPick(preview);
+                })
+                .show();
+    }
+
+    private void requestStorageThenPick(ImageView preview) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            pickImage.launch("image/*");
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            pickImage.launch("image/*");
+        } else {
+            storagePermLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+    }
+
+    private void requestCameraThenLaunch(ImageView preview) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            launchCamera();
+        } else {
+            cameraPermLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void launchCamera() {
+        cameraOutputUri = createImageUriForCamera();
+        if (cameraOutputUri == null) {
+            ToastUtils.show(this, "Cannot create image file");
+            return;
+        }
+        takePicture.launch(cameraOutputUri);
+    }
+
+    private Uri createImageUriForCamera() {
+        try {
+            File dir = new File(getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES), "Alerta");
+            if (!dir.exists() && !dir.mkdirs()) return null;
+
+            String time = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            File img = new File(dir, "IMG_" + time + ".jpg");
+            return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", img);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void showIncidentDetails(@NonNull IncidentItem item) {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View content = getLayoutInflater().inflate(R.layout.bottomsheet_incident_details, null, false);
+        dialog.setContentView(content);
+
+        ImageView img = content.findViewById(R.id.img);
+        TextView title = content.findViewById(R.id.title);
+        TextView desc = content.findViewById(R.id.desc);
+        com.google.android.material.chip.Chip chipType = content.findViewById(R.id.chipType);
+        TextView coordsWgs = content.findViewById(R.id.coords_wgs);
+
+        title.setText(item.getTitle());
+        desc.setText(item.getSnippet() == null ? "" : item.getSnippet());
+        chipType.setText(item.getType());
+
+        int color;
+        switch (String.valueOf(item.getType())) {
+            case "CRITICAL": color = ContextCompat.getColor(this, R.color.red_700); break;
+            case "HAZARD":   color = ContextCompat.getColor(this, R.color.amber_700); break;
+            default:         color = ContextCompat.getColor(this, R.color.blue_700); break;
+        }
+        chipType.setTextColor(color);
+
+        double lat = item.getPosition().latitude;
+        double lng = item.getPosition().longitude;
+        coordsWgs.setText(String.format(Locale.US, "WGS-84:  lat %.6f,  lng %.6f", lat, lng));
+
+        if (item.getPhotoUrl() != null && !item.getPhotoUrl().isEmpty()) {
+            img.setVisibility(View.VISIBLE);
+            Glide.with(this).load(item.getPhotoUrl()).into(img);
+        } else {
+            img.setVisibility(View.GONE);
+        }
+
+        content.findViewById(R.id.btnNavigate).setOnClickListener(v -> {
+            Uri gmm = Uri.parse("geo:0,0?q=" + lat + "," + lng + "(" + Uri.encode(item.getTitle()) + ")");
+            startActivity(new Intent(Intent.ACTION_VIEW, gmm));
+        });
+
+        content.findViewById(R.id.btnShare).setOnClickListener(v -> {
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_TEXT,
+                    item.getTitle() + "\n" +
+                            String.format(Locale.US, "WGS-84: %.6f, %.6f", lat, lng));
+            startActivity(Intent.createChooser(share, "Share incident"));
+        });
+
+        dialog.show();
+    }
 
     private void ensureLocationPermission() {
         boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -243,7 +433,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void onPermissionsResult(Map<String, Boolean> result) {
+    private void onLocationPermissionsResult(Map<String, Boolean> result) {
         boolean grantedFine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
         boolean grantedCoarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
         if (grantedFine || grantedCoarse) {

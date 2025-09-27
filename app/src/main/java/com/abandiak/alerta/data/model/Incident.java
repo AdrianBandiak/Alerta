@@ -29,9 +29,13 @@ public class Incident {
     @Nullable private String geohash;
     @Nullable private String regionBucket;
 
+    @Nullable private String photoUrl;
+
     @ServerTimestamp
     private Date createdAt;
 
+    @SuppressWarnings("unused")
+    public Incident() { }
 
     public Incident(String title,
                     String description,
@@ -41,7 +45,7 @@ public class Incident {
                     String region,
                     String createdBy) {
         this(title, description, type, null, lat, lng, region, createdBy,
-                new ArrayList<>(Collections.singletonList("public")));
+                new ArrayList<>(Collections.singletonList("public")), null);
     }
 
     public Incident(String title,
@@ -53,6 +57,19 @@ public class Incident {
                     String region,
                     String createdBy,
                     List<String> aud) {
+        this(title, description, type, geohash, lat, lng, region, createdBy, aud, null);
+    }
+
+    public Incident(String title,
+                    String description,
+                    String type,
+                    @Nullable String geohash,
+                    double lat,
+                    double lng,
+                    String region,
+                    String createdBy,
+                    List<String> aud,
+                    @Nullable String photoUrl) {
         this.title = title;
         this.description = description;
         this.type = type;
@@ -62,6 +79,7 @@ public class Incident {
         this.region = region;
         this.createdBy = createdBy;
         this.aud = (aud == null) ? new ArrayList<>() : new ArrayList<>(aud);
+        this.photoUrl = photoUrl;
     }
 
     public Map<String, Object> toMap() {
@@ -76,8 +94,10 @@ public class Incident {
         m.put("aud", (aud == null || aud.isEmpty())
                 ? Collections.singletonList("public")
                 : aud);
-        if (geohash != null)     m.put("geohash", geohash);
+
+        if (geohash != null)      m.put("geohash", geohash);
         if (regionBucket != null) m.put("regionBucket", regionBucket);
+        if (photoUrl != null)     m.put("photoUrl", photoUrl);
 
         m.put("createdAt", FieldValue.serverTimestamp());
         return m;
@@ -96,9 +116,11 @@ public class Incident {
     public List<String> getAud() { return aud; }
     @Nullable public String getGeohash() { return geohash; }
     @Nullable public String getRegionBucket() { return regionBucket; }
+    @Nullable public String getPhotoUrl() { return photoUrl; }
     public Date getCreatedAt() { return createdAt; }
 
     public void setAud(List<String> aud) { this.aud = aud; }
     public void setGeohash(@Nullable String geohash) { this.geohash = geohash; }
     public void setRegionBucket(@Nullable String regionBucket) { this.regionBucket = regionBucket; }
+    public void setPhotoUrl(@Nullable String photoUrl) { this.photoUrl = photoUrl; }
 }

@@ -6,18 +6,11 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/hint_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hint_location_based_on_center"
-        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-        android:paddingBottom="8dp"/>
-
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/incident_title">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_title"
             android:layout_width="match_parent"
@@ -27,8 +20,9 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/incident_description"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:hint="@string/incident_description">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_description"
             android:layout_width="match_parent"
@@ -39,9 +33,9 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/incident_type"
         android:layout_marginTop="8dp"
-        app:endIconMode="dropdown_menu">
+        android:hint="@string/incident_type">
+
         <AutoCompleteTextView
             android:id="@+id/input_type"
             android:layout_width="match_parent"
@@ -50,54 +44,50 @@
 
     <TextView
         android:id="@+id/coords_value"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="lat: 0.000000, lng: 0.000000"
-        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:text="@string/hint_location_based_on_center"/>
+
+    <ImageView
+        android:id="@+id/img_preview"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_image_placeholder"
+        android:visibility="gone"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_add_photo"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/action_add_photo"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_add_photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add photo" />
-
-        <ImageView
-            android:id="@+id/img_preview"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginStart="16dp"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            android:background="@drawable/bg_image_placeholder"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="16dp">
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/action_cancel" />
+            android:layout_weight="1"
+            android:text="@string/action_cancel"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save"
-            android:layout_width="wrap_content"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/action_save"
-            android:layout_marginStart="16dp"/>
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/action_save"/>
     </LinearLayout>
 
 </LinearLayout>

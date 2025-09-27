@@ -8,7 +8,6 @@
     <string name="hint_email">email@domain.com</string>
     <string name="hint_password">********</string>
     <string name="register_button_text">Continue</string>
-
     <string name="fill_all_fields">Please fill in all fields</string>
     <string name="invalid_email">Invalid email address</string>
     <string name="invalid_password">Password must be at least 6 characters and contain letters and digits</string>
@@ -24,10 +23,12 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="sign_in">Sign in to your account</string>
+
     <string name="status_online">ONLINE</string>
     <string name="home_location_placeholder">Kraków (PL)</string>
     <string name="home_time_placeholder">Tue 14:32</string>
     <string name="bullet_dot">•</string>
+
     <string name="content_desc_alert_banner">Regional alert banner</string>
     <string name="alert_banner_title">⚠ Regional alert: Power outage in District 3</string>
     <string name="alert_banner_subtitle">Tap to view details &amp; safety tips</string>
@@ -55,19 +56,54 @@
     <string name="sample_task_title">[#T-104] Distribute water packs (Team A)</string>
     <string name="sample_task_time">14:45</string>
     <string name="sample_feed_text">Fire Dept closed road at Wawelska (15:05)</string>
+
     <string name="map_filters_all">ALL</string>
     <string name="map_filters_info">INFO</string>
     <string name="map_filters_hazard">HAZARD</string>
     <string name="map_filters_critical">CRITICAL</string>
     <string name="cd_center_pin">Center pin</string>
     <string name="tip_move_map_pick">Move the map to choose a location</string>
+
+    <string name="incident_add_title">Report incident</string>
     <string name="incident_title">Title</string>
     <string name="incident_description">Description</string>
     <string name="incident_type">Type</string>
+
     <string name="hint_location_based_on_center">Location will be taken from the map center</string>
+    <string name="incident_location_hint">Location will be taken from the map center</string>
+
+    <string name="incident_coords">Coordinates</string>
+    <string name="incident_attach_photo">Attach photo</string>
+    <string name="incident_change_photo">Change photo</string>
+
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
+    <string name="incident_cancel">Cancel</string>
+    <string name="incident_save">Save</string>
+
     <string name="incident_invalid">Fill title and type</string>
     <string name="incident_saved_preview">Preview added (not saved yet)</string>
+
+    <string-array name="incident_types">
+        <item>INFO</item>
+        <item>HAZARD</item>
+        <item>CRITICAL</item>
+    </string-array>
+
+    <string name="incident_desc">Incident description</string>
+    <string name="action_add_photo">Add photo</string>
+    <string name="action_take_photo">Take photo</string>
+    <string name="action_choose_from_gallery">Choose from gallery</string>
+    <string name="photo_attached">Photo attached</string>
+    <string name="photo_removed">Photo removed</string>
+
+    <string name="photo_source">Add photo</string>
+    <string name="photo_take">Take photo</string>
+    <string name="photo_pick">Choose from gallery</string>
+    <string name="photo_added">Photo attached</string>
+    <string name="camera_permission_rationale">Camera permission is needed to take a photo.</string>
+
+    <string name="navigation">Navigate</string>
+    <string name="share">Share</string>
 
 </resources>
