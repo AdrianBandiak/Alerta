@@ -152,8 +152,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/white"
+        android:fitsSystemWindows="false"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
-        app:itemRippleColor="@color/bottom_nav_ripple"/>
+        app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
+        app:itemRippleColor="@color/bottom_nav_ripple" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -5,7 +5,13 @@
         <item name="colorPrimary">#E53935</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorPrimaryContainer">#FFCDD2</item>
-        <item name="colorSecondary">#E53935</item>
+
+        <item name="colorSecondary">#FF8F00</item>
+        <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondaryContainer">#FFE0B2</item>
+
+        <item name="colorTertiary">#1565C0</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
 
         <item name="fontFamily">@font/inter</item>
         <item name="android:fontFamily">@font/inter</item>
@@ -19,8 +25,8 @@
         <item name="buttonStyle">@style/Widget.Material3.Button</item>
 
         <item name="chipStyle">@style/Alerta.Chip</item>
-
         <item name="materialCardViewStyle">@style/Alerta.Card.Base</item>
+        <item name="floatingActionButtonStyle">@style/Alerta.FAB</item>
     </style>
 
     <style name="ThemeOverlay.Alerta.Toolbar" parent="ThemeOverlay.Material3.ActionBar">
@@ -43,7 +49,7 @@
     <style name="Alerta.Chip" parent="Widget.Material3.Chip.Assist">
         <item name="android:textAppearance">@style/TextAppearance.Alerta.Chip</item>
         <item name="chipIconVisible">false</item>
-        <item name="rippleColor">?attr/colorPrimary</item>
+        <item name="rippleColor">@color/outline</item>
     </style>
 
     <style name="Alerta.Card.Base" parent="Widget.Material3.CardView.Elevated">
@@ -65,5 +71,43 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="android:alpha">0</item>
     </style>
+
+    <style name="Alerta.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">@color/amber_700</item>
+        <item name="tint">@android:color/white</item>
+        <item name="rippleColor">@color/outline</item>
+    </style>
+
+    <style name="Alerta.Button.Amber" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/amber_700</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="rippleColor">@color/outline</item>
+    </style>
+
+    <style name="Alerta.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/amber_700</item>
+        <item name="rippleColor">@color/outline</item>
+    </style>
+
+    <style name="Alerta.BottomNav.ActiveIndicator" parent="">
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <style name="Alerta.TextInputLayout.Amber" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/amber_700</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="cursorColor">@color/amber_700</item>
+        <item name="hintTextColor">@color/amber_700</item>
+        <item name="startIconTint">@color/amber_700</item>
+        <item name="endIconTint">@color/amber_700</item>
+        <item name="colorControlActivated">@color/amber_700</item>
+    </style>
+
+
 
 </resources>

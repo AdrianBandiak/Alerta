@@ -105,5 +105,17 @@
 
     <string name="navigation">Navigate</string>
     <string name="share">Share</string>
+    <string name="location_unavailable">Location unavailable</string>
 
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="choose">Choose</string>
+    <string name="gps">GPS</string>
+    <string name="map">Map</string>
+    <string name="photo">Photo</string>
+    <string name="remove">Remove</string>
+    <string name="location">Location</string>
+    <string name="incident_create_title">New incident</string>
+    <string name="incident_create_subtitle">Location will be taken from the map center</string>
+    <string name="incident_add_photo">Add photo</string>
 </resources>

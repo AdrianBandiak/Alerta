@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,8 +13,8 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,6 +49,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -75,7 +77,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private FusedLocationProviderClient fused;
 
-    // --- permissions
     private final ActivityResultLauncher<String[]> locationPermsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onLocationPermissionsResult);
 
@@ -90,10 +91,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 else ToastUtils.show(this, "Camera permission denied");
             });
 
-    // --- photo state
     private Uri pickedPhotoUri = null;
     private Uri cameraOutputUri = null;
-    private ImageView currentPhotoPreview = null; // aktualny podgląd w bottom-sheet
+    private ImageView currentPhotoPreview = null;
 
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -108,7 +108,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (Boolean.TRUE.equals(success)) {
                     pickedPhotoUri = cameraOutputUri;
                     updatePreview();
-                    scanIfNeeded(cameraOutputUri); // dla <29
+                    scanIfNeeded(cameraOutputUri);
                 } else {
                     pickedPhotoUri = null;
                     updatePreview();
@@ -123,7 +123,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fused = LocationServices.getFusedLocationProviderClient(this);
         incidentRepo = new IncidentRepository();
 
-        // bottom nav
         bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_map);
@@ -152,17 +151,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
         }
 
-        // map
         SupportMapFragment frag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (frag != null) frag.getMapAsync(this);
 
-        // chips
         ChipGroup chips = findViewById(R.id.chips_filters);
         if (chips != null) {
             chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
                 if (checkedIds == null || checkedIds.isEmpty()) return;
                 int id = checkedIds.get(0);
-                if (id == R.id.chip_all)      setFilter("ALL");
+                if (id == R.id.chip_all) setFilter("ALL");
                 else if (id == R.id.chip_info) setFilter("INFO");
                 else if (id == R.id.chip_hazard) setFilter("HAZARD");
                 else if (id == R.id.chip_critical) setFilter("CRITICAL");
@@ -170,13 +167,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
-        fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
+        if (fabAdd != null) {
+            fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
+            fabAdd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.amber_700)));
+            fabAdd.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
+            raiseFabAboveBottomNav(fabAdd);
+        }
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(50.0614, 19.9366), 11f));
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(true);
@@ -185,7 +186,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         clusterManager.setRenderer(new IncidentRenderer(this, map, clusterManager));
         map.setOnCameraIdleListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
-
         clusterManager.setOnClusterItemClickListener(item -> {
             showIncidentDetails(item);
             return true;
@@ -193,6 +193,106 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         ensureLocationPermission();
         subscribeIncidents();
+    }
+
+    private void raiseFabAboveBottomNav(@NonNull View fab) {
+        View nav = bottomNav;
+        fab.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int navH = nav != null ? nav.getHeight() : 0;
+                int extra = dp(16);
+                android.view.ViewGroup.LayoutParams lp = fab.getLayoutParams();
+                if (lp instanceof android.view.ViewGroup.MarginLayoutParams) {
+                    android.view.ViewGroup.MarginLayoutParams mlp = (android.view.ViewGroup.MarginLayoutParams) lp;
+                    mlp.setMargins(mlp.leftMargin, mlp.topMargin, mlp.rightMargin, navH + dp(24) + extra);
+                    fab.setLayoutParams(mlp);
+                }
+                fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+    }
+
+    private int dp(int v) {
+        float d = getResources().getDisplayMetrics().density;
+        return Math.round(v * d);
+    }
+
+    private void openCreateIncidentSheet() {
+        pickedPhotoUri = null;
+        final BottomSheetDialog dialog = new BottomSheetDialog(this);
+        final View sheet = LayoutInflater.from(this).inflate(R.layout.dialog_incident_create, null, false);
+        dialog.setContentView(sheet);
+
+        sheet.findViewById(R.id.btn_close).setOnClickListener(v -> dialog.dismiss());
+
+        final TextInputEditText inputTitle = sheet.findViewById(R.id.input_title);
+        final TextInputEditText inputDescription = sheet.findViewById(R.id.input_description);
+        final MaterialAutoCompleteTextView inputType = sheet.findViewById(R.id.input_type);
+        final TextInputEditText inputLat = sheet.findViewById(R.id.input_lat);
+        final TextInputEditText inputLng = sheet.findViewById(R.id.input_lng);
+        final View btnAddPhoto = sheet.findViewById(R.id.btn_add_photo);
+        final ImageView imgPreview = sheet.findViewById(R.id.img_preview);
+        final View btnRemovePhoto = sheet.findViewById(R.id.btn_remove_photo);
+
+        String[] types = new String[]{"INFO", "HAZARD", "CRITICAL"};
+        inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+
+        LatLng target = map.getCameraPosition().target;
+        inputLat.setText(String.format(Locale.US, "%.6f", target.latitude));
+        inputLng.setText(String.format(Locale.US, "%.6f", target.longitude));
+
+        btnAddPhoto.setOnClickListener(v -> {
+            currentPhotoPreview = imgPreview;
+            showPhotoSourceChooser();
+        });
+
+        btnRemovePhoto.setOnClickListener(v -> {
+            pickedPhotoUri = null;
+            updatePreview();
+        });
+
+        sheet.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
+        sheet.findViewById(R.id.btn_save).setOnClickListener(v -> {
+            String title = inputTitle.getText() != null ? inputTitle.getText().toString().trim() : "";
+            String desc = inputDescription.getText() != null ? inputDescription.getText().toString().trim() : "";
+            String type = inputType.getText() != null ? inputType.getText().toString().trim() : "";
+            String slat = inputLat.getText() != null ? inputLat.getText().toString().trim() : "";
+            String slng = inputLng.getText() != null ? inputLng.getText().toString().trim() : "";
+
+            if (title.isEmpty() || type.isEmpty() || slat.isEmpty() || slng.isEmpty()) {
+                ToastUtils.show(this, getString(R.string.incident_invalid));
+                return;
+            }
+
+            double lat;
+            double lng;
+            try {
+                lat = Double.parseDouble(slat);
+                lng = Double.parseDouble(slng);
+            } catch (Exception ex) {
+                ToastUtils.show(this, getString(R.string.incident_invalid));
+                return;
+            }
+
+            String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                    ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
+
+            Incident inc = new Incident(title, desc, type, lat, lng, currentRegion, uid);
+            Map<String, Object> data = inc.toMap();
+            if (pickedPhotoUri != null) data.put("photoUrl", pickedPhotoUri.toString());
+
+            incidentRepo.createIncident(data)
+                    .addOnSuccessListener(ref -> {
+                        ToastUtils.show(this, "Incident created");
+                        dialog.dismiss();
+                    })
+                    .addOnFailureListener(e -> {
+                        ToastUtils.show(this, "Create failed: " + e.getMessage());
+                    });
+        });
+
+        dialog.show();
     }
 
     private void setFilter(String type) {
@@ -205,109 +305,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void subscribeIncidents() {
         if (registration != null) { registration.remove(); registration = null; }
         if (map == null || clusterManager == null) return;
-
         clusterManager.clearItems();
         clusterManager.cluster();
 
         registration = incidentRepo.listenVisibleIncidentsForCurrentUser(
                 "ALL".equals(currentType) ? null : currentType,
-                /*regionBucket*/ null,
-                /*region*/ currentRegion,
+                null,
+                currentRegion,
                 (QuerySnapshot snapshots, com.google.firebase.firestore.FirebaseFirestoreException e) -> {
                     if (e != null) {
                         ToastUtils.show(this, "Error loading incidents: " + e.getMessage());
                         return;
                     }
                     if (snapshots == null) return;
-
                     clusterManager.clearItems();
                     for (DocumentSnapshot d : snapshots.getDocuments()) {
-                        String id     = d.getId();
-                        String title  = d.getString("title");
-                        String desc   = d.getString("description");
-                        String type   = d.getString("type");
-                        Double lat    = d.getDouble("lat");
-                        Double lng    = d.getDouble("lng");
-                        String photo  = d.getString("photoUrl");
+                        String id = d.getId();
+                        String title = d.getString("title");
+                        String desc = d.getString("description");
+                        String type = d.getString("type");
+                        Double lat = d.getDouble("lat");
+                        Double lng = d.getDouble("lng");
+                        String photo = d.getString("photoUrl");
                         if (title == null || type == null || lat == null || lng == null) continue;
-
-                        IncidentItem item = new IncidentItem(
-                                id, title, desc == null ? "" : desc, lat, lng, type, photo
-                        );
+                        IncidentItem item = new IncidentItem(id, title, desc == null ? "" : desc, lat, lng, type, photo);
                         clusterManager.addItem(item);
                     }
                     clusterManager.cluster();
                 });
     }
 
-    private void openCreateIncidentSheet() {
-        if (map == null) return;
-
-        pickedPhotoUri = null;
-
-        final BottomSheetDialog dialog = new BottomSheetDialog(this);
-        final View sheet = LayoutInflater.from(this).inflate(R.layout.dialog_incident_create, null, false);
-        dialog.setContentView(sheet);
-
-        final TextInputEditText inputTitle = sheet.findViewById(R.id.input_title);
-        final TextInputEditText inputDescription = sheet.findViewById(R.id.input_description);
-        final AutoCompleteTextView inputType = sheet.findViewById(R.id.input_type);
-        final TextView coordsValue = sheet.findViewById(R.id.coords_value);
-        final View btnAddPhoto = sheet.findViewById(R.id.btn_add_photo);
-        final ImageView imgPreview = sheet.findViewById(R.id.img_preview);
-
-        String[] types = new String[]{"INFO", "HAZARD", "CRITICAL"};
-        inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
-
-        LatLng target = map.getCameraPosition().target;
-        if (coordsValue != null) {
-            coordsValue.setText(String.format(Locale.US, "lat: %.6f, lng: %.6f", target.latitude, target.longitude));
-        }
-
-        if (btnAddPhoto != null) {
-            btnAddPhoto.setOnClickListener(v -> {
-                currentPhotoPreview = imgPreview; // zapamiętaj preview z tego bottom-sheetu
-                showPhotoSourceChooser();
-            });
-        }
-
-        sheet.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
-        sheet.findViewById(R.id.btn_save).setOnClickListener(v -> {
-            String title = inputTitle.getText() != null ? inputTitle.getText().toString().trim() : "";
-            String desc  = inputDescription.getText() != null ? inputDescription.getText().toString().trim() : "";
-            String type  = inputType.getText() != null ? inputType.getText().toString().trim() : "";
-
-            if (title.isEmpty() || type.isEmpty()) {
-                ToastUtils.show(this, getString(R.string.incident_invalid));
-                return;
-            }
-
-            LatLng t = map.getCameraPosition().target;
-            String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                    ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
-
-            Incident inc = new Incident(title, desc, type, t.latitude, t.longitude, currentRegion, uid);
-            Map<String, Object> data = inc.toMap();
-            if (pickedPhotoUri != null) {
-                data.put("photoUrl", pickedPhotoUri.toString());
-            }
-
-            incidentRepo.createIncident(data)
-                    .addOnSuccessListener(ref -> {
-                        ToastUtils.show(this, "Incident created");
-                        dialog.dismiss();
-                    })
-                    .addOnFailureListener(e -> {
-                        ToastUtils.show(this, "Create failed: " + e.getMessage());
-                    });
-        });
-
-        // Nie ustawiamy tu preview – zrobi to updatePreview() po wyborze/zdjęciu
-        dialog.show();
-    }
-
     private void showPhotoSourceChooser() {
-        String[] items = new String[] { "Take photo", "Pick from gallery" };
+        String[] items = new String[]{"Take photo", "Pick from gallery"};
         new AlertDialog.Builder(this)
                 .setTitle(R.string.incident_attach_photo)
                 .setItems(items, (d, which) -> {
@@ -348,10 +377,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         takePicture.launch(cameraOutputUri);
     }
 
-    /**
-     * API 29+ — zapis do MediaStore (Pictures/Alerta), galeria widzi od razu.
-     * <29 — publiczny katalog Pictures/Alerta + FileProvider (i skan w scanIfNeeded()).
-     */
     private Uri createImageUriForCamera() {
         try {
             String fileName = "IMG_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg";
@@ -375,34 +400,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    /** Dla <29 – zasygnalizuj skanerowi multimediów */
     private void scanIfNeeded(Uri uri) {
-        if (uri == null) return;
-        if (Build.VERSION.SDK_INT >= 29) return;
+        if (uri == null || Build.VERSION.SDK_INT >= 29) return;
         try {
-            File pictures = android.os.Environment.getExternalStoragePublicDirectory(
-                    android.os.Environment.DIRECTORY_PICTURES
-            );
+            File pictures = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES);
             if (pictures != null) {
-                android.media.MediaScannerConnection.scanFile(
-                        this,
-                        new String[]{ pictures.getAbsolutePath() },
-                        null,
-                        null
-                );
+                android.media.MediaScannerConnection.scanFile(this, new String[]{pictures.getAbsolutePath()}, null, null);
             }
         } catch (Exception ignored) { }
     }
 
-    /** Odśwież podgląd zdjęcia w aktualnie otwartym bottom-sheet */
     private void updatePreview() {
         if (currentPhotoPreview == null) return;
+        View remove = ((View) currentPhotoPreview.getParent()).findViewById(R.id.btn_remove_photo);
         if (pickedPhotoUri != null) {
             currentPhotoPreview.setImageURI(pickedPhotoUri);
             currentPhotoPreview.setVisibility(View.VISIBLE);
+            if (remove != null) remove.setVisibility(View.VISIBLE);
         } else {
             currentPhotoPreview.setImageDrawable(null);
             currentPhotoPreview.setVisibility(View.GONE);
+            if (remove != null) remove.setVisibility(View.GONE);
         }
     }
 
@@ -423,9 +441,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         int color;
         switch (String.valueOf(item.getType())) {
-            case "CRITICAL": color = ContextCompat.getColor(this, R.color.red_700); break;
-            case "HAZARD":   color = ContextCompat.getColor(this, R.color.amber_700); break;
-            default:         color = ContextCompat.getColor(this, R.color.blue_700); break;
+            case "CRITICAL":
+                color = ContextCompat.getColor(this, R.color.red_700);
+                break;
+            case "HAZARD":
+                color = ContextCompat.getColor(this, R.color.amber_700);
+                break;
+            default:
+                color = ContextCompat.getColor(this, R.color.blue_700);
+                break;
         }
         chipType.setTextColor(color);
 
@@ -457,60 +481,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         dialog.show();
     }
 
-    // location
+
     private void ensureLocationPermission() {
         boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-        if (fine || coarse) {
-            enableMyLocationLayer();
-            fused.getLastLocation().addOnSuccessListener(loc -> {
-                if (loc != null) {
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), 13f));
-                }
-            });
-        } else {
-            if (isPermanentlyDenied()) {
-                ToastUtils.show(this, "Enable location permission in Settings.");
-                openAppSettings();
-            } else {
-                locationPermsLauncher.launch(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                });
-            }
-        }
-    }
-
-    private void onLocationPermissionsResult(Map<String, Boolean> result) {
-        boolean grantedFine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
-        boolean grantedCoarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
-        if (grantedFine || grantedCoarse) {
-            enableMyLocationLayer();
-        }
-    }
-
-    private boolean isPermanentlyDenied() {
-        boolean fineDenied = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        boolean coarseDenied = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-
-        boolean fineRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        boolean coarseRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-        return fineDenied && coarseDenied && !fineRationale && !coarseRationale;
-    }
-
-    private void openAppSettings() {
-        try {
-            Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            i.setData(Uri.fromParts("package", getPackageName(), null));
-            startActivity(i);
-        } catch (ActivityNotFoundException ignored) { }
+        if (fine || coarse) enableMyLocationLayer();
+        else locationPermsLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
     }
 
     private void enableMyLocationLayer() {
         if (map == null) return;
         try { map.setMyLocationEnabled(true); } catch (SecurityException ignored) { }
+    }
+
+    private void onLocationPermissionsResult(Map<String, Boolean> result) {
+        boolean grantedFine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
+        boolean grantedCoarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
+        if (grantedFine || grantedCoarse) enableMyLocationLayer();
     }
 
     @Override
@@ -525,4 +512,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onDestroy();
         if (registration != null) registration.remove();
     }
+
 }
