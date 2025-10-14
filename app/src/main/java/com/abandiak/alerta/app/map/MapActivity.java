@@ -2,11 +2,13 @@ package com.abandiak.alerta.app.map;
 
 import android.Manifest;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +75,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private FusedLocationProviderClient fused;
 
+    // --- permissions
     private final ActivityResultLauncher<String[]> locationPermsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onLocationPermissionsResult);
 
@@ -87,20 +90,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 else ToastUtils.show(this, "Camera permission denied");
             });
 
+    // --- photo state
     private Uri pickedPhotoUri = null;
     private Uri cameraOutputUri = null;
+    private ImageView currentPhotoPreview = null; // aktualny podgląd w bottom-sheet
 
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri != null) pickedPhotoUri = uri;
+                if (uri != null) {
+                    pickedPhotoUri = uri;
+                    updatePreview();
+                }
             });
 
     private final ActivityResultLauncher<Uri> takePicture =
             registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
                 if (Boolean.TRUE.equals(success)) {
                     pickedPhotoUri = cameraOutputUri;
+                    updatePreview();
+                    scanIfNeeded(cameraOutputUri); // dla <29
                 } else {
                     pickedPhotoUri = null;
+                    updatePreview();
                 }
             });
 
@@ -112,6 +123,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fused = LocationServices.getFusedLocationProviderClient(this);
         incidentRepo = new IncidentRepository();
 
+        // bottom nav
         bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_map);
@@ -140,24 +152,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
         }
 
+        // map
         SupportMapFragment frag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (frag != null) frag.getMapAsync(this);
 
+        // chips
         ChipGroup chips = findViewById(R.id.chips_filters);
-        chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (checkedIds == null || checkedIds.isEmpty()) return;
-            int id = checkedIds.get(0);
-
-            if (id == R.id.chip_all) {
-                setFilter("ALL");
-            } else if (id == R.id.chip_info) {
-                setFilter("INFO");
-            } else if (id == R.id.chip_hazard) {
-                setFilter("HAZARD");
-            } else if (id == R.id.chip_critical) {
-                setFilter("CRITICAL");
-            }
-        });
+        if (chips != null) {
+            chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (checkedIds == null || checkedIds.isEmpty()) return;
+                int id = checkedIds.get(0);
+                if (id == R.id.chip_all)      setFilter("ALL");
+                else if (id == R.id.chip_info) setFilter("INFO");
+                else if (id == R.id.chip_hazard) setFilter("HAZARD");
+                else if (id == R.id.chip_critical) setFilter("CRITICAL");
+            });
+        }
 
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
         fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
@@ -222,13 +232,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (title == null || type == null || lat == null || lng == null) continue;
 
                         IncidentItem item = new IncidentItem(
-                                id,
-                                title,
-                                desc == null ? "" : desc,
-                                lat,
-                                lng,
-                                type,
-                                photo
+                                id, title, desc == null ? "" : desc, lat, lng, type, photo
                         );
                         clusterManager.addItem(item);
                     }
@@ -261,7 +265,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (btnAddPhoto != null) {
-            btnAddPhoto.setOnClickListener(v -> showPhotoSourceChooser(imgPreview));
+            btnAddPhoto.setOnClickListener(v -> {
+                currentPhotoPreview = imgPreview; // zapamiętaj preview z tego bottom-sheetu
+                showPhotoSourceChooser();
+            });
         }
 
         sheet.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
@@ -295,26 +302,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     });
         });
 
-        if (imgPreview != null && pickedPhotoUri != null) {
-            imgPreview.setImageURI(pickedPhotoUri);
-            imgPreview.setVisibility(View.VISIBLE);
-        }
-
+        // Nie ustawiamy tu preview – zrobi to updatePreview() po wyborze/zdjęciu
         dialog.show();
     }
 
-    private void showPhotoSourceChooser(ImageView preview) {
+    private void showPhotoSourceChooser() {
         String[] items = new String[] { "Take photo", "Pick from gallery" };
         new AlertDialog.Builder(this)
                 .setTitle(R.string.incident_attach_photo)
                 .setItems(items, (d, which) -> {
-                    if (which == 0) requestCameraThenLaunch(preview);
-                    else requestStorageThenPick(preview);
+                    if (which == 0) requestCameraThenLaunch();
+                    else requestStorageThenPick();
                 })
                 .show();
     }
 
-    private void requestStorageThenPick(ImageView preview) {
+    private void requestStorageThenPick() {
         if (Build.VERSION.SDK_INT >= 33) {
             pickImage.launch("image/*");
             return;
@@ -327,7 +330,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void requestCameraThenLaunch(ImageView preview) {
+    private void requestCameraThenLaunch() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             launchCamera();
@@ -345,16 +348,61 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         takePicture.launch(cameraOutputUri);
     }
 
+    /**
+     * API 29+ — zapis do MediaStore (Pictures/Alerta), galeria widzi od razu.
+     * <29 — publiczny katalog Pictures/Alerta + FileProvider (i skan w scanIfNeeded()).
+     */
     private Uri createImageUriForCamera() {
         try {
-            File dir = new File(getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES), "Alerta");
-            if (!dir.exists() && !dir.mkdirs()) return null;
-
-            String time = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            File img = new File(dir, "IMG_" + time + ".jpg");
-            return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", img);
+            String fileName = "IMG_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg";
+            if (Build.VERSION.SDK_INT >= 29) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Alerta");
+                return getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                File dir = new File(
+                        android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES),
+                        "Alerta"
+                );
+                if (!dir.exists() && !dir.mkdirs()) return null;
+                File img = new File(dir, fileName);
+                return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", img);
+            }
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    /** Dla <29 – zasygnalizuj skanerowi multimediów */
+    private void scanIfNeeded(Uri uri) {
+        if (uri == null) return;
+        if (Build.VERSION.SDK_INT >= 29) return;
+        try {
+            File pictures = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_PICTURES
+            );
+            if (pictures != null) {
+                android.media.MediaScannerConnection.scanFile(
+                        this,
+                        new String[]{ pictures.getAbsolutePath() },
+                        null,
+                        null
+                );
+            }
+        } catch (Exception ignored) { }
+    }
+
+    /** Odśwież podgląd zdjęcia w aktualnie otwartym bottom-sheet */
+    private void updatePreview() {
+        if (currentPhotoPreview == null) return;
+        if (pickedPhotoUri != null) {
+            currentPhotoPreview.setImageURI(pickedPhotoUri);
+            currentPhotoPreview.setVisibility(View.VISIBLE);
+        } else {
+            currentPhotoPreview.setImageDrawable(null);
+            currentPhotoPreview.setVisibility(View.GONE);
         }
     }
 
@@ -409,6 +457,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         dialog.show();
     }
 
+    // location
     private void ensureLocationPermission() {
         boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
