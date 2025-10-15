@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
+    android:backgroundTint="@color/white"
+    app:cardCornerRadius="20dp"
     app:cardUseCompatPadding="true"
+    app:cardElevation="4dp"
     android:padding="16dp">
 
     <LinearLayout
@@ -15,11 +17,12 @@
         <ImageView
             android:id="@+id/img"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:adjustViewBounds="true"
+            android:layout_height="400dp"
             android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
             android:visibility="gone"
-            android:background="@drawable/bg_image_placeholder" />
+            android:background="@drawable/bg_image_placeholder"
+            android:contentDescription="@string/photo" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,15 +38,26 @@
                 android:layout_weight="1"
                 android:textStyle="bold"
                 android:textSize="18sp"
-                android:textColor="@color/text_primary" />
+                android:textColor="@color/black"
+                android:fontFamily="@font/inter"
+                android:text="Incident title" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipType"
-                style="@style/Widget.Material3.Chip.Assist"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="INFO"
-                app:chipMinHeight="28dp"/>
+                android:text="CRITICAL"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/inter"
+                android:clickable="false"
+                android:checkable="false"
+                app:chipCornerRadius="8dp"
+                app:chipStrokeWidth="0dp"
+                app:rippleColor="@android:color/transparent"
+                android:visibility="visible"
+                app:chipBackgroundColor="@color/red_700" />
         </LinearLayout>
 
         <TextView
@@ -51,7 +65,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/text_secondary"
-            android:layout_marginTop="6dp" />
+            android:textSize="14sp"
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="6dp"
+            android:text="No power" />
 
         <TextView
             android:id="@+id/coords_wgs"
@@ -59,7 +76,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:fontFamily="@font/inter"
             android:text="WGS-84: lat 0.000000, lng 0.000000" />
 
         <LinearLayout
@@ -71,20 +90,30 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNavigate"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Alerta.Button.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/navigation"
-                app:icon="@drawable/ic_navigation" />
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_navigation"
+                app:iconPadding="8dp"
+                app:iconGravity="textStart"
+                app:iconTint="@color/amber_700"
+                android:textColor="@color/amber_700" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnShare"
-                style="@style/Widget.Material3.Button"
+                style="@style/Alerta.Button.Amber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/share"
-                app:icon="@drawable/ic_share" />
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_share"
+                app:iconPadding="8dp"
+                app:iconGravity="textStart"
+                app:iconTint="@android:color/white" />
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

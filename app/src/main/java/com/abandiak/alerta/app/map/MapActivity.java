@@ -439,27 +439,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         desc.setText(item.getSnippet() == null ? "" : item.getSnippet());
         chipType.setText(item.getType());
 
-        int color;
+        int bgColor;
         switch (String.valueOf(item.getType())) {
             case "CRITICAL":
-                color = ContextCompat.getColor(this, R.color.red_700);
+                bgColor = ContextCompat.getColor(this, R.color.red_700);
                 break;
             case "HAZARD":
-                color = ContextCompat.getColor(this, R.color.amber_700);
+                bgColor = ContextCompat.getColor(this, R.color.amber_700);
                 break;
             default:
-                color = ContextCompat.getColor(this, R.color.blue_700);
+                bgColor = ContextCompat.getColor(this, R.color.blue_700);
                 break;
         }
-        chipType.setTextColor(color);
+
+        chipType.setChipBackgroundColor(ColorStateList.valueOf(bgColor));
+        chipType.setTextColor(ContextCompat.getColor(this, android.R.color.white));
 
         double lat = item.getPosition().latitude;
         double lng = item.getPosition().longitude;
-        coordsWgs.setText(String.format(Locale.US, "WGS-84:  lat %.6f,  lng %.6f", lat, lng));
+        String latDir = lat >= 0 ? "N" : "S";
+        String lngDir = lng >= 0 ? "E" : "W";
+        coordsWgs.setText(String.format(Locale.US, "📍 %.5f° %s, %.5f° %s",
+                Math.abs(lat), latDir, Math.abs(lng), lngDir));
 
         if (item.getPhotoUrl() != null && !item.getPhotoUrl().isEmpty()) {
             img.setVisibility(View.VISIBLE);
-            Glide.with(this).load(item.getPhotoUrl()).into(img);
+            Glide.with(this)
+                    .load(item.getPhotoUrl())
+                    .centerCrop()
+                    .into(img);
         } else {
             img.setVisibility(View.GONE);
         }
@@ -480,6 +488,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         dialog.show();
     }
+
 
 
     private void ensureLocationPermission() {
