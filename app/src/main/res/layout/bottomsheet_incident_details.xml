@@ -79,7 +79,38 @@
             android:textColor="@color/black"
             android:textSize="13sp"
             android:fontFamily="@font/inter"
-            android:text="WGS-84: lat 0.000000, lng 0.000000" />
+            android:text="WGS-84: lat 0.000000°, lng 0.000000°" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkbox_verified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Incident verified by authorities"
+            android:visibility="visible"
+            android:enabled="false"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="12dp" />
+
+        <TextView
+            android:id="@+id/logs_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Incident history"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="12dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/logs_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:paddingBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -113,7 +144,24 @@
                 app:iconPadding="8dp"
                 app:iconGravity="textStart"
                 app:iconTint="@android:color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_incident"
+                style="@style/Alerta.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:textColor="@color/red_700"
+                app:strokeColor="@color/red_700"
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="@color/red_700"
+                app:iconPadding="6dp"
+                app:iconGravity="textStart"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

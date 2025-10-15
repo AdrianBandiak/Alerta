@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -45,14 +48,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
@@ -60,6 +67,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -67,6 +75,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap map;
     private BottomNavigationView bottomNav;
+    private AppBarLayout appBar;
 
     private ClusterManager<IncidentItem> clusterManager;
     private IncidentRepository incidentRepo;
@@ -76,6 +85,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private String currentType = "ALL";
 
     private FusedLocationProviderClient fused;
+
+    private Uri pickedPhotoUri = null;
+    private Uri cameraOutputUri = null;
+    private ImageView currentPhotoPreview = null;
 
     private final ActivityResultLauncher<String[]> locationPermsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onLocationPermissionsResult);
@@ -90,10 +103,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (granted) launchCamera();
                 else ToastUtils.show(this, "Camera permission denied");
             });
-
-    private Uri pickedPhotoUri = null;
-    private Uri cameraOutputUri = null;
-    private ImageView currentPhotoPreview = null;
 
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -120,6 +129,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        appBar = findViewById(R.id.appBar);
+        if (appBar != null) {
+            appBar.setOnApplyWindowInsetsListener((v, insets) -> {
+                int topInset = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        topInset = insets.getInsets(WindowInsets.Type.statusBars()).top;
+                    }
+                }
+                v.setPadding(0, topInset, 0, 0);
+                return insets;
+            });
+        }
+
         fused = LocationServices.getFusedLocationProviderClient(this);
         incidentRepo = new IncidentRepository();
 
@@ -127,27 +150,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_map);
             bottomNav.setOnItemSelectedListener(item -> {
-                final int id = item.getItemId();
+                int id = item.getItemId();
                 if (id == R.id.nav_home) {
                     startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_map) {
-                    return true;
                 } else if (id == R.id.nav_tasks) {
                     startActivity(new Intent(this, TasksActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
                 } else if (id == R.id.nav_teams) {
                     startActivity(new Intent(this, TeamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
                 } else if (id == R.id.nav_more) {
                     startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
                 }
-                return false;
+                overridePendingTransition(0, 0);
+                return id == R.id.nav_map;
             });
         }
 
@@ -175,6 +189,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
@@ -196,26 +211,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void raiseFabAboveBottomNav(@NonNull View fab) {
-        View nav = bottomNav;
+        if (bottomNav == null) return;
         fab.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                int navH = nav != null ? nav.getHeight() : 0;
+                int navH = bottomNav.getHeight();
                 int extra = dp(16);
-                android.view.ViewGroup.LayoutParams lp = fab.getLayoutParams();
-                if (lp instanceof android.view.ViewGroup.MarginLayoutParams) {
-                    android.view.ViewGroup.MarginLayoutParams mlp = (android.view.ViewGroup.MarginLayoutParams) lp;
-                    mlp.setMargins(mlp.leftMargin, mlp.topMargin, mlp.rightMargin, navH + dp(24) + extra);
-                    fab.setLayoutParams(mlp);
-                }
+                android.view.ViewGroup.MarginLayoutParams mlp = (android.view.ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+                mlp.setMargins(mlp.leftMargin, mlp.topMargin, mlp.rightMargin, navH + dp(24) + extra);
+                fab.setLayoutParams(mlp);
                 fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
 
     private int dp(int v) {
-        float d = getResources().getDisplayMetrics().density;
-        return Math.round(v * d);
+        return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
     private void openCreateIncidentSheet() {
@@ -276,24 +287,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
             String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                    ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
+                    ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                    : "anonymous";
 
             Incident inc = new Incident(title, desc, type, lat, lng, currentRegion, uid);
             Map<String, Object> data = inc.toMap();
-            if (pickedPhotoUri != null) data.put("photoUrl", pickedPhotoUri.toString());
+            data.put("createdBy", uid);
+            data.put("verified", false);
+            if (pickedPhotoUri != null)
+                data.put("photoUrl", pickedPhotoUri.toString());
 
             incidentRepo.createIncident(data)
                     .addOnSuccessListener(ref -> {
                         ToastUtils.show(this, "Incident created");
                         dialog.dismiss();
                     })
-                    .addOnFailureListener(e -> {
-                        ToastUtils.show(this, "Create failed: " + e.getMessage());
-                    });
+                    .addOnFailureListener(e -> ToastUtils.show(this, "Create failed: " + e.getMessage()));
         });
 
         dialog.show();
     }
+
 
     private void setFilter(String type) {
         if (!type.equals(currentType)) {
@@ -302,8 +316,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
+
     private void subscribeIncidents() {
-        if (registration != null) { registration.remove(); registration = null; }
+        if (registration != null) {
+            registration.remove();
+            registration = null;
+        }
         if (map == null || clusterManager == null) return;
         clusterManager.clearItems();
         clusterManager.cluster();
@@ -319,6 +338,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                     if (snapshots == null) return;
                     clusterManager.clearItems();
+
                     for (DocumentSnapshot d : snapshots.getDocuments()) {
                         String id = d.getId();
                         String title = d.getString("title");
@@ -327,13 +347,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Double lat = d.getDouble("lat");
                         Double lng = d.getDouble("lng");
                         String photo = d.getString("photoUrl");
+                        String createdBy = d.getString("createdBy");
+                        boolean verified = d.getBoolean("verified") != null && d.getBoolean("verified");
+
                         if (title == null || type == null || lat == null || lng == null) continue;
-                        IncidentItem item = new IncidentItem(id, title, desc == null ? "" : desc, lat, lng, type, photo);
+
+                        IncidentItem item = new IncidentItem(
+                                id,
+                                title,
+                                desc == null ? "" : desc,
+                                lat,
+                                lng,
+                                type,
+                                photo,
+                                verified,
+                                createdBy
+                        );
+
                         clusterManager.addItem(item);
                     }
                     clusterManager.cluster();
                 });
     }
+
 
     private void showPhotoSourceChooser() {
         String[] items = new String[]{"Take photo", "Pick from gallery"};
@@ -432,8 +468,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         ImageView img = content.findViewById(R.id.img);
         TextView title = content.findViewById(R.id.title);
         TextView desc = content.findViewById(R.id.desc);
-        com.google.android.material.chip.Chip chipType = content.findViewById(R.id.chipType);
+        Chip chipType = content.findViewById(R.id.chipType);
         TextView coordsWgs = content.findViewById(R.id.coords_wgs);
+        MaterialCheckBox checkboxVerified = content.findViewById(R.id.checkbox_verified);
+        View btnDelete = content.findViewById(R.id.btn_delete_incident);
+        LinearLayout logsContainer = content.findViewById(R.id.logs_container);
+        TextView logsTitle = content.findViewById(R.id.logs_title);
 
         title.setText(item.getTitle());
         desc.setText(item.getSnippet() == null ? "" : item.getSnippet());
@@ -451,7 +491,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 bgColor = ContextCompat.getColor(this, R.color.blue_700);
                 break;
         }
-
         chipType.setChipBackgroundColor(ColorStateList.valueOf(bgColor));
         chipType.setTextColor(ContextCompat.getColor(this, android.R.color.white));
 
@@ -459,18 +498,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         double lng = item.getPosition().longitude;
         String latDir = lat >= 0 ? "N" : "S";
         String lngDir = lng >= 0 ? "E" : "W";
-        coordsWgs.setText(String.format(Locale.US, "📍 %.5f° %s, %.5f° %s",
+        coordsWgs.setText(String.format(Locale.US, "WGS-84:  %.5f° %s,  %.5f° %s",
                 Math.abs(lat), latDir, Math.abs(lng), lngDir));
 
-        if (item.getPhotoUrl() != null && !item.getPhotoUrl().isEmpty()) {
-            img.setVisibility(View.VISIBLE);
-            Glide.with(this)
-                    .load(item.getPhotoUrl())
-                    .centerCrop()
-                    .into(img);
-        } else {
-            img.setVisibility(View.GONE);
-        }
+        checkboxVerified.setChecked(item.isVerified());
+        checkboxVerified.setEnabled(false);
 
         content.findViewById(R.id.btnNavigate).setOnClickListener(v -> {
             Uri gmm = Uri.parse("geo:0,0?q=" + lat + "," + lng + "(" + Uri.encode(item.getTitle()) + ")");
@@ -486,9 +518,100 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             startActivity(Intent.createChooser(share, "Share incident"));
         });
 
+        if (item.getPhotoUrl() != null && !item.getPhotoUrl().isEmpty()) {
+            img.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(item.getPhotoUrl())
+                    .centerCrop()
+                    .into(img);
+        } else {
+            img.setVisibility(View.GONE);
+        }
+
+        logsContainer.removeAllViews();
+        logsTitle.setVisibility(View.GONE);
+
+        if (item.getId() != null) {
+            FirebaseFirestore.getInstance()
+                    .collection("incidents")
+                    .document(item.getId())
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        if (snapshot != null && snapshot.exists()) {
+                            @SuppressWarnings("unchecked")
+                            List<Map<String, Object>> logs =
+                                    (List<Map<String, Object>>) snapshot.get("logs");
+
+                            if (logs != null && !logs.isEmpty()) {
+                                logsTitle.setVisibility(View.VISIBLE);
+                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+                                for (Map<String, Object> entry : logs) {
+                                    try {
+                                        Long ts = (Long) entry.get("timestamp");
+                                        String action = String.valueOf(entry.get("action"));
+                                        String time = (ts != null)
+                                                ? sdf.format(new Date(ts))
+                                                : "--:--";
+
+                                        TextView logView = new TextView(this);
+                                        logView.setText(String.format(Locale.US, "%s   %s", time, action));
+                                        logView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+                                        logView.setTextSize(13);
+                                        logView.setTypeface(logView.getTypeface(), Typeface.ITALIC);
+                                        logView.setPadding(0, dp(2), 0, dp(2));
+                                        logsContainer.addView(logView);
+
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            } else {
+                                logsTitle.setVisibility(View.VISIBLE);
+                                TextView empty = new TextView(this);
+                                empty.setText("No activity logs available.");
+                                empty.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+                                empty.setTextSize(13);
+                                empty.setTypeface(empty.getTypeface(), Typeface.ITALIC);
+                                logsContainer.addView(empty);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        ToastUtils.show(this, "Failed to load incident history: " + e.getMessage());
+                    });
+        }
+
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+
+        if (!item.isVerified() && uid != null && uid.equals(item.getCreatedBy())) {
+            btnDelete.setVisibility(View.VISIBLE);
+            btnDelete.setOnClickListener(v -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Delete incident")
+                        .setMessage("Are you sure you want to delete this incident?")
+                        .setPositiveButton("Delete", (d, w) -> {
+                            new IncidentRepository()
+                                    .deleteIncident(item.getId())
+                                    .addOnSuccessListener(unused -> {
+                                        ToastUtils.show(this, "Incident deleted");
+                                        dialog.dismiss();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            ToastUtils.show(this, "Failed to delete: " + e.getMessage()));
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+        } else {
+            btnDelete.setVisibility(View.GONE);
+        }
+
         dialog.show();
     }
-
 
 
     private void ensureLocationPermission() {

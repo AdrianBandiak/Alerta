@@ -12,7 +12,13 @@ public class IncidentItem implements ClusterItem {
     private final String snippet;
     private final LatLng position;
     private final String type;
-    @Nullable private final String photoUrl;
+
+    @Nullable
+    private final String photoUrl;
+    @Nullable
+    private final String createdBy;
+
+    private final boolean verified;
 
     public IncidentItem(String id,
                         String title,
@@ -21,12 +27,7 @@ public class IncidentItem implements ClusterItem {
                         double lng,
                         String type,
                         @Nullable String photoUrl) {
-        this.id = id;
-        this.title = title;
-        this.snippet = snippet;
-        this.position = new LatLng(lat, lng);
-        this.type = type;
-        this.photoUrl = photoUrl;
+        this(id, title, snippet, lat, lng, type, photoUrl, false, null);
     }
 
     public IncidentItem(String id,
@@ -35,7 +36,26 @@ public class IncidentItem implements ClusterItem {
                         double lat,
                         double lng,
                         String type) {
-        this(id, title, snippet, lat, lng, type, null);
+        this(id, title, snippet, lat, lng, type, null, false, null);
+    }
+
+    public IncidentItem(String id,
+                        String title,
+                        String snippet,
+                        double lat,
+                        double lng,
+                        String type,
+                        @Nullable String photoUrl,
+                        boolean verified,
+                        @Nullable String createdBy) {
+        this.id = id;
+        this.title = title;
+        this.snippet = snippet;
+        this.position = new LatLng(lat, lng);
+        this.type = type;
+        this.photoUrl = photoUrl;
+        this.verified = verified;
+        this.createdBy = createdBy;
     }
 
     @Override public LatLng getPosition() { return position; }
@@ -43,8 +63,14 @@ public class IncidentItem implements ClusterItem {
     @Override public String getSnippet()  { return snippet; }
     @Override public Float getZIndex()    { return 0f; }
 
-    public String getId()       { return id; }
-    public String getType()     { return type; }
+    public String getId()        { return id; }
+    public String getType()      { return type; }
+
     @Nullable
-    public String getPhotoUrl() { return photoUrl; }
+    public String getPhotoUrl()  { return photoUrl; }
+
+    @Nullable
+    public String getCreatedBy() { return createdBy; }
+
+    public boolean isVerified()  { return verified; }
 }

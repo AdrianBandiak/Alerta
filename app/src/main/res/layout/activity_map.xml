@@ -4,46 +4,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/map_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/white">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:elevation="0dp">
+        android:background="@color/white"
+        android:elevation="3dp"
+        android:translationZ="3dp"
+        android:fitsSystemWindows="true"
+        android:paddingTop="0dp">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp">
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardUseCompatPadding="false"
+            android:layout_gravity="center">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chips_filters"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:gravity="center_horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="6dp"
                 app:singleSelection="true"
                 app:selectionRequired="true"
-                app:singleLine="true"
-                app:chipSpacingHorizontal="8dp">
+                app:chipSpacingHorizontal="22dp"
+                app:singleLine="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_all"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/map_filters_all"
                     android:checked="true"
+                    android:text="@string/map_filters_all"
                     app:checkedIconVisible="true"
-                    app:chipBackgroundColor="@color/chip_all_bg"
-                    app:chipStrokeWidth="0dp"/>
+                    app:chipBackgroundColor="@color/chip_all_selector"
+                    app:chipStrokeWidth="0dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_info"
@@ -52,10 +60,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_info"
                     app:checkedIconVisible="true"
-                    app:chipBackgroundColor="@color/chip_info_bg"
+                    app:chipBackgroundColor="@color/chip_info_selector"
                     app:chipIcon="@drawable/ic_dot"
                     app:chipIconTint="@color/blue_700"
-                    app:chipStrokeWidth="0dp"/>
+                    app:chipStrokeWidth="0dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_hazard"
@@ -64,10 +72,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_hazard"
                     app:checkedIconVisible="true"
-                    app:chipBackgroundColor="@color/chip_hazard_bg"
+                    app:chipBackgroundColor="@color/chip_hazard_selector"
                     app:chipIcon="@drawable/ic_dot"
                     app:chipIconTint="@color/amber_700"
-                    app:chipStrokeWidth="0dp"/>
+                    app:chipStrokeWidth="0dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_critical"
@@ -76,10 +84,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_critical"
                     app:checkedIconVisible="true"
-                    app:chipBackgroundColor="@color/chip_critical_bg"
+                    app:chipBackgroundColor="@color/chip_critical_selector"
                     app:chipIcon="@drawable/ic_dot"
                     app:chipIconTint="@color/red_700"
-                    app:chipStrokeWidth="0dp"/>
+                    app:chipStrokeWidth="0dp" />
             </com.google.android.material.chip.ChipGroup>
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
@@ -152,11 +160,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/white"
-        android:fitsSystemWindows="false"
+        android:paddingBottom="0dp"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
         app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
         app:itemRippleColor="@color/bottom_nav_ripple" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
