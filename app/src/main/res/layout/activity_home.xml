@@ -273,7 +273,10 @@
                     android:layout_weight="1"
                     android:text="@string/btn_create_task"
                     app:icon="@drawable/ic_task"
-                    app:iconPadding="8dp"/>
+                    app:iconPadding="8dp"
+                    app:strokeColor="@color/alerta_primary"
+                    android:textColor="@color/alerta_primary"
+                    app:iconTint="@color/alerta_primary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnJoinTeam"
@@ -284,7 +287,11 @@
                     android:layout_marginStart="@dimen/space_sm"
                     android:text="@string/btn_join_team"
                     app:icon="@drawable/ic_team"
-                    app:iconPadding="8dp"/>
+                    app:iconPadding="8dp"
+                    app:strokeColor="@color/alerta_primary"
+                    android:textColor="@color/alerta_primary"
+                    app:iconTint="@color/alerta_primary" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -373,10 +380,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:paddingBottom="0dp"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
         app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
-        app:itemRippleColor="@color/bottom_nav_ripple"
-        android:background="@color/white"/>
+        app:itemRippleColor="@color/bottom_nav_ripple" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

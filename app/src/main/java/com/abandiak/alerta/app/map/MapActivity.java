@@ -183,9 +183,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
         if (fabAdd != null) {
             fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
-            fabAdd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.amber_700)));
-            fabAdd.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
-            raiseFabAboveBottomNav(fabAdd);
         }
     }
 

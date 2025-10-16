@@ -2,37 +2,69 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true"
+    tools:context=".app.tasks.TasksActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topBar"
+        android:id="@+id/topAppBar"
         style="@style/Widget.Material3.Toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:title="Tasks"
+        android:layout_marginTop="24dp"
+        android:background="@color/white"
+        android:title="@string/title_tasks"
         android:titleTextColor="@color/text_primary"
-        app:navigationIcon="@drawable/ic_chevron_right"
-        app:navigationIconTint="@color/text_primary"/>
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_scrollFlags="scroll|enterAlways" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerTasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="@dimen/space_md"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"/>
+        android:layout_marginBottom="100dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_task_home" />
+
+    <LinearLayout
+        android:id="@+id/map_quick_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="100dp"
+            android:contentDescription="@string/add_task"
+            app:srcCompat="@drawable/ic_add"
+            app:tint="@color/white"
+            app:backgroundTint="@color/amber_700" />
+
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:paddingBottom="0dp"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
         app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
-        app:itemRippleColor="@color/bottom_nav_ripple"
-        android:background="@color/white"/>
+        app:itemRippleColor="@color/bottom_nav_ripple" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
