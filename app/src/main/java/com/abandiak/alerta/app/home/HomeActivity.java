@@ -7,6 +7,9 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -33,19 +36,22 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.search.SearchBar;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String HOME_MAP_TAG = "home_map_full";
-    private static final String DEFAULT_REGION = "GLOBAL";
+    private static final String REGION_SAME_AS_MAP = "PL-MA";
 
     private BottomNavigationView bottomNav;
     private GoogleMap map;
@@ -54,9 +60,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ClusterManager<IncidentItem> clusterManager;
     private IncidentRenderer renderer;
 
-    private final IncidentRepository incidentsRepo = new IncidentRepository();
-    private ListenerRegistration incidentsReg;
-    private String selectedType = null;
+    private final IncidentRepository incidentRepo = new IncidentRepository();
+    private ListenerRegistration registration;
+    private List<IncidentItem> allItems = new ArrayList<>();
+
+    private SearchBar searchBar;
+    private String currentQuery = "";
 
     private final ActivityResultLauncher<String[]> permsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onPermissionsResult);
@@ -69,32 +78,65 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         fused = LocationServices.getFusedLocationProviderClient(this);
         attachMap();
 
-        bottomNav = findViewById(R.id.bottomNav);
-        if (bottomNav != null) {
-            bottomNav.setSelectedItemId(R.id.nav_home);
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) return true;
-                if (id == R.id.nav_map) {
-                    startActivity(new Intent(this, MapActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_tasks) {
-                    startActivity(new Intent(this, TasksActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_teams) {
-                    startActivity(new Intent(this, TeamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_more) {
-                    startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    overridePendingTransition(0, 0);
-                    return true;
+        setupSearchUI();
+        setupBottomNavigation();
+    }
+
+    private void setupSearchUI() {
+        EditText inputSearch = findViewById(R.id.inputSearch);
+
+        if (inputSearch != null) {
+            inputSearch.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentQuery = s == null ? "" : s.toString();
+                    applySearchFilter();
                 }
-                return false;
+
+                @Override public void afterTextChanged(Editable s) { }
+            });
+
+            inputSearch.setOnEditorActionListener((v, actionId, event) -> {
+                currentQuery = v.getText().toString();
+                applySearchFilter();
+                return true;
             });
         }
+    }
+
+
+    private void setupBottomNavigation() {
+        bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav == null) return;
+
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) return true;
+            if (id == R.id.nav_map) {
+                startActivity(new Intent(this, MapActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (id == R.id.nav_tasks) {
+                startActivity(new Intent(this, TasksActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (id == R.id.nav_teams) {
+                startActivity(new Intent(this, TeamsActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (id == R.id.nav_more) {
+                startActivity(new Intent(this, MoreActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void attachMap() {
@@ -119,7 +161,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.map = googleMap;
-
         map.getUiSettings().setMapToolbarEnabled(false);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(50.0614, 19.9366), 11f));
 
@@ -129,64 +170,92 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         map.setOnCameraIdleListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
-        map.setOnInfoWindowClickListener(clusterManager);
-
-        subscribeIncidents(DEFAULT_REGION, selectedType);
 
         ensureLocationPermissionAndCenter();
+        subscribeIncidents(REGION_SAME_AS_MAP, null);
     }
 
     private void subscribeIncidents(String region, String type) {
-        if (incidentsReg != null) {
-            incidentsReg.remove();
-            incidentsReg = null;
+        if (registration != null) {
+            registration.remove();
+            registration = null;
         }
 
-        incidentsReg = incidentsRepo.listenIncidents(region, type, new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(QuerySnapshot value, FirebaseFirestoreException error) {
-                if (error != null) {
-                    ToastUtils.show(HomeActivity.this, "Error loading incidents: " + error.getMessage());
-                    return;
-                }
-                if (value == null) return;
+        if (clusterManager == null) return;
+        clusterManager.clearItems();
+        clusterManager.cluster();
 
-                clusterManager.clearItems();
-                for (DocumentSnapshot d : value.getDocuments()) {
-                    Map<String, Object> m = d.getData();
-                    if (m == null) continue;
-                    Object t = m.get("title");
-                    Object desc = m.get("description");
-                    Object type = m.get("type");
-                    Object lat = m.get("lat");
-                    Object lng = m.get("lng");
-                    if (t == null || type == null || lat == null || lng == null) continue;
-
-                    double la, ln;
-                    try {
-                        la = (lat instanceof Number) ? ((Number) lat).doubleValue() : Double.parseDouble(String.valueOf(lat));
-                        ln = (lng instanceof Number) ? ((Number) lng).doubleValue() : Double.parseDouble(String.valueOf(lng));
-                    } catch (Exception ex) {
-                        continue;
+        registration = incidentRepo.listenVisibleIncidentsForCurrentUser(
+                type,
+                null,
+                region,
+                (QuerySnapshot snapshots, FirebaseFirestoreException e) -> {
+                    if (e != null) {
+                        ToastUtils.show(this, "Error loading incidents: " + e.getMessage());
+                        return;
                     }
+                    if (snapshots == null) return;
 
-                    IncidentItem item = new IncidentItem(
-                            d.getId(),
-                            String.valueOf(t),
-                            desc != null ? String.valueOf(desc) : "",
-                            la, ln,
-                            String.valueOf(type)
-                    );
-                    clusterManager.addItem(item);
-                }
-                clusterManager.cluster();
+                    allItems.clear();
+                    for (DocumentSnapshot d : snapshots.getDocuments()) {
+                        String id = d.getId();
+                        String title = d.getString("title");
+                        String desc = d.getString("description");
+                        String t = d.getString("type");
+                        Double lat = d.getDouble("lat");
+                        Double lng = d.getDouble("lng");
+                        String photo = d.getString("photoUrl");
+                        String createdBy = d.getString("createdBy");
+                        boolean verified = d.getBoolean("verified") != null && d.getBoolean("verified");
+
+                        if (title == null || t == null || lat == null || lng == null) continue;
+
+                        IncidentItem item = new IncidentItem(
+                                id,
+                                title,
+                                desc == null ? "" : desc,
+                                lat,
+                                lng,
+                                t,
+                                photo,
+                                verified,
+                                createdBy
+                        );
+                        allItems.add(item);
+                    }
+                    applySearchFilter();
+                });
+    }
+
+    private void applySearchFilter() {
+        if (clusterManager == null) return;
+
+        String q = currentQuery == null ? "" : currentQuery.trim();
+        String qUpper = q.toUpperCase(Locale.ROOT);
+        boolean queryIsType = qUpper.equals("INFO") || qUpper.equals("HAZARD") || qUpper.equals("CRITICAL");
+
+        clusterManager.clearItems();
+        for (IncidentItem it : allItems) {
+            boolean matches;
+            if (q.isEmpty()) {
+                matches = true;
+            } else if (queryIsType) {
+                matches = qUpper.equals(String.valueOf(it.getType()).toUpperCase(Locale.ROOT));
+            } else {
+                matches = String.valueOf(it.getTitle())
+                        .toLowerCase(Locale.ROOT)
+                        .contains(q.toLowerCase(Locale.ROOT));
             }
-        });
+            if (matches) clusterManager.addItem(it);
+        }
+        clusterManager.cluster();
     }
 
     private void ensureLocationPermissionAndCenter() {
-        boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        boolean coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
 
         if (fine || coarse) {
             enableMyLocationAndCenter();
@@ -238,9 +307,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (incidentsReg != null) {
-            incidentsReg.remove();
-            incidentsReg = null;
+        if (registration != null) {
+            registration.remove();
+            registration = null;
         }
     }
 
