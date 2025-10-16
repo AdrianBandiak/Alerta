@@ -1,9 +1,12 @@
 package com.abandiak.alerta.app.home;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -36,7 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.search.SearchBar;
+import com.google.android.material.chip.Chip;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -56,6 +59,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private BottomNavigationView bottomNav;
     private GoogleMap map;
     private FusedLocationProviderClient fused;
+    private Chip chipOnline;
 
     private ClusterManager<IncidentItem> clusterManager;
     private IncidentRenderer renderer;
@@ -64,8 +68,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ListenerRegistration registration;
     private List<IncidentItem> allItems = new ArrayList<>();
 
-    private SearchBar searchBar;
     private String currentQuery = "";
+
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     private final ActivityResultLauncher<String[]> permsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onPermissionsResult);
@@ -76,11 +81,52 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_home);
 
         fused = LocationServices.getFusedLocationProviderClient(this);
-        attachMap();
+        chipOnline = findViewById(R.id.chipOnline);
 
+        attachMap();
         setupSearchUI();
         setupBottomNavigation();
+        observeNetworkStatus();
     }
+
+
+    private void observeNetworkStatus() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        boolean initialOnline = cm.getActiveNetwork() != null;
+        updateConnectionStatus(initialOnline);
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                runOnUiThread(() -> updateConnectionStatus(true));
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                runOnUiThread(() -> updateConnectionStatus(false));
+            }
+        };
+        cm.registerDefaultNetworkCallback(networkCallback);
+    }
+
+    private void updateConnectionStatus(boolean isOnline) {
+        if (chipOnline == null) return;
+
+        if (isOnline) {
+            chipOnline.setText("ONLINE");
+            chipOnline.setChipBackgroundColorResource(R.color.status_online_bg);
+            chipOnline.setChipIconResource(R.drawable.ic_status_dot);
+            chipOnline.setTextColor(ContextCompat.getColor(this, R.color.white));
+        } else {
+            chipOnline.setText("OFFLINE");
+            chipOnline.setChipBackgroundColorResource(R.color.status_offline_bg);
+            chipOnline.setChipIconResource(R.drawable.ic_status_dot);
+            chipOnline.setTextColor(ContextCompat.getColor(this, R.color.white));
+        }
+    }
+
 
     private void setupSearchUI() {
         EditText inputSearch = findViewById(R.id.inputSearch);
@@ -104,7 +150,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
-
 
     private void setupBottomNavigation() {
         bottomNav = findViewById(R.id.bottomNav);
@@ -138,6 +183,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             return false;
         });
     }
+
 
     private void attachMap() {
         SupportMapFragment existing =
@@ -251,6 +297,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         clusterManager.cluster();
     }
 
+
     private void ensureLocationPermissionAndCenter() {
         boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
@@ -297,6 +344,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -310,6 +358,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (registration != null) {
             registration.remove();
             registration = null;
+        }
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null && networkCallback != null) {
+            cm.unregisterNetworkCallback(networkCallback);
         }
     }
 

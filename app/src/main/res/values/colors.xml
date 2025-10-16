@@ -24,4 +24,11 @@
     <color name="chip_critical_bg">#FFEBEE</color>
 
     <color name="searchbar_background">#F1F3F4</color>
+
+    <color name="chip_online_bg">#1FE53935</color>
+    <color name="chip_offline_bg">#1AF44336</color>
+    <color name="gray_border">#33000000</color>
+    <color name="status_online_bg">#4CAF50</color>
+    <color name="status_offline_bg">#F44336</color>
+
 </resources>

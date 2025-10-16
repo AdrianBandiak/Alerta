@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fontFamily="@font/inter"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -19,9 +21,7 @@
             style="@style/Widget.Material3.Toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:menu="@menu/menu_top_appbar"
-            app:contentInsetStartWithNavigation="0dp"
-            tools:ignore="ExtraText">
+            app:contentInsetStartWithNavigation="0dp">
 
             <LinearLayout
                 android:id="@+id/brandContainer"
@@ -32,41 +32,47 @@
 
                 <ImageView
                     android:id="@+id/brandLogo"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
                     android:src="@drawable/logo_alerta"
-                    android:contentDescription="@string/content_desc_logo"/>
+                    android:contentDescription="@string/content_desc_logo" />
 
                 <TextView
                     android:id="@+id/brandTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="10dp"
                     android:text="@string/app_name"
                     android:textColor="@color/text_primary"
                     android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceTitleLarge"/>
+                    android:textSize="22sp"
+                    android:letterSpacing="0.02" />
             </LinearLayout>
+
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOnline"
-                style="@style/Alerta.Chip"
+                style="@style/Widget.Material3.Chip.Assist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
-                android:text="@string/status_online"
-                android:textColor="@color/alerta_primary"
-                android:textAppearance="@style/TextAppearance.Alerta.Chip"
-                app:chipMinHeight="22dp"
-                app:chipIcon="@drawable/ic_online_dot"
-                app:chipIconTint="@color/alerta_primary"
-                app:chipIconSize="14dp"
+                android:layout_marginEnd="16dp"
+                android:checkable="false"
+                android:text="ONLINE"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:chipMinHeight="28dp"
+                app:chipCornerRadius="16dp"
+                app:chipIcon="@drawable/ic_status_dot"
+                app:chipIconSize="12dp"
+                app:iconStartPadding="4dp"
                 app:chipStartPadding="6dp"
                 app:chipEndPadding="6dp"
-                app:iconStartPadding="4dp"
-                app:chipBackgroundColor="#1FE53935"
-                app:chipStrokeColor="@color/alerta_primary"
-                app:chipStrokeWidth="1dp"/>
+                app:chipStrokeWidth="0dp"
+                app:chipBackgroundColor="@color/status_online_bg" />
+
+
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -129,43 +135,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAlert"
-                style="@style/Alerta.Card.Elevated"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_md"
-                app:cardCornerRadius="@dimen/radius_md"
-                app:cardBackgroundColor="#FFFDE7"
-                app:strokeColor="#FBC02D"
-                app:strokeWidth="1dp"
-                android:contentDescription="@string/content_desc_alert_banner">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/space_md">
-
-                    <TextView
-                        android:id="@+id/textAlertTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/alert_banner_title"
-                        android:textStyle="bold"
-                        android:textColor="#212121"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/textAlertSubtitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/alert_banner_subtitle"
-                        android:textColor="#424242"
-                        android:textSize="13sp"
-                        android:layout_marginTop="@dimen/space_xs"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/searchContainer"
