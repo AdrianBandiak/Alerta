@@ -46,9 +46,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         h.textMeta.setText(t.getTime());
 
         h.checkDone.setChecked(t.isCompleted());
-        h.icon.setImageResource(t.isCompleted() ? R.drawable.ic_check_circle : R.drawable.ic_check);
-        h.icon.setAlpha(t.isCompleted() ? 0.5f : 1f);
+
+        if (t.isCompleted()) {
+            h.icon.setImageResource(R.drawable.ic_check_circle);
+            h.icon.setColorFilter(
+                    h.itemView.getContext().getColor(R.color.status_online_bg),
+                    android.graphics.PorterDuff.Mode.SRC_IN
+            );
+            h.icon.setAlpha(1f);
+        } else {
+            h.icon.setImageResource(R.drawable.ic_task);
+            h.icon.setColorFilter(
+                    h.itemView.getContext().getColor(R.color.alerta_primary),
+                    android.graphics.PorterDuff.Mode.SRC_IN
+            );
+            h.icon.setAlpha(1f);
+        }
     }
+
 
     @Override
     public int getItemCount() {

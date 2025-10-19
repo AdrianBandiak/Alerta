@@ -45,9 +45,9 @@
     <string name="btn_report_incident">Report incident</string>
     <string name="btn_create_task">Create task</string>
     <string name="btn_join_team">Join team</string>
-    <string name="section_my_tasks_today">My tasks (today)</string>
+    <string name="section_my_tasks">My tasks</string>
     <string name="section_activity_feed">Activity feed</string>
-    <string name="action_view_all">View all</string>
+    <string name="action_view">View</string>
     <string name="cd_list_my_tasks_today">List of my tasks for today</string>
     <string name="cd_recent_activity_feed">Recent activity feed</string>
     <string name="cd_task_icon">Task icon</string>

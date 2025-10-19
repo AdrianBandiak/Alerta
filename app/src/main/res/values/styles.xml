@@ -16,6 +16,11 @@
         <item name="fontFamily">@font/inter</item>
         <item name="android:fontFamily">@font/inter</item>
 
+        <item name="colorControlActivated">@color/status_online_bg</item>
+        <item name="android:colorAccent">@color/status_online_bg</item>
+        <item name="colorAccent">@color/status_online_bg</item>
+
+
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -28,6 +33,7 @@
         <item name="materialCardViewStyle">@style/Alerta.Card.Base</item>
         <item name="floatingActionButtonStyle">@style/Alerta.FAB</item>
     </style>
+
 
     <style name="ThemeOverlay.Alerta.Toolbar" parent="ThemeOverlay.Material3.ActionBar">
         <item name="chipStyle">@style/Alerta.Chip</item>

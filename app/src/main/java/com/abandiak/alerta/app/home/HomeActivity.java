@@ -12,7 +12,10 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.app.tasks.TaskAdapter;
@@ -99,13 +102,29 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         observeNetworkStatus();
 
         RecyclerView recyclerTasks = findViewById(R.id.recyclerTasks);
+        TextView btnViewAllTasks = findViewById(R.id.btnViewAllTasks);
+
         if (recyclerTasks != null) {
             recyclerTasks.setLayoutManager(new LinearLayoutManager(this));
             taskAdapter = new TaskAdapter(new ArrayList<>());
             recyclerTasks.setAdapter(taskAdapter);
+            recyclerTasks.setVisibility(View.GONE);
             subscribeToTodayTasks();
         }
+
+        if (btnViewAllTasks != null && recyclerTasks != null) {
+            btnViewAllTasks.setOnClickListener(v -> {
+                if (recyclerTasks.getVisibility() == View.GONE) {
+                    recyclerTasks.setVisibility(View.VISIBLE);
+                    btnViewAllTasks.setText("Hide");
+                } else {
+                    recyclerTasks.setVisibility(View.GONE);
+                    btnViewAllTasks.setText("View");
+                }
+            });
+        }
     }
+
 
 
     private void observeNetworkStatus() {
