@@ -4,7 +4,7 @@ import com.abandiak.alerta.data.model.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -41,4 +41,21 @@ public class TaskRepository {
     public String getCurrentUserId() {
         return currentUserId;
     }
+
+    public ListenerRegistration listenForTodayTasks(OnTasksLoadedListener listener) {
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        return tasksRef.whereEqualTo("createdBy", currentUserId)
+                .whereEqualTo("date", today)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        listener.onError(e);
+                        return;
+                    }
+                    if (snapshots != null) {
+                        listener.onSuccess(snapshots.toObjects(Task.class));
+                    }
+                });
+    }
+
 }

@@ -49,7 +49,6 @@
                     android:letterSpacing="0.02" />
             </LinearLayout>
 
-
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOnline"
                 style="@style/Widget.Material3.Chip.Assist"
@@ -71,8 +70,6 @@
                 app:chipEndPadding="6dp"
                 app:chipStrokeWidth="0dp"
                 app:chipBackgroundColor="@color/status_online_bg" />
-
-
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -135,7 +132,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/searchContainer"
                 android:layout_width="match_parent"
@@ -175,7 +171,6 @@
                         android:paddingStart="8dp"
                         android:inputType="text"
                         android:imeOptions="actionSearch" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -1,5 +1,6 @@
 package com.abandiak.alerta.app.tasks;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
@@ -7,8 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.R;
+import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.app.map.MapActivity;
+import com.abandiak.alerta.app.more.MoreActivity;
+import com.abandiak.alerta.app.teams.TeamsActivity;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +30,25 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_tasks);
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                } else if (id == R.id.nav_map) {
+                    startActivity(new Intent(this, MapActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                } else if (id == R.id.nav_teams) {
+                    startActivity(new Intent(this, TeamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                } else if (id == R.id.nav_more) {
+                    startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                }
+                overridePendingTransition(0, 0);
+                return id == R.id.nav_tasks;
+            });
+        }
+
         repo = new TaskRepository();
         RecyclerView recycler = findViewById(R.id.recyclerTasks);
         recycler.setLayoutManager(new LinearLayoutManager(this));
@@ -32,10 +57,10 @@ public class TasksActivity extends AppCompatActivity {
 
         FloatingActionButton fabAdd = findViewById(R.id.fabAddTask);
         fabAdd.setOnClickListener(v -> showAddTaskDialog());
-        setupBottomNavigation();
 
         loadTasks();
     }
+
 
     private void loadTasks() {
         repo.getTasksForToday(new TaskRepository.OnTasksLoadedListener() {

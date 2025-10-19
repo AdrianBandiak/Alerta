@@ -13,6 +13,12 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.abandiak.alerta.app.tasks.TaskAdapter;
+import com.abandiak.alerta.data.model.Task;
+import com.abandiak.alerta.data.repository.TaskRepository;
+
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -67,6 +73,10 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final IncidentRepository incidentRepo = new IncidentRepository();
     private ListenerRegistration registration;
     private List<IncidentItem> allItems = new ArrayList<>();
+    private TaskAdapter taskAdapter;
+    private TaskRepository taskRepo = new TaskRepository();
+
+    private ListenerRegistration taskListener;
 
     private String currentQuery = "";
 
@@ -87,6 +97,14 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupSearchUI();
         setupBottomNavigation();
         observeNetworkStatus();
+
+        RecyclerView recyclerTasks = findViewById(R.id.recyclerTasks);
+        if (recyclerTasks != null) {
+            recyclerTasks.setLayoutManager(new LinearLayoutManager(this));
+            taskAdapter = new TaskAdapter(new ArrayList<>());
+            recyclerTasks.setAdapter(taskAdapter);
+            subscribeToTodayTasks();
+        }
     }
 
 
@@ -344,6 +362,24 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
+    private void subscribeToTodayTasks() {
+        if (taskListener != null) taskListener.remove();
+
+        taskListener = taskRepo.listenForTodayTasks(new TaskRepository.OnTasksLoadedListener() {
+            @Override
+            public void onSuccess(List<Task> tasks) {
+                runOnUiThread(() -> {
+                    if (taskAdapter != null) taskAdapter.updateData(tasks);
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                ToastUtils.show(HomeActivity.this, "Error loading tasks: " + e.getMessage());
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {
@@ -358,6 +394,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (registration != null) {
             registration.remove();
             registration = null;
+        }
+
+        if (taskListener != null) {
+            taskListener.remove();
+            taskListener = null;
         }
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
