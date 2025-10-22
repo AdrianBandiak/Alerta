@@ -95,6 +95,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         fused = LocationServices.getFusedLocationProviderClient(this);
         chipOnline = findViewById(R.id.chipOnline);
+        TextView textTime = findViewById(R.id.textTime);
+        updateCurrentDateTime(textTime);
 
         attachMap();
         setupSearchUI();
@@ -399,6 +401,28 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    private void updateCurrentDateTime(TextView textTime) {
+        if (textTime == null) return;
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("EEE HH:mm", java.util.Locale.getDefault());
+        String formatted = sdf.format(new java.util.Date());
+
+        formatted = formatted.substring(0, 1).toUpperCase() + formatted.substring(1);
+
+        textTime.setText(formatted);
+
+        android.os.Handler handler = new android.os.Handler();
+        Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                String newTime = sdf.format(new java.util.Date());
+                newTime = newTime.substring(0, 1).toUpperCase() + newTime.substring(1);
+                textTime.setText(newTime);
+                handler.postDelayed(this, 60000); // co 1 minutę
+            }
+        };
+        handler.post(updater);
+    }
 
     @Override
     protected void onResume() {

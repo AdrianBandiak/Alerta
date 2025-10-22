@@ -87,13 +87,17 @@ public class TasksActivity extends AppCompatActivity {
                     String title = input.getText().toString().trim();
                     if (title.isEmpty()) return;
 
+                    String currentTime = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                            .format(new java.util.Date());
+
                     Task t = new Task(
                             UUID.randomUUID().toString(),
                             title,
                             repo.getCurrentUserId(),
-                            "14:45",
+                            currentTime,
                             false,
-                            new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date())
+                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                                    .format(new java.util.Date())
                     );
                     repo.addTask(t, new TaskRepository.OnTaskAddedListener() {
                         @Override public void onSuccess() { loadTasks(); }
