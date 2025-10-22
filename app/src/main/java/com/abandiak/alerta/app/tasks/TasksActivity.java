@@ -1,12 +1,18 @@
 package com.abandiak.alerta.app.tasks;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
@@ -16,8 +22,13 @@ import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class TasksActivity extends AppCompatActivity {
@@ -36,13 +47,17 @@ public class TasksActivity extends AppCompatActivity {
             bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, HomeActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_map) {
-                    startActivity(new Intent(this, MapActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, MapActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_teams) {
-                    startActivity(new Intent(this, TeamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, TeamsActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_more) {
-                    startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, MoreActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 }
                 overridePendingTransition(0, 0);
                 return id == R.id.nav_tasks;
@@ -55,12 +70,13 @@ public class TasksActivity extends AppCompatActivity {
         adapter = new TaskAdapter(new ArrayList<>());
         recycler.setAdapter(adapter);
 
+        adapter.setOnTaskClickListener(this::showTaskDetailsDialog);
+
         FloatingActionButton fabAdd = findViewById(R.id.fabAddTask);
         fabAdd.setOnClickListener(v -> showAddTaskDialog());
 
         loadTasks();
     }
-
 
     private void loadTasks() {
         repo.getTasksForToday(new TaskRepository.OnTasksLoadedListener() {
@@ -77,78 +93,95 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void showAddTaskDialog() {
-        final android.widget.EditText input = new android.widget.EditText(this);
-        input.setHint("Task title");
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_task, null);
 
-        new AlertDialog.Builder(this)
-                .setTitle("New Task")
-                .setView(input)
-                .setPositiveButton("Add", (d, w) -> {
-                    String title = input.getText().toString().trim();
-                    if (title.isEmpty()) return;
+        TextInputEditText inputTitle = dialogView.findViewById(R.id.inputTaskTitle);
+        TextInputEditText inputDesc = dialogView.findViewById(R.id.inputTaskDescription);
+        AutoCompleteTextView inputPriority = dialogView.findViewById(R.id.inputTaskPriority);
+        TextInputEditText inputStartDate = dialogView.findViewById(R.id.inputTaskStartDate);
+        TextInputEditText inputEndDate = dialogView.findViewById(R.id.inputTaskEndDate);
 
-                    String currentTime = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                            .format(new java.util.Date());
+        String[] priorities = getResources().getStringArray(R.array.task_priorities);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                R.layout.item_dropdown_priority,
+                priorities
+        );
+        inputPriority.setAdapter(adapter);
+        inputPriority.setOnClickListener(v -> inputPriority.showDropDown());
 
-                    Task t = new Task(
-                            UUID.randomUUID().toString(),
-                            title,
-                            repo.getCurrentUserId(),
-                            currentTime,
-                            false,
-                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                                    .format(new java.util.Date())
-                    );
-                    repo.addTask(t, new TaskRepository.OnTaskAddedListener() {
-                        @Override public void onSuccess() { loadTasks(); }
-                        @Override public void onError(Exception e) {
-                            Toast.makeText(TasksActivity.this, "Error saving task", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new java.util.Date());
+        inputStartDate.setText(today);
 
-    private void setupBottomNavigation() {
-        com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        if (bottomNav == null) return;
+        inputEndDate.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (view, year, month, day) -> {
+                String date = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, day);
+                inputEndDate.setText(date);
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
 
-        bottomNav.setSelectedItemId(R.id.nav_tasks);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
 
-            if (id == R.id.nav_home) {
-                startActivity(new android.content.Intent(this, com.abandiak.alerta.app.home.HomeActivity.class)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
-                return true;
+        dialogView.findViewById(R.id.btnCreate).setOnClickListener(v -> {
+            String title = inputTitle.getText().toString().trim();
+            String desc = inputDesc.getText().toString().trim();
+            String priority = inputPriority.getText().toString().trim();
+            String startDate = inputStartDate.getText().toString().trim();
+            String endDate = inputEndDate.getText().toString().trim();
 
-            } else if (id == R.id.nav_map) {
-                startActivity(new android.content.Intent(this, com.abandiak.alerta.app.map.MapActivity.class)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
-                return true;
-
-            } else if (id == R.id.nav_tasks) {
-                return true;
-
-            } else if (id == R.id.nav_teams) {
-                startActivity(new android.content.Intent(this, com.abandiak.alerta.app.teams.TeamsActivity.class)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
-                return true;
-
-            } else if (id == R.id.nav_more) {
-                startActivity(new android.content.Intent(this, com.abandiak.alerta.app.more.MoreActivity.class)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
-                return true;
+            if (title.isEmpty()) {
+                inputTitle.setError("Title required");
+                return;
             }
 
-            return false;
+            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new java.util.Date());
+
+            Task task = new Task(
+                    UUID.randomUUID().toString(),
+                    title,
+                    repo.getCurrentUserId(),
+                    currentTime,
+                    false,
+                    startDate
+            );
+
+            task.setDescription(desc);
+            task.setPriority(priority);
+            task.setEndDate(endDate);
+
+            repo.addTask(task, new TaskRepository.OnTaskAddedListener() {
+                @Override
+                public void onSuccess() {
+                    dialog.dismiss();
+                    loadTasks();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(TasksActivity.this, "Error saving task", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
+
+        dialog.show();
     }
 
+    private void showTaskDetailsDialog(Task task) {
+        new AlertDialog.Builder(this)
+                .setTitle(task.getTitle())
+                .setMessage(
+                        "Description: " + (task.getDescription() == null || task.getDescription().isEmpty() ? "No description" : task.getDescription()) +
+                                "\n\nPriority: " + (task.getPriority() == null || task.getPriority().isEmpty() ? "Normal" : task.getPriority()) +
+                                "\nStart date: " + (task.getDate() == null ? "-" : task.getDate()) +
+                                "\nEnd date: " + (task.getEndDate() == null || task.getEndDate().isEmpty() ? "-" : task.getEndDate()) +
+                                "\nCreated at: " + task.getTime()
+                )
+                .setPositiveButton("Close", null)
+                .show();
+    }
 }

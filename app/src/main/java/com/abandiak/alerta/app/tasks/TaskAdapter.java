@@ -17,14 +17,23 @@ import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
     private List<Task> items;
+    private OnTaskClickListener listener;
 
     public TaskAdapter(List<Task> items) {
         this.items = items;
     }
 
+    public void setOnTaskClickListener(OnTaskClickListener listener) {
+        this.listener = listener;
+    }
+
     public void updateData(List<Task> newData) {
         this.items = newData;
         notifyDataSetChanged();
+    }
+
+    public interface OnTaskClickListener {
+        void onTaskClick(Task task);
     }
 
     @NonNull
@@ -42,9 +51,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         String idShort = t.getId() != null && t.getId().length() > 4
                 ? t.getId().substring(0, 4).toUpperCase()
                 : t.getId();
+
         h.textTitle.setText("[#" + idShort + "] " + t.getTitle());
         h.textMeta.setText(t.getTime());
-
         h.checkDone.setChecked(t.isCompleted());
 
         if (t.isCompleted()) {
@@ -62,12 +71,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             );
             h.icon.setAlpha(1f);
         }
-    }
 
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTaskClick(t);
+            }
+        });
+    }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return items != null ? items.size() : 0;
     }
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {

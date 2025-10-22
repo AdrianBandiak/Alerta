@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white"
+    android:fontFamily="@font/inter">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Task"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="12dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Task name"
+        app:hintTextColor="#B0B0B0">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputTaskTitle"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:inputType="textCapSentences"
+            android:textColor="@color/text_primary"
+            android:textColorHint="#B0B0B0"
+            android:textSize="10sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Description"
+        app:hintTextColor="#B0B0B0">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputTaskDescription"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:textColor="@color/text_primary"
+            android:textColorHint="#B0B0B0"
+            android:textSize="10sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:weightSum="2">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:hint="Start date"
+            app:hintTextColor="#B0B0B0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputTaskStartDate"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:textColor="@color/text_primary"
+                android:textColorHint="#B0B0B0"
+                android:textSize="10sp"
+                android:drawableEnd="@drawable/ic_calendar_red"
+                app:endIconTint="@color/alerta_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- End Date -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:hint="End date"
+            app:hintTextColor="#B0B0B0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputTaskEndDate"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:textColor="@color/text_primary"
+                android:textColorHint="#B0B0B0"
+                android:textSize="10sp"
+                android:drawableEnd="@drawable/ic_calendar_red"
+                app:endIconTint="@color/alerta_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Priority"
+        app:hintTextColor="#B0B0B0"
+        app:endIconMode="dropdown_menu"
+        app:endIconTint="@color/alerta_primary">
+
+        <AutoCompleteTextView
+            android:id="@+id/inputTaskPriority"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:fontFamily="@font/inter"
+            android:inputType="none"
+            android:focusable="false"
+            android:textColor="@color/text_primary"
+            android:textColorHint="#B0B0B0"
+            android:textSize="10sp"
+            android:gravity="center_vertical"
+            android:dropDownVerticalOffset="8dp"
+            android:dropDownHorizontalOffset="8dp"
+            android:dropDownHeight="wrap_content"
+            android:dropDownSelector="@color/alerta_primary"
+            android:entries="@array/task_priorities" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="@color/text_secondary"
+            android:textSize="10sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Task"
+            android:layout_marginStart="8dp"
+            app:backgroundTint="@color/alerta_primary"
+            android:textColor="@color/white"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+</LinearLayout>
