@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -196,16 +197,37 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void showTaskDetailsDialog(Task task) {
-        new AlertDialog.Builder(this)
-                .setTitle(task.getTitle())
-                .setMessage(
-                        "Description: " + (task.getDescription() == null || task.getDescription().isEmpty() ? "No description" : task.getDescription()) +
-                                "\n\nPriority: " + (task.getPriority() == null || task.getPriority().isEmpty() ? "Normal" : task.getPriority()) +
-                                "\nStart date: " + (task.getDate() == null ? "-" : task.getDate()) +
-                                "\nEnd date: " + (task.getEndDate() == null || task.getEndDate().isEmpty() ? "-" : task.getEndDate()) +
-                                "\nCreated at: " + task.getTime()
-                )
-                .setPositiveButton("Close", null)
-                .show();
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_task_details, null);
+
+        TextView title = dialogView.findViewById(R.id.textTaskTitle);
+        TextView desc = dialogView.findViewById(R.id.textTaskDescription);
+        TextView priority = dialogView.findViewById(R.id.textPriority);
+        TextView start = dialogView.findViewById(R.id.textStartDate);
+        TextView end = dialogView.findViewById(R.id.textEndDate);
+        TextView created = dialogView.findViewById(R.id.textCreatedAt);
+
+        title.setText(task.getTitle());
+        desc.setText(task.getDescription() == null || task.getDescription().isEmpty()
+                ? "No description provided."
+                : task.getDescription());
+        priority.setText(String.format(Locale.getDefault(),
+                "Priority: %s",
+                (task.getPriority() == null || task.getPriority().isEmpty()) ? "Normal" : task.getPriority()));
+        start.setText(String.format(Locale.getDefault(),
+                "Start date: %s",
+                task.getDate() == null ? "-" : task.getDate()));
+        end.setText(String.format(Locale.getDefault(),
+                "End date: %s",
+                (task.getEndDate() == null || task.getEndDate().isEmpty()) ? "-" : task.getEndDate()));
+        created.setText(String.format(Locale.getDefault(), "Created at: %s", task.getTime()));
+
+        AlertDialog dialog = new AlertDialog.Builder(this, com.google.android.material.R.style.Theme_Material3_Light_Dialog_Alert)
+                .setView(dialogView)
+                .create();
+
+        dialogView.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
+
+
 }
