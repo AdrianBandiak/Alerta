@@ -38,25 +38,22 @@ public class TasksActivity extends AppCompatActivity {
 
     private TaskAdapter adapter;
     private TaskRepository repo;
+    private RecyclerView recycler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-
-        View rootView = getWindow().getDecorView();
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(getWindow(), rootView);
-        controller.setAppearanceLightStatusBars(true);
-        controller.setAppearanceLightNavigationBars(true);
+        new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
+                .setAppearanceLightStatusBars(true);
 
         setContentView(R.layout.activity_tasks);
 
@@ -84,10 +81,11 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         repo = new TaskRepository();
-        RecyclerView recycler = findViewById(R.id.recyclerTasks);
+        recycler = findViewById(R.id.recyclerTasks);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TaskAdapter(new ArrayList<>());
         recycler.setAdapter(adapter);
+        recycler.setVisibility(View.GONE);
 
         adapter.setOnTaskClickListener(this::showTaskDetailsDialog);
 
@@ -101,7 +99,13 @@ public class TasksActivity extends AppCompatActivity {
         repo.getTasksForToday(new TaskRepository.OnTasksLoadedListener() {
             @Override
             public void onSuccess(List<Task> tasks) {
-                adapter.updateData(tasks);
+                if (tasks == null || tasks.isEmpty()) {
+                    adapter.updateData(new ArrayList<>());
+                    recycler.setVisibility(View.GONE);
+                } else {
+                    adapter.updateData(tasks);
+                    recycler.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -121,15 +125,16 @@ public class TasksActivity extends AppCompatActivity {
         TextInputEditText inputEndDate = dialogView.findViewById(R.id.inputTaskEndDate);
 
         String[] priorities = getResources().getStringArray(R.array.task_priorities);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(
                 this,
                 R.layout.item_dropdown_priority,
                 priorities
         );
-        inputPriority.setAdapter(adapter);
+        inputPriority.setAdapter(priorityAdapter);
         inputPriority.setOnClickListener(v -> inputPriority.showDropDown());
 
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new java.util.Date());
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(new java.util.Date());
         inputStartDate.setText(today);
 
         inputEndDate.setOnClickListener(v -> {
@@ -158,7 +163,8 @@ public class TasksActivity extends AppCompatActivity {
                 return;
             }
 
-            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new java.util.Date());
+            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault())
+                    .format(new java.util.Date());
 
             Task task = new Task(
                     UUID.randomUUID().toString(),
@@ -168,7 +174,6 @@ public class TasksActivity extends AppCompatActivity {
                     false,
                     startDate
             );
-
             task.setDescription(desc);
             task.setPriority(priority);
             task.setEndDate(endDate);

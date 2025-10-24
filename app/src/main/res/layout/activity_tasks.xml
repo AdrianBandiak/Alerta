@@ -9,25 +9,13 @@
     android:fitsSystemWindows="true"
     tools:context=".app.tasks.TasksActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
-        style="@style/Widget.Material3.Toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="24dp"
-        android:background="@color/white"
-        android:title="@string/title_tasks"
-        android:titleTextColor="@color/text_primary"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:layout_scrollFlags="scroll|enterAlways" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerTasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/space_md"
-        android:clipToPadding="false"
         android:layout_marginBottom="100dp"
+        android:clipToPadding="false"
+        android:padding="@dimen/space_md"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_task_home" />
 
