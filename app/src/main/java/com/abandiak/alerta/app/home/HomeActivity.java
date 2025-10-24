@@ -8,14 +8,18 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.app.tasks.TaskAdapter;
@@ -90,8 +94,33 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        View statusBar = new View(this);
+        statusBar.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                getResources().getDimensionPixelSize(
+                        getResources().getIdentifier("status_bar_height", "dimen", "android"))
+        ));
+        statusBar.setBackgroundColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+
+        ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
+        decorView.addView(statusBar);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.white));
+        }
+
+        View root = findViewById(android.R.id.content);
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), root);
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(true);
 
         fused = LocationServices.getFusedLocationProviderClient(this);
         chipOnline = findViewById(R.id.chipOnline);
@@ -126,6 +155,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
+
 
 
 
@@ -418,7 +448,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String newTime = sdf.format(new java.util.Date());
                 newTime = newTime.substring(0, 1).toUpperCase() + newTime.substring(1);
                 textTime.setText(newTime);
-                handler.postDelayed(this, 60000); // co 1 minutę
+                handler.postDelayed(this, 60000);
             }
         };
         handler.post(updater);

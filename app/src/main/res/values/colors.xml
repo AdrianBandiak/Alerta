@@ -32,5 +32,6 @@
     <color name="status_offline_bg">#F44336</color>
 
     <color name="task_background_light">#FAFAFA</color>
+    <color name="status_bar_gray">#F2F2F2</color>
 
 </resources>

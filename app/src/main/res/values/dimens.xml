@@ -12,6 +12,6 @@
     <dimen name="height_default">44dp</dimen>
 
     <dimen name="map_height">280dp</dimen>
-    <dimen name="statusbar_height">120dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
 
 </resources>

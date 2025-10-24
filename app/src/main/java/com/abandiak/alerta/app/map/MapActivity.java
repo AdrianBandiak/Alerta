@@ -29,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
@@ -127,6 +129,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+
+        View rootView = getWindow().getDecorView();
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), rootView);
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(true);
+
         setContentView(R.layout.activity_map);
 
         appBar = findViewById(R.id.appBar);

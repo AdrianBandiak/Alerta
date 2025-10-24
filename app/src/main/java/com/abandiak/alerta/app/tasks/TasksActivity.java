@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +42,22 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+
+        View rootView = getWindow().getDecorView();
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), rootView);
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(true);
+
         setContentView(R.layout.activity_tasks);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);

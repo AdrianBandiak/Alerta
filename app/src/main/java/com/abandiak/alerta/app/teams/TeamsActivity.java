@@ -2,8 +2,12 @@ package com.abandiak.alerta.app.teams;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
@@ -19,6 +23,22 @@ public class TeamsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
+
+        View rootView = getWindow().getDecorView();
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), rootView);
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(true);
+
         setContentView(R.layout.activity_teams);
 
         bottomNav = findViewById(R.id.bottomNav);
