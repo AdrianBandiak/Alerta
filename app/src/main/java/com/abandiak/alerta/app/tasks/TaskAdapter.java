@@ -12,19 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.data.model.Task;
+import com.abandiak.alerta.data.repository.TaskRepository;
 
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+
     private List<Task> items;
     private OnTaskClickListener listener;
+    private final TaskRepository repo = new TaskRepository();
 
     public TaskAdapter(List<Task> items) {
         this.items = items;
-    }
-
-    public void setOnTaskClickListener(OnTaskClickListener listener) {
-        this.listener = listener;
     }
 
     public void updateData(List<Task> newData) {
@@ -34,6 +33,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     public interface OnTaskClickListener {
         void onTaskClick(Task task);
+    }
+
+    public void setOnTaskClickListener(OnTaskClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -54,34 +57,48 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         h.textTitle.setText("[#" + idShort + "] " + t.getTitle());
         h.textMeta.setText(t.getTime());
-        h.checkDone.setChecked(t.isCompleted());
 
         if (t.isCompleted()) {
-            h.icon.setImageResource(R.drawable.ic_check_circle);
             h.icon.setColorFilter(
                     h.itemView.getContext().getColor(R.color.status_online_bg),
                     android.graphics.PorterDuff.Mode.SRC_IN
             );
-            h.icon.setAlpha(1f);
         } else {
-            h.icon.setImageResource(R.drawable.ic_task);
             h.icon.setColorFilter(
                     h.itemView.getContext().getColor(R.color.alerta_primary),
                     android.graphics.PorterDuff.Mode.SRC_IN
             );
-            h.icon.setAlpha(1f);
+        }
+
+        h.checkDone.setOnCheckedChangeListener(null);
+        h.checkDone.setChecked(t.isCompleted());
+
+        if (t.isCompleted()) {
+            h.itemView.setAlpha(0.5f);
+            h.textTitle.setAlpha(0.6f);
+            h.textMeta.setAlpha(0.6f);
+        } else {
+            h.itemView.setAlpha(1f);
+            h.textTitle.setAlpha(1f);
+            h.textMeta.setAlpha(1f);
         }
 
         h.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onTaskClick(t);
+            if (listener != null) listener.onTaskClick(t);
+        });
+
+        h.checkDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (t.isCompleted() != isChecked) {
+                t.setCompleted(isChecked);
+                repo.updateTaskCompletion(t.getId(), isChecked);
+                notifyItemChanged(h.getAdapterPosition());
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return items != null ? items.size() : 0;
+        return items.size();
     }
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {

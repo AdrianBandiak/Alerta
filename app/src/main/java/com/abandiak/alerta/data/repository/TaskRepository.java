@@ -1,5 +1,7 @@
 package com.abandiak.alerta.data.repository;
 
+import android.util.Log;
+
 import com.abandiak.alerta.data.model.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -27,6 +29,15 @@ public class TaskRepository {
                 .addOnSuccessListener(snapshots -> listener.onSuccess(snapshots.toObjects(Task.class)))
                 .addOnFailureListener(listener::onError);
     }
+
+    public void updateTaskCompletion(String taskId, boolean completed) {
+        FirebaseFirestore.getInstance()
+                .collection("tasks")
+                .document(taskId)
+                .update("completed", completed)
+                .addOnFailureListener(e -> Log.e("TASK_UPDATE", "Failed to update completion", e));
+    }
+
 
     public interface OnTaskAddedListener {
         void onSuccess();

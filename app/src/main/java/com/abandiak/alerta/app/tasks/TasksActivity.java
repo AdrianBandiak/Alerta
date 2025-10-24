@@ -1,5 +1,6 @@
 package com.abandiak.alerta.app.tasks;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TasksActivity extends AppCompatActivity {
@@ -196,6 +198,7 @@ public class TasksActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    @SuppressLint("SetTextI18n")
     private void showTaskDetailsDialog(Task task) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_task_details, null);
 
@@ -205,6 +208,8 @@ public class TasksActivity extends AppCompatActivity {
         TextView start = dialogView.findViewById(R.id.textStartDate);
         TextView end = dialogView.findViewById(R.id.textEndDate);
         TextView created = dialogView.findViewById(R.id.textCreatedAt);
+        TextView status = dialogView.findViewById(R.id.textStatus);
+
 
         title.setText(task.getTitle());
         desc.setText(task.getDescription() == null || task.getDescription().isEmpty()
@@ -213,13 +218,32 @@ public class TasksActivity extends AppCompatActivity {
         priority.setText(String.format(Locale.getDefault(),
                 "Priority: %s",
                 (task.getPriority() == null || task.getPriority().isEmpty()) ? "Normal" : task.getPriority()));
-        start.setText(String.format(Locale.getDefault(),
-                "Start date: %s",
-                task.getDate() == null ? "-" : task.getDate()));
-        end.setText(String.format(Locale.getDefault(),
-                "End date: %s",
-                (task.getEndDate() == null || task.getEndDate().isEmpty()) ? "-" : task.getEndDate()));
+
+        java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+
+        String formattedStart = "-";
+        String formattedEnd = "-";
+        try {
+            if (task.getDate() != null && !task.getDate().isEmpty())
+                formattedStart = outputFormat.format(Objects.requireNonNull(inputFormat.parse(task.getDate())));
+            if (task.getEndDate() != null && !task.getEndDate().isEmpty())
+                formattedEnd = outputFormat.format(Objects.requireNonNull(inputFormat.parse(task.getEndDate())));
+        } catch (Exception ignored) { }
+
+        start.setText(String.format(Locale.getDefault(), "Start date: %s", formattedStart));
+        end.setText(String.format(Locale.getDefault(), "End date: %s", formattedEnd));
+
         created.setText(String.format(Locale.getDefault(), "Created at: %s", task.getTime()));
+
+        if (task.isCompleted()) {
+            status.setText("Status: Completed");
+            status.setTextColor(ContextCompat.getColor(this, R.color.status_online_bg));
+        } else {
+            status.setText("Status: In progress");
+            status.setTextColor(ContextCompat.getColor(this, R.color.alerta_primary));
+        }
+
 
         AlertDialog dialog = new AlertDialog.Builder(this, com.google.android.material.R.style.Theme_Material3_Light_Dialog_Alert)
                 .setView(dialogView)
