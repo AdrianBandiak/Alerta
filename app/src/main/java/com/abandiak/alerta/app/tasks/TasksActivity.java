@@ -4,11 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +23,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,13 +47,9 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
@@ -96,6 +93,7 @@ public class TasksActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(v -> showAddTaskDialog());
 
         loadTasks();
+        Log.d("FIREBASE_UID", "Current UID: " + repo.getCurrentUserId());
     }
 
     private void loadTasks() {
@@ -113,7 +111,7 @@ public class TasksActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(TasksActivity.this, "Error loading tasks", Toast.LENGTH_SHORT).show();
+                ToastUtils.show(TasksActivity.this, "Error loading tasks.");
             }
         });
     }
@@ -185,12 +183,13 @@ public class TasksActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess() {
                     dialog.dismiss();
+                    ToastUtils.show(TasksActivity.this, "Task added.");
                     loadTasks();
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(TasksActivity.this, "Error saving task", Toast.LENGTH_SHORT).show();
+                    ToastUtils.show(TasksActivity.this, "Error saving task.");
                 }
             });
         });
@@ -210,7 +209,6 @@ public class TasksActivity extends AppCompatActivity {
         TextView created = dialogView.findViewById(R.id.textCreatedAt);
         TextView status = dialogView.findViewById(R.id.textStatus);
 
-
         title.setText(task.getTitle());
         desc.setText(task.getDescription() == null || task.getDescription().isEmpty()
                 ? "No description provided."
@@ -219,8 +217,8 @@ public class TasksActivity extends AppCompatActivity {
                 "Priority: %s",
                 (task.getPriority() == null || task.getPriority().isEmpty()) ? "Normal" : task.getPriority()));
 
-        java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
 
         String formattedStart = "-";
         String formattedEnd = "-";
@@ -233,7 +231,6 @@ public class TasksActivity extends AppCompatActivity {
 
         start.setText(String.format(Locale.getDefault(), "Start date: %s", formattedStart));
         end.setText(String.format(Locale.getDefault(), "End date: %s", formattedEnd));
-
         created.setText(String.format(Locale.getDefault(), "Created at: %s", task.getTime()));
 
         if (task.isCompleted()) {
@@ -244,14 +241,100 @@ public class TasksActivity extends AppCompatActivity {
             status.setTextColor(ContextCompat.getColor(this, R.color.alerta_primary));
         }
 
-
         AlertDialog dialog = new AlertDialog.Builder(this, com.google.android.material.R.style.Theme_Material3_Light_Dialog_Alert)
                 .setView(dialogView)
                 .create();
 
         dialogView.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+
+        dialogView.findViewById(R.id.btnEdit).setOnClickListener(v -> {
+            dialog.dismiss();
+            showEditTaskDialog(task);
+        });
+
+        dialogView.findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            View confirmView = getLayoutInflater().inflate(R.layout.dialog_confirm_delete, null);
+            AlertDialog confirmDialog = new AlertDialog.Builder(this)
+                    .setView(confirmView)
+                    .create();
+
+            confirmView.findViewById(R.id.btnCancel).setOnClickListener(v2 -> confirmDialog.dismiss());
+
+            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(v2 -> {
+                repo.deleteTask(task.getId(), success -> {
+                    if (success) {
+                        ToastUtils.show(this, "Task deleted.");
+                        confirmDialog.dismiss();
+                        dialog.dismiss();
+                        loadTasks();
+                    } else {
+                        ToastUtils.show(this, "Failed to delete.");
+                    }
+                });
+            });
+
+            confirmDialog.show();
+
+        });
+
         dialog.show();
     }
 
+    private void showEditTaskDialog(Task task) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_task, null);
 
+        TextInputEditText inputTitle = dialogView.findViewById(R.id.inputTaskTitle);
+        TextInputEditText inputDesc = dialogView.findViewById(R.id.inputTaskDescription);
+        AutoCompleteTextView inputPriority = dialogView.findViewById(R.id.inputTaskPriority);
+        TextInputEditText inputStart = dialogView.findViewById(R.id.inputTaskStartDate);
+        TextInputEditText inputEnd = dialogView.findViewById(R.id.inputTaskEndDate);
+
+        inputTitle.setText(task.getTitle());
+        inputDesc.setText(task.getDescription());
+        inputPriority.setText(task.getPriority());
+        inputStart.setText(task.getDate());
+        inputEnd.setText(task.getEndDate());
+
+        String[] priorities = getResources().getStringArray(R.array.task_priorities);
+        ArrayAdapter<String> adapterPriority = new ArrayAdapter<>(this, R.layout.item_dropdown_priority, priorities);
+        inputPriority.setAdapter(adapterPriority);
+        inputPriority.setOnClickListener(v -> inputPriority.showDropDown());
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btnCreate).setOnClickListener(v -> {
+            String title = inputTitle.getText().toString().trim();
+            String desc = inputDesc.getText().toString().trim();
+            String priority = inputPriority.getText().toString().trim();
+            String start = inputStart.getText().toString().trim();
+            String end = inputEnd.getText().toString().trim();
+
+            if (title.isEmpty()) {
+                inputTitle.setError("Title required");
+                return;
+            }
+
+            task.setTitle(title);
+            task.setDescription(desc);
+            task.setPriority(priority);
+            task.setDate(start);
+            task.setEndDate(end);
+
+            repo.updateTask(task, success -> {
+                if (success) {
+                    ToastUtils.show(this, "Task updated.");
+                    loadTasks();
+                } else {
+                    ToastUtils.show(this, "Update failed.");
+                }
+            });
+
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
 }
