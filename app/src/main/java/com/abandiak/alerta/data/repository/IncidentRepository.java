@@ -23,7 +23,7 @@ public class IncidentRepository {
     ) {
         return listenVisibleIncidentsForCurrentUser(
                 type,
-                /* regionBucket */ null,
+                null,
                 region,
                 listener
         );

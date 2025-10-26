@@ -7,7 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fontFamily="@font/inter"
-    android:fitsSystemWindows="true">
+    android:background="@color/background"
+    android:fitsSystemWindows="true"
+    tools:context=".app.home.HomeActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -115,12 +117,14 @@
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:fillViewport="true"
+        android:background="@color/background"
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
         android:paddingBottom="@dimen/space_lg"
@@ -175,7 +179,6 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardMap"
                 style="@style/Alerta.Card.Elevated"
@@ -217,28 +220,30 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/legend_red_critical"
+                                android:text="• Red = CRITICAL"
                                 android:textColor="#D32F2F"
-                                android:textStyle="bold"
-                                android:textSize="12sp"/>
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/legend_yellow_hazard"
+                                android:text="• Yellow = HAZARD"
                                 android:textColor="#F9A825"
                                 android:textSize="12sp"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/legend_blue_info"
+                                android:text="• Blue = INFO"
                                 android:textColor="#1976D2"
                                 android:textSize="12sp"/>
                         </LinearLayout>
+
                     </com.google.android.material.card.MaterialCardView>
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReportIncident"
@@ -252,6 +257,7 @@
                 app:backgroundTint="@color/alerta_primary"
                 android:textColor="@color/white"
                 app:iconTint="@null"/>
+
 
             <LinearLayout
                 android:id="@+id/quick_actions_secondary"
@@ -286,8 +292,8 @@
                     app:strokeColor="@color/alerta_primary"
                     android:textColor="@color/alerta_primary"
                     app:iconTint="@color/alerta_primary" />
-
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -325,50 +331,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:contentDescription="@string/cd_list_my_tasks_today"
-                tools:listitem="@layout/item_task_home"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_lg"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/labelFeed"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/section_activity_feed"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:id="@+id/btnViewAllFeed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_view"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:drawableEnd="@drawable/ic_chevron_right"
-                    android:drawablePadding="4dp"
-                    app:drawableTint="@color/text_secondary"
-                    android:padding="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerFeed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:contentDescription="@string/cd_recent_activity_feed"
-                tools:listitem="@layout/item_feed_home"/>
-
+                tools:listitem="@layout/item_task_home" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
@@ -377,7 +343,6 @@
         android:layout_gravity="bottom"
         android:background="@color/white"
         android:paddingBottom="0dp"
-        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"

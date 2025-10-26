@@ -85,7 +85,6 @@
                 app:endIconTint="@color/alerta_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- End Date -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
