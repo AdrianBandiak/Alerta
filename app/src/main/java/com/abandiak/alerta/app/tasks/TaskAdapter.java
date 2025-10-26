@@ -20,6 +20,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     private List<Task> items;
     private OnTaskClickListener listener;
+    private OnTaskStatusChangedListener statusListener;
     private final TaskRepository repo = new TaskRepository();
 
     public TaskAdapter(List<Task> items) {
@@ -35,8 +36,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         void onTaskClick(Task task);
     }
 
+    public interface OnTaskStatusChangedListener {
+        void onStatusChanged();
+    }
+
     public void setOnTaskClickListener(OnTaskClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnTaskStatusChangedListener(OnTaskStatusChangedListener listener) {
+        this.statusListener = listener;
     }
 
     @NonNull
@@ -58,30 +67,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         h.textTitle.setText("[#" + idShort + "] " + t.getTitle());
         h.textMeta.setText(t.getTime());
 
-        if (t.isCompleted()) {
-            h.icon.setColorFilter(
-                    h.itemView.getContext().getColor(R.color.status_online_bg),
-                    android.graphics.PorterDuff.Mode.SRC_IN
-            );
-        } else {
-            h.icon.setColorFilter(
-                    h.itemView.getContext().getColor(R.color.alerta_primary),
-                    android.graphics.PorterDuff.Mode.SRC_IN
-            );
-        }
+        applyTaskStyle(h, t.isCompleted());
 
         h.checkDone.setOnCheckedChangeListener(null);
         h.checkDone.setChecked(t.isCompleted());
-
-        if (t.isCompleted()) {
-            h.itemView.setAlpha(0.5f);
-            h.textTitle.setAlpha(0.6f);
-            h.textMeta.setAlpha(0.6f);
-        } else {
-            h.itemView.setAlpha(1f);
-            h.textTitle.setAlpha(1f);
-            h.textMeta.setAlpha(1f);
-        }
 
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onTaskClick(t);
@@ -91,9 +80,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (t.isCompleted() != isChecked) {
                 t.setCompleted(isChecked);
                 repo.updateTaskCompletion(t.getId(), isChecked);
-                notifyItemChanged(h.getAdapterPosition());
+
+                applyTaskStyle(h, isChecked);
+
+                if (statusListener != null) statusListener.onStatusChanged();
             }
         });
+    }
+
+    private void applyTaskStyle(TaskViewHolder h, boolean completed) {
+        int iconColor = h.itemView.getContext().getColor(
+                completed ? R.color.status_online_bg : R.color.alerta_primary
+        );
+
+        h.icon.setColorFilter(iconColor, android.graphics.PorterDuff.Mode.SRC_IN);
+
+        float alpha = completed ? 0.5f : 1f;
+        h.itemView.setAlpha(alpha);
+        h.textTitle.setAlpha(alpha);
+        h.textMeta.setAlpha(alpha);
     }
 
     @Override

@@ -29,6 +29,7 @@ import com.abandiak.alerta.data.repository.TaskRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class TasksActivity extends AppCompatActivity {
     private TaskAdapter adapter;
     private TaskRepository repo;
     private RecyclerView recycler;
+    private ListenerRegistration taskListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,17 @@ public class TasksActivity extends AppCompatActivity {
         recycler.setVisibility(View.GONE);
 
         adapter.setOnTaskClickListener(this::showTaskDetailsDialog);
+        adapter.setOnTaskStatusChangedListener(() -> {
+            repo.getTasksForToday(new TaskRepository.OnTasksLoadedListener() {
+                @Override
+                public void onSuccess(List<Task> tasks) {
+                    updateHeader(tasks);
+                }
+
+                @Override
+                public void onError(Exception e) { }
+            });
+        });
 
         FloatingActionButton fabAdd = findViewById(R.id.fabAddTask);
         fabAdd.setOnClickListener(v -> showAddTaskDialog());
@@ -97,15 +110,22 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void loadTasks() {
-        repo.getTasksForToday(new TaskRepository.OnTasksLoadedListener() {
+        if (taskListener != null) {
+            taskListener.remove();
+        }
+
+        taskListener = repo.listenForTodayTasks(new TaskRepository.OnTasksLoadedListener() {
             @Override
             public void onSuccess(List<Task> tasks) {
+                updateHeader(tasks);
                 if (tasks == null || tasks.isEmpty()) {
                     adapter.updateData(new ArrayList<>());
                     recycler.setVisibility(View.GONE);
+                    findViewById(R.id.emptyState).setVisibility(View.VISIBLE);
                 } else {
                     adapter.updateData(tasks);
                     recycler.setVisibility(View.VISIBLE);
+                    findViewById(R.id.emptyState).setVisibility(View.GONE);
                 }
             }
 
@@ -114,6 +134,32 @@ public class TasksActivity extends AppCompatActivity {
                 ToastUtils.show(TasksActivity.this, "Error loading tasks.");
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (taskListener != null) {
+            taskListener.remove();
+            taskListener = null;
+        }
+    }
+
+    private void updateHeader(List<Task> tasks) {
+        TextView subtitle = findViewById(R.id.textHeaderSubtitle);
+        if (tasks == null || tasks.isEmpty()) {
+            subtitle.setText("0 in progress • 0 completed");
+            return;
+        }
+
+        int inProgress = 0, done = 0;
+        for (Task t : tasks) {
+            if (t.isCompleted()) done++;
+            else inProgress++;
+        }
+
+        subtitle.setText(String.format(Locale.getDefault(),
+                "%d in progress • %d completed", inProgress, done));
     }
 
     private void showAddTaskDialog() {
@@ -184,7 +230,6 @@ public class TasksActivity extends AppCompatActivity {
                 public void onSuccess() {
                     dialog.dismiss();
                     ToastUtils.show(TasksActivity.this, "Task added.");
-                    loadTasks();
                 }
 
                 @Override
@@ -266,7 +311,6 @@ public class TasksActivity extends AppCompatActivity {
                         ToastUtils.show(this, "Task deleted.");
                         confirmDialog.dismiss();
                         dialog.dismiss();
-                        loadTasks();
                     } else {
                         ToastUtils.show(this, "Failed to delete.");
                     }
@@ -274,7 +318,6 @@ public class TasksActivity extends AppCompatActivity {
             });
 
             confirmDialog.show();
-
         });
 
         dialog.show();
@@ -326,7 +369,6 @@ public class TasksActivity extends AppCompatActivity {
             repo.updateTask(task, success -> {
                 if (success) {
                     ToastUtils.show(this, "Task updated.");
-                    loadTasks();
                 } else {
                     ToastUtils.show(this, "Update failed.");
                 }
