@@ -78,11 +78,12 @@
         android:id="@+id/recyclerTeams"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="160dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingBottom="100dp"
         android:clipToPadding="false"
+        android:scrollbars="vertical"
         tools:listitem="@layout/item_team" />
 
     <LinearLayout
@@ -125,8 +126,6 @@
             android:lineSpacingExtra="2dp"
             android:layout_marginHorizontal="12dp" />
     </LinearLayout>
-
-
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"

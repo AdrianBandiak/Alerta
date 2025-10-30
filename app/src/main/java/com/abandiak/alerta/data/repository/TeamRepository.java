@@ -12,81 +12,122 @@ public class TeamRepository {
     private final String uid = FirebaseAuth.getInstance().getUid();
 
     private CollectionReference teams() { return db.collection("teams"); }
-    private DocumentReference teamDoc(String id){ return teams().document(id); }
-
-    private DocumentReference codeDoc(String code){ return db.collection("team_codes").document(code); }
+    private DocumentReference teamDoc(String id) { return teams().document(id); }
+    private DocumentReference codeDoc(String code) { return db.collection("team_codes").document(code); }
 
     public interface TeamsListener { void onSuccess(List<Team> list); void onError(Exception e); }
     public interface SimpleCallback { void onResult(boolean ok, String message); }
 
-    public ListenerRegistration listenMyTeams(TeamsListener l){
+    public ListenerRegistration listenMyTeams(TeamsListener l) {
         return teams()
                 .whereArrayContains("membersIndex", uid)
-                .addSnapshotListener((snap, e)->{
-                    if(e!=null){ l.onError(e); return; }
-                    l.onSuccess(snap==null? Collections.emptyList() : snap.toObjects(Team.class));
+                .addSnapshotListener((snap, e) -> {
+                    if (e != null) { l.onError(e); return; }
+                    l.onSuccess(snap == null ? Collections.emptyList() : snap.toObjects(Team.class));
                 });
     }
 
-    public void getMyTeams(TeamsListener l){
+    public void getMyTeams(TeamsListener l) {
         teams().whereArrayContains("membersIndex", uid)
-                .get().addOnSuccessListener(s -> l.onSuccess(s.toObjects(Team.class)))
+                .get()
+                .addOnSuccessListener(s -> l.onSuccess(s.toObjects(Team.class)))
                 .addOnFailureListener(l::onError);
     }
 
-    public void createTeam(String name, String desc, SimpleCallback cb){
-        if(uid==null){ cb.onResult(false,"Not signed in"); return; }
+    public void createTeam(String name, String desc, int color, SimpleCallback cb) {
+        if (uid == null) {
+            cb.onResult(false, "Not signed in");
+            return;
+        }
+
         String id = UUID.randomUUID().toString();
         String code = genCode();
         long now = System.currentTimeMillis();
-        Team t = new Team(id, name, desc, code, uid, now);
+        Team t = new Team(id, name, desc, code, uid, now, color);
 
         WriteBatch batch = db.batch();
         DocumentReference team = teamDoc(id);
         batch.set(team, t);
         batch.update(team, "membersIndex", Arrays.asList(uid));
 
-        batch.set(team.collection("members").document(uid), new HashMap<String,Object>(){{
-            put("role","owner"); put("joinedAt", now);
+        batch.set(team.collection("members").document(uid), new HashMap<String, Object>() {{
+            put("role", "owner");
+            put("joinedAt", now);
         }});
 
-        batch.set(codeDoc(code), new HashMap<String, Object>(){{ put("teamId", id); }});
+        batch.set(codeDoc(code), new HashMap<String, Object>() {{
+            put("teamId", id);
+        }});
 
         batch.commit()
-                .addOnSuccessListener(v-> cb.onResult(true,"Team created"))
-                .addOnFailureListener(e-> { Log.e("TEAM_CREATE","",e); cb.onResult(false,"Create failed"); });
+                .addOnSuccessListener(v -> cb.onResult(true, "Team created"))
+                .addOnFailureListener(e -> {
+                    Log.e("TEAM_CREATE", "", e);
+                    cb.onResult(false, "Create failed");
+                });
     }
 
-    public void joinByCode(String rawCode, SimpleCallback cb){
-        if(uid==null){ cb.onResult(false,"Not signed in"); return; }
+    public void joinByCode(String rawCode, SimpleCallback cb) {
+        if (uid == null) {
+            cb.onResult(false, "Not signed in");
+            return;
+        }
+
         String code = rawCode.trim().toUpperCase(Locale.ROOT);
         codeDoc(code).get().addOnSuccessListener(doc -> {
-            if(!doc.exists()){ cb.onResult(false,"Invalid code"); return; }
+            if (!doc.exists()) {
+                cb.onResult(false, "Invalid code");
+                return;
+            }
             String teamId = doc.getString("teamId");
-            if(teamId==null){ cb.onResult(false,"Invalid code"); return; }
+            if (teamId == null) {
+                cb.onResult(false, "Invalid code");
+                return;
+            }
 
             DocumentReference team = teamDoc(teamId);
             long now = System.currentTimeMillis();
 
             db.runTransaction(tr -> {
                         tr.set(team.collection("members").document(uid),
-                                new HashMap<String,Object>(){{ put("role","member"); put("joinedAt", now); }}, SetOptions.merge());
+                                new HashMap<String, Object>() {{
+                                    put("role", "member");
+                                    put("joinedAt", now);
+                                }}, SetOptions.merge());
                         List<String> idx = (List<String>) tr.get(team).get("membersIndex");
-                        if(idx==null) idx = new ArrayList<>();
-                        if(!idx.contains(uid)) { idx.add(uid); tr.update(team, "membersIndex", idx); }
+                        if (idx == null) idx = new ArrayList<>();
+                        if (!idx.contains(uid)) {
+                            idx.add(uid);
+                            tr.update(team, "membersIndex", idx);
+                        }
                         return null;
-                    }).addOnSuccessListener(v-> cb.onResult(true,"Joined"))
-                    .addOnFailureListener(e-> cb.onResult(false,"Join failed"));
-        }).addOnFailureListener(e-> cb.onResult(false,"Join failed"));
+                    }).addOnSuccessListener(v -> cb.onResult(true, "Joined"))
+                    .addOnFailureListener(e -> cb.onResult(false, "Join failed"));
+        }).addOnFailureListener(e -> cb.onResult(false, "Join failed"));
     }
 
-    private String genCode(){
+    private String genCode() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         StringBuilder sb = new StringBuilder(6);
         Random r = ThreadLocalRandom.current();
-        for(int i=0;i<6;i++) sb.append(chars.charAt(r.nextInt(chars.length())));
+        for (int i = 0; i < 6; i++) sb.append(chars.charAt(r.nextInt(chars.length())));
         return sb.toString();
     }
 
-    public String currentUid(){ return uid; }
+    public String currentUid() { return uid; }
+
+    public void updateTeam(Team team, SimpleCallback cb) {
+        teams().document(team.getId())
+                .set(team, SetOptions.merge())
+                .addOnSuccessListener(v -> cb.onResult(true, "Updated"))
+                .addOnFailureListener(e -> cb.onResult(false, "Update failed"));
+    }
+
+    public void deleteTeam(String teamId, java.util.function.Consumer<Boolean> cb) {
+        teams().document(teamId)
+                .delete()
+                .addOnSuccessListener(v -> cb.accept(true))
+                .addOnFailureListener(e -> cb.accept(false));
+    }
+
 }

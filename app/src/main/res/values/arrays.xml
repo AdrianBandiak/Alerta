@@ -7,4 +7,10 @@
         <item>Critical</item>
         <item>Urgent</item>
     </string-array>
+
+    <string-array name="team_visibility">
+        <item>Private</item>
+        <item>Unlisted</item>
+        <item>Public</item>
+    </string-array>
 </resources>

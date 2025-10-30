@@ -1,9 +1,14 @@
 package com.abandiak.alerta.app.teams;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -11,6 +16,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
@@ -20,9 +26,14 @@ import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.skydoves.colorpickerview.ColorEnvelope;
+import com.skydoves.colorpickerview.ColorPickerView;
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TeamsActivity extends AppCompatActivity {
 
@@ -52,9 +63,7 @@ public class TeamsActivity extends AppCompatActivity {
         adapter = new TeamListAdapter();
         recycler.setAdapter(adapter);
 
-        adapter.setOnTeamClick(team -> {
-            ToastUtils.show(this, "Open team: " + team.getName());
-        });
+        adapter.setOnTeamClick(this::showTeamDetailsDialog);
 
         findViewById(R.id.btnCreateTeam).setOnClickListener(v -> showCreateDialog());
         findViewById(R.id.btnJoinTeam).setOnClickListener(v -> showJoinDialog());
@@ -65,13 +74,17 @@ public class TeamsActivity extends AppCompatActivity {
             bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, HomeActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_map) {
-                    startActivity(new Intent(this, MapActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, MapActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_tasks) {
-                    startActivity(new Intent(this, TasksActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, TasksActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_more) {
-                    startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, MoreActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 }
                 overridePendingTransition(0, 0);
                 return id == R.id.nav_teams;
@@ -83,13 +96,16 @@ public class TeamsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         reg = repo.listenMyTeams(new TeamRepository.TeamsListener() {
-            @Override public void onSuccess(List<Team> list) {
+            @Override
+            public void onSuccess(List<Team> list) {
                 adapter.submit(list);
                 boolean empty = list == null || list.isEmpty();
                 emptyState.setVisibility(empty ? View.VISIBLE : View.GONE);
                 recycler.setVisibility(empty ? View.GONE : View.VISIBLE);
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 ToastUtils.show(TeamsActivity.this, "Failed to load teams.");
             }
         });
@@ -98,26 +114,271 @@ public class TeamsActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (reg != null) { reg.remove(); reg = null; }
+        if (reg != null) {
+            reg.remove();
+            reg = null;
+        }
     }
 
     private void showCreateDialog() {
         View view = getLayoutInflater().inflate(R.layout.dialog_create_team, null);
-        TextInputEditText inputName = view.findViewById(R.id.inputTeamName);
-        TextInputEditText inputDesc = view.findViewById(R.id.inputTeamDesc);
 
-        AlertDialog d = new AlertDialog.Builder(this).setView(view).create();
-        view.findViewById(R.id.btnCancel).setOnClickListener(v -> d.dismiss());
+        EditText inputName = view.findViewById(R.id.inputTeamName);
+        EditText inputDesc = view.findViewById(R.id.inputTeamDesc);
+        EditText inputRegion = view.findViewById(R.id.inputTeamRegion);
+        View colorPreview = view.findViewById(R.id.viewColorPreview);
+        Button btnPickColor = view.findViewById(R.id.btnPickColor);
+
+        final int[] selectedColor = {Color.RED};
+
+        btnPickColor.setOnClickListener(v -> {
+            View pickerView = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
+            ColorPickerView colorPickerView = pickerView.findViewById(R.id.colorPickerView);
+            View preview = pickerView.findViewById(R.id.colorPreview);
+            EditText inputR = pickerView.findViewById(R.id.inputR);
+            EditText inputG = pickerView.findViewById(R.id.inputG);
+            EditText inputB = pickerView.findViewById(R.id.inputB);
+            Button btnCancel = pickerView.findViewById(R.id.btnCancel);
+            Button btnOk = pickerView.findViewById(R.id.btnOk);
+
+            final int[] dialogColor = {selectedColor[0]};
+            preview.setBackgroundColor(dialogColor[0]);
+
+            inputR.setText(String.valueOf(Color.red(dialogColor[0])));
+            inputG.setText(String.valueOf(Color.green(dialogColor[0])));
+            inputB.setText(String.valueOf(Color.blue(dialogColor[0])));
+
+            colorPickerView.setColorListener((ColorEnvelopeListener) (ColorEnvelope envelope, boolean fromUser) -> {
+                int color = envelope.getColor();
+                dialogColor[0] = color;
+                preview.setBackgroundColor(color);
+                inputR.setText(String.valueOf(Color.red(color)));
+                inputG.setText(String.valueOf(Color.green(color)));
+                inputB.setText(String.valueOf(Color.blue(color)));
+            });
+
+            View.OnFocusChangeListener updateColor = (v1, hasFocus) -> {
+                if (!hasFocus) {
+                    try {
+                        int r = parseColorValue(inputR.getText().toString());
+                        int g = parseColorValue(inputG.getText().toString());
+                        int b = parseColorValue(inputB.getText().toString());
+                        int color = Color.rgb(r, g, b);
+                        dialogColor[0] = color;
+                        preview.setBackgroundColor(color);
+                        colorPickerView.setPureColor(color);
+                        colorPickerView.selectByHsvColor(color);
+                    } catch (Exception ignored) {}
+                }
+            };
+            inputR.setOnFocusChangeListener(updateColor);
+            inputG.setOnFocusChangeListener(updateColor);
+            inputB.setOnFocusChangeListener(updateColor);
+
+            AlertDialog pickerDialog = new AlertDialog.Builder(this)
+                    .setView(pickerView)
+                    .create();
+
+            btnCancel.setOnClickListener(v2 -> pickerDialog.dismiss());
+            btnOk.setOnClickListener(v2 -> {
+                selectedColor[0] = dialogColor[0];
+                ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+                pickerDialog.dismiss();
+            });
+
+            pickerDialog.show();
+        });
+
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
+        view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
         view.findViewById(R.id.btnCreate).setOnClickListener(v -> {
-            String name = text(inputName);
-            String desc = text(inputDesc);
-            if (name.isEmpty()) { inputName.setError("Name required"); return; }
-            repo.createTeam(name, desc, (ok, msg) -> {
+            String name = inputName.getText().toString().trim();
+            String desc = inputDesc.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                inputName.setError("Name required");
+                return;
+            }
+
+            repo.createTeam(name, desc, selectedColor[0], (ok, msg) -> {
                 ToastUtils.show(this, ok ? "Team created." : msg);
-                if (ok) d.dismiss();
+                if (ok) dialog.dismiss();
             });
         });
-        d.show();
+
+        dialog.show();
+    }
+
+    private void showTeamDetailsDialog(Team team) {
+        View view = getLayoutInflater().inflate(R.layout.dialog_team_details, null);
+
+        TextView textName = view.findViewById(R.id.textTeamName);
+        TextView textDesc = view.findViewById(R.id.textTeamDescription);
+        TextView textCode = view.findViewById(R.id.textTeamCode);
+        TextView textCreatedBy = view.findViewById(R.id.textCreatedBy);
+        TextView textCreatedAt = view.findViewById(R.id.textCreatedAt);
+
+        textName.setText(team.getName());
+        textDesc.setText(team.getDescription() == null || team.getDescription().isEmpty()
+                ? "No description provided."
+                : team.getDescription());
+        textCode.setText("Code: " + (team.getCode() == null ? "—" : team.getCode()));
+        textCreatedBy.setText("Created by: " + (team.getCreatedBy() == null ? "Unknown" : team.getCreatedBy()));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        String date = team.getCreatedAt() > 0 ? sdf.format(new java.util.Date(team.getCreatedAt())) : "—";
+        textCreatedAt.setText("Created at: " + date);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
+        view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnEdit).setOnClickListener(v -> {
+            dialog.dismiss();
+            showEditTeamDialog(team);
+        });
+
+        view.findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            View confirmView = getLayoutInflater().inflate(R.layout.dialog_confirm_delete, null);
+            AlertDialog confirmDialog = new AlertDialog.Builder(this)
+                    .setView(confirmView)
+                    .create();
+
+            confirmView.findViewById(R.id.btnCancel).setOnClickListener(v2 -> confirmDialog.dismiss());
+            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(v2 -> {
+                repo.deleteTeam(team.getId(), success -> {
+                    if (success) {
+                        ToastUtils.show(this, "Team deleted.");
+                        confirmDialog.dismiss();
+                        dialog.dismiss();
+                    } else {
+                        ToastUtils.show(this, "Failed to delete team.");
+                    }
+                });
+            });
+
+            confirmDialog.show();
+        });
+
+        dialog.show();
+    }
+
+    private void showEditTeamDialog(Team team) {
+        View view = getLayoutInflater().inflate(R.layout.dialog_create_team, null);
+
+        EditText inputName = view.findViewById(R.id.inputTeamName);
+        EditText inputDesc = view.findViewById(R.id.inputTeamDesc);
+        EditText inputRegion = view.findViewById(R.id.inputTeamRegion);
+        View colorPreview = view.findViewById(R.id.viewColorPreview);
+        Button btnPickColor = view.findViewById(R.id.btnPickColor);
+
+        inputName.setText(team.getName());
+        inputDesc.setText(team.getDescription());
+
+        final int[] selectedColor = {team.getColor()};
+        ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+
+        btnPickColor.setOnClickListener(v -> {
+            View pickerView = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
+            ColorPickerView colorPickerView = pickerView.findViewById(R.id.colorPickerView);
+            View preview = pickerView.findViewById(R.id.colorPreview);
+            EditText inputR = pickerView.findViewById(R.id.inputR);
+            EditText inputG = pickerView.findViewById(R.id.inputG);
+            EditText inputB = pickerView.findViewById(R.id.inputB);
+            Button btnCancel = pickerView.findViewById(R.id.btnCancel);
+            Button btnOk = pickerView.findViewById(R.id.btnOk);
+
+            final int[] dialogColor = {selectedColor[0]};
+            preview.setBackgroundColor(dialogColor[0]);
+
+            inputR.setText(String.valueOf(Color.red(dialogColor[0])));
+            inputG.setText(String.valueOf(Color.green(dialogColor[0])));
+            inputB.setText(String.valueOf(Color.blue(dialogColor[0])));
+
+            colorPickerView.setColorListener((ColorEnvelopeListener) (ColorEnvelope envelope, boolean fromUser) -> {
+                int color = envelope.getColor();
+                dialogColor[0] = color;
+                preview.setBackgroundColor(color);
+                inputR.setText(String.valueOf(Color.red(color)));
+                inputG.setText(String.valueOf(Color.green(color)));
+                inputB.setText(String.valueOf(Color.blue(color)));
+            });
+
+            View.OnFocusChangeListener updateColor = (v1, hasFocus) -> {
+                if (!hasFocus) {
+                    try {
+                        int r = parseColorValue(inputR.getText().toString());
+                        int g = parseColorValue(inputG.getText().toString());
+                        int b = parseColorValue(inputB.getText().toString());
+                        int color = Color.rgb(r, g, b);
+                        dialogColor[0] = color;
+                        preview.setBackgroundColor(color);
+                        colorPickerView.setPureColor(color);
+                        colorPickerView.selectByHsvColor(color);
+                    } catch (Exception ignored) {}
+                }
+            };
+            inputR.setOnFocusChangeListener(updateColor);
+            inputG.setOnFocusChangeListener(updateColor);
+            inputB.setOnFocusChangeListener(updateColor);
+
+            AlertDialog pickerDialog = new AlertDialog.Builder(this)
+                    .setView(pickerView)
+                    .create();
+
+            btnCancel.setOnClickListener(v2 -> pickerDialog.dismiss());
+            btnOk.setOnClickListener(v2 -> {
+                selectedColor[0] = dialogColor[0];
+                ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+                pickerDialog.dismiss();
+            });
+
+            pickerDialog.show();
+        });
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
+        view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnCreate).setOnClickListener(v -> {
+            String name = inputName.getText().toString().trim();
+            String desc = inputDesc.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                inputName.setError("Name required");
+                return;
+            }
+
+            team.setName(name);
+            team.setDescription(desc);
+            team.setColor(selectedColor[0]);
+
+            repo.updateTeam(team, (ok, msg) -> {
+                ToastUtils.show(this, ok ? "Team updated." : msg);
+            });
+
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private int parseColorValue(String text) {
+        if (text == null || text.isEmpty()) return 0;
+        try {
+            int v = Integer.parseInt(text);
+            return Math.max(0, Math.min(255, v));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void showJoinDialog() {
@@ -127,8 +388,11 @@ public class TeamsActivity extends AppCompatActivity {
         AlertDialog d = new AlertDialog.Builder(this).setView(view).create();
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> d.dismiss());
         view.findViewById(R.id.btnJoin).setOnClickListener(v -> {
-            String code = input.getText()==null ? "" : input.getText().toString();
-            if (code.trim().length() != 6) { input.setError("Enter 6-char code"); return; }
+            String code = input.getText() == null ? "" : input.getText().toString();
+            if (code.trim().length() != 6) {
+                input.setError("Enter 6-char code");
+                return;
+            }
             repo.joinByCode(code, (ok, msg) -> {
                 ToastUtils.show(this, ok ? "Joined team." : msg);
                 if (ok) d.dismiss();
@@ -136,6 +400,4 @@ public class TeamsActivity extends AppCompatActivity {
         });
         d.show();
     }
-
-    private static String text(EditText e){ return e.getText()==null? "": e.getText().toString().trim(); }
 }

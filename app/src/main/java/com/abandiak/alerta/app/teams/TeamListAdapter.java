@@ -1,5 +1,6 @@
 package com.abandiak.alerta.app.teams;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
@@ -59,6 +61,10 @@ public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.TeamVH
             meta = meta + " • " + date;
         }
         h.textMeta.setText(meta);
+
+        int color = t.getColor() != 0 ? t.getColor() :
+                h.itemView.getContext().getColor(R.color.alerta_primary);
+        ImageViewCompat.setImageTintList(h.icon, ColorStateList.valueOf(color));
 
         h.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onTeamClick(t);

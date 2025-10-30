@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="24dp"
+    android:fontFamily="@font/inter"
+    android:elevation="6dp">
+
+    <TextView
+        android:id="@+id/textTeamName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Team Name"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="12dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:id="@+id/textTeamDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:paddingBottom="16dp"
+        android:lineSpacingExtra="2dp" />
+
+    <TextView
+        android:id="@+id/textTeamCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Code: ABC123"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/textCreatedBy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Created by: user123"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/textCreatedAt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Created at: 27 Oct 2025"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EAEAEA"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="80dp"
+            android:text="@string/edit"
+            android:textColor="@color/alerta_primary"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDelete"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="80dp"
+            android:text="@string/delete"
+            android:textColor="#B00020"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClose"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="100dp"
+            android:text="@string/close"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/alerta_primary"
+            android:textSize="12sp"
+            app:cornerRadius="50dp"
+            android:elevation="1dp" />
+    </LinearLayout>
+</LinearLayout>
