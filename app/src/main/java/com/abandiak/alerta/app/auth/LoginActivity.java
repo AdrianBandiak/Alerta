@@ -29,27 +29,26 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.app.profile.CompleteProfileActivity;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
     private TextView textViewRegisterLink;
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db;
     private TextInputEditText editTextEmail, editTextPassword;
     private Button buttonLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
         super.onCreate(savedInstanceState);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
             getWindow().setNavigationBarColor(Color.TRANSPARENT);
@@ -69,15 +68,13 @@ public class LoginActivity extends AppCompatActivity {
             return WindowInsetsCompat.CONSUMED;
         });
 
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(getWindow(), root);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), root);
         controller.setAppearanceLightStatusBars(true);
         controller.setAppearanceLightNavigationBars(true);
-        controller.setSystemBarsBehavior(
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        );
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -112,9 +109,33 @@ public class LoginActivity extends AppCompatActivity {
 
             firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        ToastUtils.show(this, "Login successful.");
-                        startActivity(new Intent(this, HomeActivity.class));
-                        finish();
+                        String uid = firebaseAuth.getCurrentUser() != null
+                                ? firebaseAuth.getCurrentUser().getUid() : null;
+
+                        if (uid == null) {
+                            ToastUtils.show(this, "User not found.");
+                            buttonLogin.setEnabled(true);
+                            return;
+                        }
+
+                        db.collection("users").document(uid)
+                                .collection("profile")
+                                .document("info")
+                                .get()
+                                .addOnSuccessListener(doc -> {
+                                    if (!doc.exists()) {
+                                        ToastUtils.show(this, "Please complete your profile.");
+                                        startActivity(new Intent(this, CompleteProfileActivity.class));
+                                    } else {
+                                        ToastUtils.show(this, "Login successful.");
+                                        startActivity(new Intent(this, HomeActivity.class));
+                                    }
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    ToastUtils.show(this, "Error checking profile.");
+                                    buttonLogin.setEnabled(true);
+                                });
                     })
                     .addOnFailureListener(e -> {
                         ToastUtils.show(this, "Login failed: Invalid credentials.");
@@ -122,10 +143,8 @@ public class LoginActivity extends AppCompatActivity {
                     });
         });
 
-        textViewRegisterLink.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+        textViewRegisterLink.setOnClickListener(v ->
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
         Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in_translate);
         logo.setVisibility(View.VISIBLE);

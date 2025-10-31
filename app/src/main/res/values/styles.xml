@@ -20,7 +20,6 @@
         <item name="android:colorAccent">@color/status_online_bg</item>
         <item name="colorAccent">@color/status_online_bg</item>
 
-
         <item name="android:statusBarColor">@color/status_bar_gray</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -120,5 +119,32 @@
         <item name="android:padding">12dp</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="AlertaTextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="hintTextColor">@color/hint_color_selector</item>
+        <item name="android:textColorHint">@color/hint_color_selector</item>
+        <item name="boxStrokeColor">@color/alerta_primary</item>
+        <item name="colorControlActivated">@color/alerta_primary</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="startIconTint">@color/alerta_primary</item>
+        <item name="endIconTint">@color/alerta_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:labelTextSize">11sp</item>
+    </style>
+
+    <style name="AlertaTextInput.Dropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="hintTextColor">@color/hint_color_selector</item>
+        <item name="android:textColorHint">@color/hint_color_selector</item>
+        <item name="boxStrokeColor">@color/alerta_primary</item>
+        <item name="colorControlActivated">@color/alerta_primary</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="startIconTint">@color/alerta_primary</item>
+        <item name="endIconTint">@color/alerta_primary</item>
+        <item name="android:popupElevation">6dp</item>
+        <item name="android:popupBackground">@android:color/white</item>
+    </style>
+
 
 </resources>

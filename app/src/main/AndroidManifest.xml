@@ -11,17 +11,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_MEDIA_IMAGES"
         tools:targetApi="33" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
         tools:targetApi="33" />
@@ -38,6 +34,18 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.Alerta">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_api_key" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/alerta_primary" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -48,17 +56,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/maps_api_key" />
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/alerta_primary" />
-
         <service
             android:name=".core.notifications.AlertaMessagingService"
             android:exported="false">
@@ -68,26 +65,39 @@
         </service>
 
         <activity
+            android:name=".app.profile.CompleteProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+
+        <activity
             android:name=".app.map.MapActivity"
             android:exported="false" />
+
         <activity
             android:name=".app.tasks.TasksActivity"
             android:exported="false" />
+
         <activity
             android:name=".app.teams.TeamsActivity"
             android:exported="false" />
+
         <activity
             android:name=".app.more.MoreActivity"
             android:exported="false" />
+
         <activity
             android:name=".app.home.HomeActivity"
             android:exported="false" />
+
         <activity
             android:name=".app.auth.RegisterActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+
         <activity
             android:name=".app.auth.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

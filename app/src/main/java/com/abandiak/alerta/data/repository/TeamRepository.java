@@ -43,29 +43,42 @@ public class TeamRepository {
         String id = UUID.randomUUID().toString();
         String code = genCode();
         long now = System.currentTimeMillis();
-        Team t = new Team(id, name, desc, code, uid, now, color);
 
-        WriteBatch batch = db.batch();
-        DocumentReference team = teamDoc(id);
-        batch.set(team, t);
-        batch.update(team, "membersIndex", Arrays.asList(uid));
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(userDoc -> {
+                    String firstName = userDoc.getString("firstName");
+                    String lastName = userDoc.getString("lastName");
+                    String fullName = ((firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "")).trim();
 
-        batch.set(team.collection("members").document(uid), new HashMap<String, Object>() {{
-            put("role", "owner");
-            put("joinedAt", now);
-        }});
+                    Team t = new Team(id, name, desc, code, uid, fullName, now, color);
 
-        batch.set(codeDoc(code), new HashMap<String, Object>() {{
-            put("teamId", id);
-        }});
+                    WriteBatch batch = db.batch();
+                    DocumentReference team = teamDoc(id);
+                    batch.set(team, t);
+                    batch.update(team, "membersIndex", Arrays.asList(uid));
 
-        batch.commit()
-                .addOnSuccessListener(v -> cb.onResult(true, "Team created"))
+                    batch.set(team.collection("members").document(uid), new HashMap<String, Object>() {{
+                        put("role", "owner");
+                        put("joinedAt", now);
+                    }});
+
+                    batch.set(codeDoc(code), new HashMap<String, Object>() {{
+                        put("teamId", id);
+                    }});
+
+                    batch.commit()
+                            .addOnSuccessListener(v -> cb.onResult(true, "Team created"))
+                            .addOnFailureListener(e -> {
+                                Log.e("TEAM_CREATE", "", e);
+                                cb.onResult(false, "Create failed");
+                            });
+                })
                 .addOnFailureListener(e -> {
-                    Log.e("TEAM_CREATE", "", e);
-                    cb.onResult(false, "Create failed");
+                    Log.e("TEAM_CREATE", "Failed to get user profile", e);
+                    cb.onResult(false, "Failed to get user profile");
                 });
     }
+
 
     public void joinByCode(String rawCode, SimpleCallback cb) {
         if (uid == null) {

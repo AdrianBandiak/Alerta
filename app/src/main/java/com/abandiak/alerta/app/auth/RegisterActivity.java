@@ -86,11 +86,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 .set(userMap, SetOptions.merge())
                                 .addOnSuccessListener(unused -> {
                                     ToastUtils.show(this, getString(R.string.account_created));
-                                    Intent intent = new Intent(this, HomeActivity.class);
+                                    Intent intent = new Intent(this, LoginActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
                                 })
+
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "Firestore error: ", e);
                                     ToastUtils.show(this, getString(R.string.data_save_error));

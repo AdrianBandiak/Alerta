@@ -228,7 +228,11 @@ public class TeamsActivity extends AppCompatActivity {
                 ? "No description provided."
                 : team.getDescription());
         textCode.setText("Code: " + (team.getCode() == null ? "—" : team.getCode()));
-        textCreatedBy.setText("Created by: " + (team.getCreatedBy() == null ? "Unknown" : team.getCreatedBy()));
+        String createdBy = (team.getCreatedByName() != null && !team.getCreatedByName().isEmpty())
+                ? team.getCreatedByName()
+                : "Unknown";
+        textCreatedBy.setText("Created by: " + createdBy);
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         String date = team.getCreatedAt() > 0 ? sdf.format(new java.util.Date(team.getCreatedAt())) : "—";
