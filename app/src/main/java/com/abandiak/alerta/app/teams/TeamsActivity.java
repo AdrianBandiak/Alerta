@@ -12,7 +12,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,6 +58,18 @@ public class TeamsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_teams);
 
+        View root = findViewById(R.id.rootLayout);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    topInset,
+                    v.getPaddingRight(),
+                    v.getPaddingBottom()
+            );
+            return insets;
+        });
+
         repo = new TeamRepository();
         emptyState = findViewById(R.id.emptyState);
         recycler = findViewById(R.id.recyclerTeams);
@@ -91,6 +105,8 @@ public class TeamsActivity extends AppCompatActivity {
             });
         }
     }
+
+
 
     @Override
     protected void onStart() {

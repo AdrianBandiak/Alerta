@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:fitsSystemWindows="true"
+    android:id="@+id/rootLayout"
     tools:context=".app.teams.TeamsActivity">
 
     <LinearLayout
@@ -16,7 +18,8 @@
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingTop="28dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:background="@android:color/transparent">
 
         <TextView
             android:id="@+id/textTitle"
@@ -26,7 +29,8 @@
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:fontFamily="@font/inter" />
+            android:fontFamily="@font/inter"
+            android:letterSpacing="0.02" />
 
         <TextView
             android:id="@+id/textSubtitle"
@@ -78,7 +82,7 @@
         android:id="@+id/recyclerTeams"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="164dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingBottom="100dp"
@@ -132,10 +136,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:paddingBottom="0dp"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
         app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
-        app:itemRippleColor="@color/bottom_nav_ripple"
-        android:background="@color/white"/>
+        app:itemRippleColor="@color/bottom_nav_ripple" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
