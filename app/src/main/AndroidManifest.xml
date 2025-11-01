@@ -12,9 +12,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission
         android:name="android.permission.READ_MEDIA_IMAGES"
-        tools:targetApi="33" />
+        tools:targetApi="33"
+        tools:ignore="SelectedPhotoAccess" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -27,9 +29,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_alerta"
+        android:roundIcon="@mipmap/ic_launcher_alerta"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.Alerta">
@@ -40,8 +42,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
-
+            android:resource="@mipmap/ic_launcher_alerta" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/alerta_primary" />
@@ -72,19 +73,15 @@
         <activity
             android:name=".app.map.MapActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.tasks.TasksActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.teams.TeamsActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.more.MoreActivity"
             android:exported="false" />
-
         <activity
             android:name=".app.home.HomeActivity"
             android:exported="false" />
