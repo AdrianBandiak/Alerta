@@ -63,4 +63,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     implementation libs.colorpickerview
+    implementation libs.circleimageview
 }

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.12.3"
+circleimageview = "3.1.0"
 colorpickerview = "2.3.0"
 firebaseBom = "34.3.0"
 junit = "4.13.2"
@@ -17,6 +18,7 @@ mapsUtils = "3.8.2"
 core = "1.13.1"
 
 [libraries]
+circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
 colorpickerview = { module = "com.github.skydoves:colorpickerview", version.ref = "colorpickerview" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }

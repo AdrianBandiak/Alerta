@@ -119,11 +119,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         db.collection("users").document(uid)
-                                .collection("profile")
-                                .document("info")
                                 .get()
                                 .addOnSuccessListener(doc -> {
-                                    if (!doc.exists()) {
+                                    boolean needsProfile = !doc.exists() || !Boolean.TRUE.equals(doc.getBoolean("profileCompleted"));
+                                    if (needsProfile) {
                                         ToastUtils.show(this, "Please complete your profile.");
                                         startActivity(new Intent(this, CompleteProfileActivity.class));
                                     } else {

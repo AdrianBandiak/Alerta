@@ -125,6 +125,6 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="close">Close</string>
-
+    <string name="profile_picture">Profile picture</string>
 
 </resources>
