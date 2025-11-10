@@ -250,8 +250,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final View sheet = LayoutInflater.from(this).inflate(R.layout.dialog_incident_create, null, false);
         dialog.setContentView(sheet);
 
-        sheet.findViewById(R.id.btn_close).setOnClickListener(v -> dialog.dismiss());
-
         final TextInputEditText inputTitle = sheet.findViewById(R.id.input_title);
         final TextInputEditText inputDescription = sheet.findViewById(R.id.input_description);
         final MaterialAutoCompleteTextView inputType = sheet.findViewById(R.id.input_type);
@@ -260,6 +258,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final View btnAddPhoto = sheet.findViewById(R.id.btn_add_photo);
         final ImageView imgPreview = sheet.findViewById(R.id.img_preview);
         final View btnRemovePhoto = sheet.findViewById(R.id.btn_remove_photo);
+        final View btnCancel = sheet.findViewById(R.id.btnCancel);
+        final View btnSave = sheet.findViewById(R.id.btnSave);
 
         String[] types = new String[]{"INFO", "HAZARD", "CRITICAL"};
         inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
@@ -278,8 +278,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             updatePreview();
         });
 
-        sheet.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
-        sheet.findViewById(R.id.btn_save).setOnClickListener(v -> {
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSave.setOnClickListener(v -> {
             String title = inputTitle.getText() != null ? inputTitle.getText().toString().trim() : "";
             String desc = inputDescription.getText() != null ? inputDescription.getText().toString().trim() : "";
             String type = inputType.getText() != null ? inputType.getText().toString().trim() : "";
@@ -291,8 +292,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
 
-            double lat;
-            double lng;
+            double lat, lng;
             try {
                 lat = Double.parseDouble(slat);
                 lng = Double.parseDouble(slng);
@@ -309,19 +309,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Map<String, Object> data = inc.toMap();
             data.put("createdBy", uid);
             data.put("verified", false);
-            if (pickedPhotoUri != null)
+
+            if (pickedPhotoUri != null) {
                 data.put("photoUrl", pickedPhotoUri.toString());
+            }
 
             incidentRepo.createIncident(data)
                     .addOnSuccessListener(ref -> {
                         ToastUtils.show(this, "Incident created");
                         dialog.dismiss();
                     })
-                    .addOnFailureListener(e -> ToastUtils.show(this, "Create failed: " + e.getMessage()));
+                    .addOnFailureListener(e ->
+                            ToastUtils.show(this, "Create failed: " + e.getMessage()));
         });
 
         dialog.show();
     }
+
 
 
     private void setFilter(String type) {
@@ -463,17 +467,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void updatePreview() {
         if (currentPhotoPreview == null) return;
-        View remove = ((View) currentPhotoPreview.getParent()).findViewById(R.id.btn_remove_photo);
+
+        View parent = (View) currentPhotoPreview.getParent();
+        View remove = parent.findViewById(R.id.btn_remove_photo);
+        View addButton = ((View) parent.getParent()).findViewById(R.id.btn_add_photo);
+
         if (pickedPhotoUri != null) {
             currentPhotoPreview.setImageURI(pickedPhotoUri);
             currentPhotoPreview.setVisibility(View.VISIBLE);
             if (remove != null) remove.setVisibility(View.VISIBLE);
+            if (addButton != null) addButton.setVisibility(View.GONE);
         } else {
             currentPhotoPreview.setImageDrawable(null);
             currentPhotoPreview.setVisibility(View.GONE);
             if (remove != null) remove.setVisibility(View.GONE);
+            if (addButton != null) addButton.setVisibility(View.VISIBLE);
         }
     }
+
 
     private void showIncidentDetails(@NonNull IncidentItem item) {
         BottomSheetDialog dialog = new BottomSheetDialog(this);

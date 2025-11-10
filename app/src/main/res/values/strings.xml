@@ -126,5 +126,7 @@
     <string name="delete">Delete</string>
     <string name="close">Close</string>
     <string name="profile_picture">Profile picture</string>
+    <string name="remove_photo">remove photo</string>
+    <string name="photo_preview">photo preview</string>
 
 </resources>
