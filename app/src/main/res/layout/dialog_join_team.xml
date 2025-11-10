@@ -1,35 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center_horizontal">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="Invite code (e.g. AB3D9Q)">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/inputCode"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:maxLength="6" android:inputType="textCapCharacters"/>
-    </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Join team"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:fontFamily="@font/inter"
+        android:layout_marginBottom="20dp" />
+
+    <EditText
+        android:id="@+id/inputCode"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Enter 6-character code"
+        android:inputType="textCapCharacters"
+        android:maxLength="6"
+        android:fontFamily="@font/inter"
+        android:textAllCaps="true"
+        android:paddingHorizontal="14dp"
+        android:background="@drawable/bg_input_field"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="28dp" />
 
     <LinearLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:gravity="end"
-        android:layout_marginTop="12dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
+        <TextView
             android:id="@+id/btnCancel"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:text="Cancel"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textSize="15sp"
+            android:textColor="@color/gray_500"
+            android:fontFamily="@font/inter"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp" />
 
-        <com.google.android.material.button.MaterialButton
+        <TextView
             android:id="@+id/btnJoin"
-            style="@style/Widget.Material3.Button"
-            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Join"
-            app:backgroundTint="@color/alerta_primary"
-            android:textColor="@color/white"/>
+            android:textSize="15sp"
+            android:fontFamily="@font/inter"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/alerta_primary"
+            android:background="@drawable/bg_primary_button"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="24dp"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
+
 </LinearLayout>
