@@ -16,6 +16,8 @@ public class Incident {
     private String region;
     private String createdBy;
     private List<String> aud;
+    private int teamColor;
+    @Nullable private String teamId;
 
     @Nullable private String geohash;
     @Nullable private String regionBucket;
@@ -75,6 +77,8 @@ public class Incident {
         if (geohash != null) m.put("geohash", geohash);
         if (regionBucket != null) m.put("regionBucket", regionBucket);
         if (photoUrl != null) m.put("photoUrl", photoUrl);
+        if (teamId != null) m.put("teamId", teamId);
+        if (teamColor != 0) m.put("teamColor", teamColor);
 
         m.put("verified", verified);
         m.put("verifiedBy", verifiedBy);
@@ -104,4 +108,10 @@ public class Incident {
     public void setVerified(boolean verified) { this.verified = verified; }
     public void setVerifiedBy(@Nullable String verifiedBy) { this.verifiedBy = verifiedBy; }
     public void setLogs(@Nullable List<Map<String, Object>> logs) { this.logs = logs; }
+    @Nullable public String getTeamId() { return teamId; }
+    public void setTeamId(@Nullable String teamId) { this.teamId = teamId; }
+
+    public int getTeamColor() { return teamColor; }
+    public void setTeamColor(int teamColor) { this.teamColor = teamColor; }
+
 }

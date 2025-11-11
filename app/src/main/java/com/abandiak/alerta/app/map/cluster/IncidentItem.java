@@ -1,5 +1,6 @@
 package com.abandiak.alerta.app.map.cluster;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,6 +13,8 @@ public class IncidentItem implements ClusterItem {
     private final String snippet;
     private final LatLng position;
     private final String type;
+    private int teamColor;
+    private String teamId;
 
     @Nullable
     private final String photoUrl;
@@ -58,6 +61,7 @@ public class IncidentItem implements ClusterItem {
         this.createdBy = createdBy;
     }
 
+    @NonNull
     @Override public LatLng getPosition() { return position; }
     @Override public String getTitle()    { return title; }
     @Override public String getSnippet()  { return snippet; }
@@ -73,4 +77,8 @@ public class IncidentItem implements ClusterItem {
     public String getCreatedBy() { return createdBy; }
 
     public boolean isVerified()  { return verified; }
+    public int getTeamColor() { return teamColor; }
+    public void setTeamColor(int teamColor) { this.teamColor = teamColor; }
+    public String getTeamId() { return teamId; }
+    public void setTeamId(String teamId) { this.teamId = teamId; }
 }

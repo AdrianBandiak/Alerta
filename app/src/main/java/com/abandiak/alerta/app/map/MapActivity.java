@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -59,6 +60,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -261,8 +263,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final View btnCancel = sheet.findViewById(R.id.btnCancel);
         final View btnSave = sheet.findViewById(R.id.btnSave);
 
-        String[] types = new String[]{"INFO", "HAZARD", "CRITICAL"};
+        final TextInputLayout layoutTeam = sheet.findViewById(R.id.layout_team);
+        final MaterialAutoCompleteTextView inputTeam = sheet.findViewById(R.id.input_team);
+
+        String[] types = new String[]{"INFO", "HAZARD", "CRITICAL", "TEAM"};
         inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+
+        inputType.setOnItemClickListener((parent, view, position, id) -> {
+            String selected = parent.getItemAtPosition(position).toString();
+            if ("TEAM".equals(selected)) {
+                layoutTeam.setVisibility(View.VISIBLE);
+                loadUserTeams(inputTeam);
+            } else {
+                layoutTeam.setVisibility(View.GONE);
+                inputTeam.setText("");
+            }
+        });
 
         LatLng target = map.getCameraPosition().target;
         inputLat.setText(String.format(Locale.US, "%.6f", target.latitude));
@@ -305,19 +321,65 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                     : "anonymous";
 
+            if ("TEAM".equals(type)) {
+                String selectedTeam = inputTeam.getText() != null ? inputTeam.getText().toString().trim() : "";
+                if (selectedTeam.isEmpty()) {
+                    ToastUtils.show(this, "Select a team first");
+                    return;
+                }
+
+                FirebaseFirestore.getInstance()
+                        .collection("teams")
+                        .whereEqualTo("name", selectedTeam)
+                        .limit(1)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap.isEmpty()) {
+                                ToastUtils.show(this, "Team not found");
+                                return;
+                            }
+
+                            DocumentSnapshot teamDoc = snap.getDocuments().get(0);
+                            String teamId = teamDoc.getId();
+                            Long colorLong = teamDoc.getLong("color");
+                            int teamColor = colorLong != null ? colorLong.intValue() : ContextCompat.getColor(this, R.color.blue_700);
+
+                            List<String> aud = (List<String>) teamDoc.get("membersIndex");
+
+                            Incident inc = new Incident(title, desc, type, lat, lng, currentRegion, uid);
+                            inc.setTeamId(teamId);
+                            inc.setTeamColor(teamColor);
+                            Map<String, Object> data = inc.toMap();
+                            data.put("aud", aud);
+                            data.put("createdBy", uid);
+                            data.put("verified", false);
+                            data.put("teamId", teamId);
+                            data.put("teamColor", teamColor);
+                            if (pickedPhotoUri != null) data.put("photoUrl", pickedPhotoUri.toString());
+
+                            incidentRepo.createIncident(data)
+                                    .addOnSuccessListener(ref -> {
+                                        ToastUtils.show(this, "Team incident created for " + selectedTeam);
+                                        dialog.dismiss();
+                                        subscribeIncidents();
+                                    })
+                                    .addOnFailureListener(e -> ToastUtils.show(this, "Create failed: " + e.getMessage()));
+                        })
+                        .addOnFailureListener(e -> ToastUtils.show(this, "Failed to get team info"));
+                return;
+            }
+
             Incident inc = new Incident(title, desc, type, lat, lng, currentRegion, uid);
             Map<String, Object> data = inc.toMap();
             data.put("createdBy", uid);
             data.put("verified", false);
-
-            if (pickedPhotoUri != null) {
-                data.put("photoUrl", pickedPhotoUri.toString());
-            }
+            if (pickedPhotoUri != null) data.put("photoUrl", pickedPhotoUri.toString());
 
             incidentRepo.createIncident(data)
                     .addOnSuccessListener(ref -> {
                         ToastUtils.show(this, "Incident created");
                         dialog.dismiss();
+                        subscribeIncidents();
                     })
                     .addOnFailureListener(e ->
                             ToastUtils.show(this, "Create failed: " + e.getMessage()));
@@ -325,6 +387,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         dialog.show();
     }
+
 
 
 
@@ -346,19 +409,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         clusterManager.clearItems();
         clusterManager.cluster();
 
+        Log.d("MAP_DEBUG", "Subscribing to incidents: type=" + currentType);
+
         registration = incidentRepo.listenVisibleIncidentsForCurrentUser(
                 "ALL".equals(currentType) ? null : currentType,
                 null,
                 currentRegion,
                 (QuerySnapshot snapshots, com.google.firebase.firestore.FirebaseFirestoreException e) -> {
                     if (e != null) {
+                        Log.e("MAP_DEBUG", "Firestore error: " + e.getMessage(), e);
                         ToastUtils.show(this, "Error loading incidents: " + e.getMessage());
                         return;
                     }
-                    if (snapshots == null) return;
+                    if (snapshots == null) {
+                        Log.w("MAP_DEBUG", "No snapshots returned (null)");
+                        return;
+                    }
+
+                    Log.d("MAP_DEBUG", "Loaded " + snapshots.size() + " incidents from Firestore");
                     clusterManager.clearItems();
 
                     for (DocumentSnapshot d : snapshots.getDocuments()) {
+                        Log.d("MAP_DEBUG", "Incident doc: " + d.getId() + " | " + d.getData());
+
                         String id = d.getId();
                         String title = d.getString("title");
                         String desc = d.getString("description");
@@ -369,7 +442,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         String createdBy = d.getString("createdBy");
                         boolean verified = d.getBoolean("verified") != null && d.getBoolean("verified");
 
-                        if (title == null || type == null || lat == null || lng == null) continue;
+                        if (title == null || type == null || lat == null || lng == null) {
+                            Log.w("MAP_DEBUG", "Skipping invalid incident: " + id);
+                            continue;
+                        }
 
                         IncidentItem item = new IncidentItem(
                                 id,
@@ -383,11 +459,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 createdBy
                         );
 
+                        if (d.contains("teamId")) item.setTeamId(d.getString("teamId"));
+                        if (d.contains("teamColor")) {
+                            Long colorLong = d.getLong("teamColor");
+                            if (colorLong != null) item.setTeamColor(colorLong.intValue());
+                            Log.d("MAP_DEBUG", "Team color for " + id + ": " + item.getTeamColor());
+                        }
+
                         clusterManager.addItem(item);
                     }
+
+                    Log.d("MAP_DEBUG", "Finished adding items → clustering...");
                     clusterManager.cluster();
                 });
     }
+
 
 
     private void showPhotoSourceChooser() {
@@ -506,19 +592,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         chipType.setText(item.getType());
 
         int bgColor;
-        switch (String.valueOf(item.getType())) {
-            case "CRITICAL":
-                bgColor = ContextCompat.getColor(this, R.color.red_700);
-                break;
-            case "HAZARD":
-                bgColor = ContextCompat.getColor(this, R.color.amber_700);
-                break;
-            default:
-                bgColor = ContextCompat.getColor(this, R.color.blue_700);
-                break;
+
+        if ("TEAM".equals(item.getType()) && item.getTeamColor() != 0) {
+            bgColor = item.getTeamColor();
+        } else {
+            switch (String.valueOf(item.getType())) {
+                case "CRITICAL":
+                    bgColor = ContextCompat.getColor(this, R.color.red_700);
+                    break;
+                case "HAZARD":
+                    bgColor = ContextCompat.getColor(this, R.color.amber_700);
+                    break;
+                case "INFO":
+                default:
+                    bgColor = ContextCompat.getColor(this, R.color.blue_700);
+                    break;
+            }
         }
+
         chipType.setChipBackgroundColor(ColorStateList.valueOf(bgColor));
         chipType.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
 
         double lat = item.getPosition().latitude;
         double lng = item.getPosition().longitude;
@@ -638,6 +732,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         dialog.show();
     }
+
+    private void loadUserTeams(MaterialAutoCompleteTextView inputTeam) {
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (uid == null) return;
+
+        FirebaseFirestore.getInstance()
+                .collection("teams")
+                .whereArrayContains("membersIndex", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (snap.isEmpty()) {
+                        inputTeam.setText("No teams found", false);
+                        inputTeam.setEnabled(false);
+                        return;
+                    }
+                    inputTeam.setEnabled(true);
+
+                    List<String> teamNames = new java.util.ArrayList<>();
+                    for (DocumentSnapshot d : snap) {
+                        String name = d.getString("name");
+                        if (name != null) teamNames.add(name);
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, teamNames);
+                    inputTeam.setAdapter(adapter);
+                })
+                .addOnFailureListener(e -> {
+                    inputTeam.setText("Error loading teams", false);
+                    inputTeam.setEnabled(false);
+                });
+    }
+
 
 
     private void ensureLocationPermission() {
