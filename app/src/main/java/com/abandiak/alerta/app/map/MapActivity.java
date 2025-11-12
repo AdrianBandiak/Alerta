@@ -191,19 +191,82 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         ChipGroup chips = findViewById(R.id.chips_filters);
         if (chips != null) {
             chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
-                if (checkedIds == null || checkedIds.isEmpty()) return;
-                int id = checkedIds.get(0);
-                if (id == R.id.chip_all) setFilter("ALL");
-                else if (id == R.id.chip_info) setFilter("INFO");
-                else if (id == R.id.chip_hazard) setFilter("HAZARD");
-                else if (id == R.id.chip_critical) setFilter("CRITICAL");
+                java.util.List<String> selectedTypes = new java.util.ArrayList<>();
+
+                if (checkedIds.contains(R.id.chip_info)) selectedTypes.add("INFO");
+                if (checkedIds.contains(R.id.chip_hazard)) selectedTypes.add("HAZARD");
+                if (checkedIds.contains(R.id.chip_critical)) selectedTypes.add("CRITICAL");
+                if (checkedIds.contains(R.id.chip_team)) selectedTypes.add("TEAM");
+
+                if (selectedTypes.isEmpty()) {
+                    currentType = "ALL";
+                    subscribeIncidents();
+                } else {
+                    filterByTypes(selectedTypes);
+                }
             });
+
         }
 
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
         if (fabAdd != null) {
             fabAdd.setOnClickListener(v -> openCreateIncidentSheet());
         }
+    }
+
+
+    private void filterByTypes(List<String> types) {
+        if (registration != null) {
+            registration.remove();
+            registration = null;
+        }
+        if (map == null || clusterManager == null) return;
+
+        clusterManager.clearItems();
+        clusterManager.cluster();
+
+        registration = incidentRepo.listenVisibleIncidentsForCurrentUser(
+                null,
+                null,
+                currentRegion,
+                (snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("MAP_DEBUG", "Firestore error: " + e.getMessage(), e);
+                        return;
+                    }
+                    if (snapshots == null) return;
+
+                    clusterManager.clearItems();
+
+                    for (DocumentSnapshot d : snapshots.getDocuments()) {
+                        String type = d.getString("type");
+                        if (type == null) continue;
+                        if (!types.contains(type)) continue; // filtruj
+
+                        Double lat = d.getDouble("lat");
+                        Double lng = d.getDouble("lng");
+                        if (lat == null || lng == null) continue;
+
+                        String id = d.getId();
+                        String title = d.getString("title");
+                        String desc = d.getString("description");
+                        String photo = d.getString("photoUrl");
+                        String createdBy = d.getString("createdBy");
+                        boolean verified = Boolean.TRUE.equals(d.getBoolean("verified"));
+
+                        IncidentItem item = new IncidentItem(id, title, desc, lat, lng, type, photo, verified, createdBy);
+
+                        if (d.contains("teamId")) item.setTeamId(d.getString("teamId"));
+                        if (d.contains("teamColor")) {
+                            Long colorLong = d.getLong("teamColor");
+                            if (colorLong != null) item.setTeamColor(colorLong.intValue());
+                        }
+
+                        clusterManager.addItem(item);
+                    }
+
+                    clusterManager.cluster();
+                });
     }
 
 

@@ -36,59 +36,51 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingHorizontal="20dp"
-                android:paddingVertical="6dp"
-                app:singleSelection="true"
-                app:selectionRequired="true"
-                app:chipSpacingHorizontal="22dp"
-                app:singleLine="true">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_all"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/map_filters_all"
-                    app:checkedIconVisible="true"
-                    app:chipBackgroundColor="@color/chip_all_selector"
-                    app:chipStrokeWidth="0dp" />
+                android:paddingVertical="2dp"
+                app:singleLine="true"
+                app:chipSpacingHorizontal="12dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_info"
-                    style="@style/Widget.Material3.Chip.Filter"
+                    style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_info"
-                    app:checkedIconVisible="true"
                     app:chipBackgroundColor="@color/chip_info_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/blue_700"
-                    app:chipStrokeWidth="0dp" />
+                    app:chipIconTint="@color/blue_700" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_hazard"
-                    style="@style/Widget.Material3.Chip.Filter"
+                    style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_hazard"
-                    app:checkedIconVisible="true"
                     app:chipBackgroundColor="@color/chip_hazard_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/amber_700"
-                    app:chipStrokeWidth="0dp" />
+                    app:chipIconTint="@color/amber_700" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_critical"
-                    style="@style/Widget.Material3.Chip.Filter"
+                    style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/map_filters_critical"
-                    app:checkedIconVisible="true"
                     app:chipBackgroundColor="@color/chip_critical_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/red_700"
-                    app:chipStrokeWidth="0dp" />
+                    app:chipIconTint="@color/red_700" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_team"
+                    style="@style/App.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TEAM"
+                    app:chipBackgroundColor="@color/chip_team_selector"
+                    app:chipIcon="@drawable/ic_dot"
+                    app:chipIconTint="@color/green_700" />
             </com.google.android.material.chip.ChipGroup>
+
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
 
