@@ -24,7 +24,9 @@ import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,7 +38,7 @@ public class MoreActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
-    private ImageView imageProfile;
+    private ShapeableImageView imageProfile;
     private TextView textName, textEmail;
 
     private final ActivityResultLauncher<Intent> pickImageLauncher =
@@ -83,32 +85,67 @@ public class MoreActivity extends AppCompatActivity {
     }
 
     private void uploadProfileImage(Uri uri) {
+
         String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        Log.d("STORAGE", "Uploading to: profile_pics/" + uid + "/profile.jpg");
 
         FirebaseStorage.getInstance()
                 .getReference("profile_pics/" + uid + "/profile.jpg")
                 .putFile(uri)
-                .addOnSuccessListener(t -> {
-                    ToastUtils.show(this, "Profile picture updated!");
-                    imageProfile.setImageURI(uri);
+                .addOnSuccessListener(task -> {
+
+                    task.getStorage().getDownloadUrl()
+                            .addOnSuccessListener(downloadUri -> {
+
+                                FirebaseFirestore.getInstance()
+                                        .collection("users")
+                                        .document(uid)
+                                        .update("photoUrl", downloadUri.toString());
+
+                                imageProfile.setImageURI(uri);
+
+                                imageProfile.setStrokeWidth(0);
+
+                                ToastUtils.show(this, "Profile picture updated!");
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("STORAGE", "Upload failed", e);
                     ToastUtils.show(this, "Upload failed: " + e.getMessage());
                 });
     }
 
+
+
     private void loadUserData() {
         String uid = auth.getCurrentUser().getUid();
+
         db.collection("users").document(uid).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
+
                         textName.setText(doc.getString("firstName") + " " + doc.getString("lastName"));
                         textEmail.setText(auth.getCurrentUser().getEmail());
+
+                        String photoUrl = doc.getString("photoUrl");
+
+                        if (photoUrl != null && !photoUrl.isEmpty()) {
+
+                            Glide.with(this)
+                                    .load(photoUrl)
+                                    .centerCrop()
+                                    .into(imageProfile);
+
+                            imageProfile.setStrokeWidth(0);
+
+                        } else {
+
+                            imageProfile.setImageResource(R.drawable.ic_person_placeholder);
+                            imageProfile.setStrokeWidth(6);
+                        }
                     }
                 });
     }
+
+
 
     private void setupBottomNav() {
         bottomNav = findViewById(R.id.bottomNav);
