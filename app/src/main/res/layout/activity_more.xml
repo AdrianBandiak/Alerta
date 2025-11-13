@@ -37,11 +37,9 @@
                     app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.CircleImage"
                     app:strokeColor="@color/gray_400"
                     app:strokeWidth="6dp"
-                    android:padding="3dp"
-                    android:scaleType="centerInside"
+                    android:scaleType="centerCrop"
                     android:layout_marginEnd="16dp"
                     android:contentDescription="@string/profile_picture" />
-
 
 
                 <LinearLayout
@@ -102,6 +100,7 @@
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchNotifications"
+                style="@style/AlertaSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Push notifications"
@@ -112,6 +111,7 @@
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchDarkMode"
+                style="@style/AlertaSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Dark mode"

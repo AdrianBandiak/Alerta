@@ -178,4 +178,13 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="AlertaSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/AlertaSwitchOverlay</item>
+    </style>
+
+    <style name="AlertaSwitchOverlay" parent="">
+        <item name="colorPrimary">@color/alerta_primary</item>
+        <item name="colorSecondary">@color/alerta_primary</item>
+    </style>
+
 </resources>
