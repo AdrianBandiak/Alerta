@@ -53,6 +53,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.chip.Chip;
@@ -241,7 +242,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     for (DocumentSnapshot d : snapshots.getDocuments()) {
                         String type = d.getString("type");
                         if (type == null) continue;
-                        if (!types.contains(type)) continue; // filtruj
+                        if (!types.contains(type)) continue;
 
                         Double lat = d.getDouble("lat");
                         Double lng = d.getDouble("lng");
@@ -640,6 +641,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         View content = getLayoutInflater().inflate(R.layout.bottomsheet_incident_details, null, false);
         dialog.setContentView(content);
 
+        View sheetParent = (View) content.getParent();
+        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(sheetParent);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
+        behavior.setDraggable(true);
+
         ImageView img = content.findViewById(R.id.img);
         TextView title = content.findViewById(R.id.title);
         TextView desc = content.findViewById(R.id.desc);
@@ -655,7 +662,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         chipType.setText(item.getType());
 
         int bgColor;
-
         if ("TEAM".equals(item.getType()) && item.getTeamColor() != 0) {
             bgColor = item.getTeamColor();
         } else {
@@ -672,16 +678,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     break;
             }
         }
-
         chipType.setChipBackgroundColor(ColorStateList.valueOf(bgColor));
         chipType.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-
 
         double lat = item.getPosition().latitude;
         double lng = item.getPosition().longitude;
         String latDir = lat >= 0 ? "N" : "S";
         String lngDir = lng >= 0 ? "E" : "W";
-        coordsWgs.setText(String.format(Locale.US, "WGS-84:  %.5f° %s,  %.5f° %s",
+        coordsWgs.setText(String.format(Locale.US, "%.2f° %s, %.2f° %s",
                 Math.abs(lat), latDir, Math.abs(lng), lngDir));
 
         checkboxVerified.setChecked(item.isVerified());
@@ -697,7 +701,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             share.setType("text/plain");
             share.putExtra(Intent.EXTRA_TEXT,
                     item.getTitle() + "\n" +
-                            String.format(Locale.US, "WGS-84: %.6f, %.6f", lat, lng));
+                            String.format(Locale.US, "%.2f° %s, %.2f° %s",
+                                    Math.abs(lat), latDir, Math.abs(lng), lngDir));
             startActivity(Intent.createChooser(share, "Share incident"));
         });
 
@@ -727,7 +732,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                             if (logs != null && !logs.isEmpty()) {
                                 logsTitle.setVisibility(View.VISIBLE);
-                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm: ", Locale.getDefault());
 
                                 for (Map<String, Object> entry : logs) {
                                     try {
@@ -765,7 +770,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     });
         }
 
-
         String uid = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                 : null;
@@ -795,6 +799,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         dialog.show();
     }
+
 
     private void loadUserTeams(MaterialAutoCompleteTextView inputTeam) {
         String uid = FirebaseAuth.getInstance().getUid();

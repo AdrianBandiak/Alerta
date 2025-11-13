@@ -6,8 +6,7 @@
     android:backgroundTint="@color/white"
     app:cardCornerRadius="20dp"
     app:cardUseCompatPadding="true"
-    app:cardElevation="4dp"
-    android:padding="16dp">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:scaleType="centerCrop"
-            android:adjustViewBounds="true"
             android:visibility="gone"
             android:background="@drawable/bg_image_placeholder"
             android:contentDescription="@string/photo" />
@@ -27,107 +25,145 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp">
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/inter"
+                    android:text="Incident title" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipType"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CRITICAL"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/inter"
+                    android:includeFontPadding="false"
+                    android:minHeight="28dp"
+                    android:layout_marginBottom="2dp"
+                    app:chipMinHeight="28dp"
+                    app:chipCornerRadius="6dp"
+                    app:chipStrokeWidth="0dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:chipBackgroundColor="@color/red_700" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/title"
-                android:layout_width="0dp"
+                android:id="@+id/desc"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:textColor="@color/black"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
                 android:fontFamily="@font/inter"
-                android:text="Incident title" />
+                android:lineSpacingExtra="2dp"
+                android:layout_marginTop="6dp"
+                android:text="Description goes here..." />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipType"
-                style="@style/Widget.Material3.Chip.Filter"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_location_pin"
+                    app:tint="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/coords_wgs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter"
+                    android:layout_marginStart="6dp"
+                    android:text="50.02° N, 19.86° E" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp">
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/checkbox_verified"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.85"
+                    android:scaleY="0.85"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/text_secondary"
+                    android:text="Incident verified by authorities"
+                    android:enabled="false" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:background="@color/gray_300" />
+
+            <TextView
+                android:id="@+id/logs_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CRITICAL"
+                android:text="Incident history"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textSize="15sp"
                 android:fontFamily="@font/inter"
-                android:clickable="false"
-                android:checkable="false"
-                app:chipCornerRadius="8dp"
-                app:chipStrokeWidth="0dp"
-                app:rippleColor="@android:color/transparent"
-                android:visibility="visible"
-                app:chipBackgroundColor="@color/red_700" />
+                android:textColor="@color/black"
+                android:layout_marginTop="14dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/logs_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="4dp" />
+
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            android:fontFamily="@font/inter"
-            android:layout_marginTop="6dp"
-            android:text="No power" />
-
-        <TextView
-            android:id="@+id/coords_wgs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="13sp"
-            android:fontFamily="@font/inter"
-            android:text="WGS-84: lat 0.000000°, lng 0.000000°" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/checkbox_verified"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Incident verified by authorities"
-            android:visibility="visible"
-            android:enabled="false"
-            android:textColor="@color/black"
-            android:fontFamily="@font/inter"
-            android:layout_marginTop="12dp" />
-
-        <TextView
-            android:id="@+id/logs_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Incident history"
-            android:textStyle="bold"
-            android:textSize="15sp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/inter"
-            android:layout_marginTop="12dp"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/logs_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="4dp"
-            android:paddingBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end"
-            android:layout_marginTop="14dp">
+            android:padding="12dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNavigate"
                 style="@style/Alerta.Button.Outlined"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="@string/navigation"
-                app:cornerRadius="24dp"
+                app:cornerRadius="20dp"
                 app:icon="@drawable/ic_navigation"
-                app:iconPadding="8dp"
+                app:iconPadding="6dp"
                 app:iconGravity="textStart"
                 app:iconTint="@color/amber_700"
                 android:textColor="@color/amber_700" />
@@ -136,12 +172,12 @@
                 android:id="@+id/btnShare"
                 style="@style/Alerta.Button.Amber"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:text="@string/share"
-                app:cornerRadius="24dp"
+                app:cornerRadius="20dp"
                 app:icon="@drawable/ic_share"
-                app:iconPadding="8dp"
+                app:iconPadding="6dp"
                 app:iconGravity="textStart"
                 app:iconTint="@android:color/white" />
 
@@ -149,19 +185,18 @@
                 android:id="@+id/btn_delete_incident"
                 style="@style/Alerta.Button.Outlined"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="Delete"
                 android:textColor="@color/red_700"
                 app:strokeColor="@color/red_700"
-                app:cornerRadius="24dp"
+                app:cornerRadius="20dp"
                 app:icon="@drawable/ic_delete"
                 app:iconTint="@color/red_700"
-                app:iconPadding="6dp"
+                app:iconPadding="4dp"
                 app:iconGravity="textStart"
                 android:layout_marginStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>
