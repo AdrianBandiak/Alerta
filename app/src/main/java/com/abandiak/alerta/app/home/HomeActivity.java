@@ -341,26 +341,31 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void applySearchFilter() {
         if (clusterManager == null) return;
 
-        String q = currentQuery == null ? "" : currentQuery.trim();
-        String qUpper = q.toUpperCase(Locale.ROOT);
-        boolean queryIsType = qUpper.equals("INFO") || qUpper.equals("HAZARD") || qUpper.equals("CRITICAL");
+        String q = currentQuery == null ? "" : currentQuery.trim().toLowerCase(Locale.ROOT);
 
         clusterManager.clearItems();
         for (IncidentItem it : allItems) {
-            boolean matches;
+
             if (q.isEmpty()) {
-                matches = true;
-            } else if (queryIsType) {
-                matches = qUpper.equals(String.valueOf(it.getType()).toUpperCase(Locale.ROOT));
-            } else {
-                matches = String.valueOf(it.getTitle())
-                        .toLowerCase(Locale.ROOT)
-                        .contains(q.toLowerCase(Locale.ROOT));
+                clusterManager.addItem(it);
+                continue;
             }
+
+            String title = it.getTitle() == null ? "" : it.getTitle().toLowerCase(Locale.ROOT);
+            String type = it.getType() == null ? "" : it.getType().toLowerCase(Locale.ROOT);
+            String desc = it.getSnippet() == null ? "" : it.getSnippet().toLowerCase(Locale.ROOT);
+
+            boolean matches =
+                    title.contains(q) ||
+                            type.contains(q) ||
+                            desc.contains(q);
+
             if (matches) clusterManager.addItem(it);
         }
+
         clusterManager.cluster();
     }
+
 
 
     private void ensureLocationPermissionAndCenter() {
