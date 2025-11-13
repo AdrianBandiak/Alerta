@@ -145,6 +145,17 @@ public class TasksActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (getIntent().getBooleanExtra("open_create_task", false)) {
+            getIntent().removeExtra("open_create_task");
+            showAddTaskDialog();
+        }
+    }
+
+
     private void updateHeader(List<Task> tasks) {
         TextView subtitle = findViewById(R.id.textHeaderSubtitle);
         if (tasks == null || tasks.isEmpty()) {

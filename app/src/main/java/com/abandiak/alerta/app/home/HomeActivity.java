@@ -94,6 +94,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         super.onCreate(savedInstanceState);
@@ -131,6 +132,28 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupSearchUI();
         setupBottomNavigation();
         observeNetworkStatus();
+
+        findViewById(R.id.btnReportIncident).setOnClickListener(v -> {
+            Intent i = new Intent(this, MapActivity.class);
+            i.putExtra("open_create_incident", true);
+            startActivity(i);
+            overridePendingTransition(0, 0);
+        });
+
+        findViewById(R.id.btnCreateTask).setOnClickListener(v -> {
+            Intent i = new Intent(this, TasksActivity.class);
+            i.putExtra("open_create_task", true);
+            startActivity(i);
+            overridePendingTransition(0, 0);
+        });
+
+        findViewById(R.id.btnJoinTeam).setOnClickListener(v -> {
+            Intent i = new Intent(this, TeamsActivity.class);
+            i.putExtra("open_join_team", true);
+            startActivity(i);
+            overridePendingTransition(0, 0);
+        });
+
 
         RecyclerView recyclerTasks = findViewById(R.id.recyclerTasks);
         TextView btnViewAllTasks = findViewById(R.id.btnViewAllTasks);

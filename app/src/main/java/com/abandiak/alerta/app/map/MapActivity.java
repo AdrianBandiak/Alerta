@@ -94,6 +94,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Uri pickedPhotoUri = null;
     private Uri cameraOutputUri = null;
     private ImageView currentPhotoPreview = null;
+    private boolean pendingOpenCreateIncident = false;
 
     private final ActivityResultLauncher<String[]> locationPermsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::onLocationPermissionsResult);
@@ -289,7 +290,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         ensureLocationPermission();
         subscribeIncidents();
+
+        if (pendingOpenCreateIncident) {
+            openCreateIncidentSheet();
+            pendingOpenCreateIncident = false;
+        }
     }
+
 
     private void raiseFabAboveBottomNav(@NonNull View fab) {
         if (bottomNav == null) return;
@@ -854,9 +861,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (getIntent().getBooleanExtra("open_create_incident", false)) {
+            getIntent().removeExtra("open_create_incident");
+            pendingOpenCreateIncident = true;
+        }
+
+        if (pendingOpenCreateIncident && map != null) {
+            openCreateIncidentSheet();
+            pendingOpenCreateIncident = false;
+        }
+
         if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_map);
         overridePendingTransition(0, 0);
     }
+
+
 
     @Override
     protected void onDestroy() {

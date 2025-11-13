@@ -128,6 +128,17 @@ public class TeamsActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (getIntent().getBooleanExtra("open_join_team", false)) {
+            getIntent().removeExtra("open_join_team");
+            showJoinDialog();
+        }
+    }
+
+
+    @Override
     protected void onStop() {
         super.onStop();
         if (reg != null) {
