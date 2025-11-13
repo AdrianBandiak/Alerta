@@ -24,6 +24,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
@@ -49,12 +50,7 @@ public class TeamsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightStatusBars(true);
+        SystemBars.apply(this);
 
         setContentView(R.layout.activity_teams);
 

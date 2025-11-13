@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.app.tasks.TaskAdapter;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
-
+import com.abandiak.alerta.core.utils.SystemBars;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -94,34 +94,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
+        SystemBars.apply(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        View statusBar = new View(this);
-        statusBar.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                getResources().getDimensionPixelSize(
-                        getResources().getIdentifier("status_bar_height", "dimen", "android"))
-        ));
-        statusBar.setBackgroundColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-
-        ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
-        decorView.addView(statusBar);
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.white));
-        }
-
-        View root = findViewById(android.R.id.content);
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(getWindow(), root);
-        controller.setAppearanceLightStatusBars(true);
-        controller.setAppearanceLightNavigationBars(true);
 
         fused = LocationServices.getFusedLocationProviderClient(this);
         chipOnline = findViewById(R.id.chipOnline);
@@ -178,8 +153,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
-
-
 
 
     private void observeNetworkStatus() {

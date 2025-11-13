@@ -23,6 +23,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
@@ -51,11 +52,7 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightStatusBars(true);
+        SystemBars.apply(this);
 
         setContentView(R.layout.activity_tasks);
 
@@ -297,7 +294,7 @@ public class TasksActivity extends AppCompatActivity {
             status.setTextColor(ContextCompat.getColor(this, R.color.alerta_primary));
         }
 
-        AlertDialog dialog = new AlertDialog.Builder(this, com.google.android.material.R.style.Theme_Material3_Light_Dialog_Alert)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(dialogView)
                 .create();
 

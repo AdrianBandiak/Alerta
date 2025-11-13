@@ -22,6 +22,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,12 +50,7 @@ public class MoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightStatusBars(true);
+        SystemBars.apply(this);
 
         setContentView(R.layout.activity_more);
 

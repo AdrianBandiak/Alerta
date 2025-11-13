@@ -30,6 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.profile.CompleteProfileActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,33 +46,14 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        SystemBars.apply(this);
+
         super.onCreate(savedInstanceState);
 
         if (getSupportActionBar() != null) getSupportActionBar().hide();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(Color.TRANSPARENT);
-        }
 
         setContentView(R.layout.activity_login);
-
-        LinearLayout root = findViewById(R.id.login_root);
-        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(
-                    v.getPaddingLeft(),
-                    bars.top + v.getPaddingTop(),
-                    v.getPaddingRight(),
-                    bars.bottom + v.getPaddingBottom()
-            );
-            return WindowInsetsCompat.CONSUMED;
-        });
-
-        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), root);
-        controller.setAppearanceLightStatusBars(true);
-        controller.setAppearanceLightNavigationBars(true);
-        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -81,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         ImageView logo = findViewById(R.id.logoImage);
+        LinearLayout root = findViewById(R.id.login_root);
 
         String baseText = "Don't have an account? ";
         String boldText = "Register";
@@ -150,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         root.setVisibility(View.VISIBLE);
         root.startAnimation(fadeIn);
     }
+
 
     private static String safeText(TextInputEditText edit) {
         return edit.getText() == null ? "" : edit.getText().toString().trim();

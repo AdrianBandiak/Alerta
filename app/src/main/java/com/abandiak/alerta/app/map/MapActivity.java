@@ -40,6 +40,7 @@ import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Incident;
 import com.abandiak.alerta.data.repository.IncidentRepository;
@@ -134,36 +135,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-
-        View rootView = getWindow().getDecorView();
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(getWindow(), rootView);
-        controller.setAppearanceLightStatusBars(true);
-        controller.setAppearanceLightNavigationBars(true);
-
+        SystemBars.apply(this);
         setContentView(R.layout.activity_map);
-
-        appBar = findViewById(R.id.appBar);
-        if (appBar != null) {
-            appBar.setOnApplyWindowInsetsListener((v, insets) -> {
-                int topInset = 0;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        topInset = insets.getInsets(WindowInsets.Type.statusBars()).top;
-                    }
-                }
-                v.setPadding(0, topInset, 0, 0);
-                return insets;
-            });
-        }
 
         fused = LocationServices.getFusedLocationProviderClient(this);
         incidentRepo = new IncidentRepository();
