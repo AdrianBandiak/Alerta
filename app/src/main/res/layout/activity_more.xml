@@ -158,6 +158,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/white"
+        android:paddingBottom="0dp"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"

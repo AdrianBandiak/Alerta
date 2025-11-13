@@ -129,4 +129,12 @@ public class MoreActivity extends AppCompatActivity {
             return true;
         });
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_more);
+    }
+
 }
