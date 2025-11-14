@@ -34,6 +34,7 @@ import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerView;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
+import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -144,6 +145,7 @@ public class TeamsActivity extends AppCompatActivity {
     }
 
     private void showCreateDialog() {
+
         View view = getLayoutInflater().inflate(R.layout.dialog_create_team, null);
 
         EditText inputName = view.findViewById(R.id.inputTeamName);
@@ -152,7 +154,7 @@ public class TeamsActivity extends AppCompatActivity {
         View colorPreview = view.findViewById(R.id.viewColorPreview);
         Button btnPickColor = view.findViewById(R.id.btnPickColor);
 
-        final int[] selectedColor = {Color.RED};
+        final int[] selectedColor = { Color.RED };
 
         btnPickColor.setOnClickListener(v -> {
             View pickerView = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
@@ -164,71 +166,55 @@ public class TeamsActivity extends AppCompatActivity {
             Button btnCancel = pickerView.findViewById(R.id.btnCancel);
             Button btnOk = pickerView.findViewById(R.id.btnOk);
 
-            final int[] dialogColor = {selectedColor[0]};
+            final int[] dialogColor = { selectedColor[0] };
             preview.setBackgroundColor(dialogColor[0]);
 
             inputR.setText(String.valueOf(Color.red(dialogColor[0])));
             inputG.setText(String.valueOf(Color.green(dialogColor[0])));
             inputB.setText(String.valueOf(Color.blue(dialogColor[0])));
 
-            colorPickerView.setColorListener((ColorEnvelopeListener) (ColorEnvelope envelope, boolean fromUser) -> {
-                int color = envelope.getColor();
-                dialogColor[0] = color;
-                preview.setBackgroundColor(color);
-                inputR.setText(String.valueOf(Color.red(color)));
-                inputG.setText(String.valueOf(Color.green(color)));
-                inputB.setText(String.valueOf(Color.blue(color)));
+            colorPickerView.setColorListener((ColorEnvelopeListener) (envelope, fromUser) -> {
+                int c = envelope.getColor();
+                dialogColor[0] = c;
+                preview.setBackgroundColor(c);
+                inputR.setText(String.valueOf(Color.red(c)));
+                inputG.setText(String.valueOf(Color.green(c)));
+                inputB.setText(String.valueOf(Color.blue(c)));
             });
-
-            View.OnFocusChangeListener updateColor = (v1, hasFocus) -> {
-                if (!hasFocus) {
-                    try {
-                        int r = parseColorValue(inputR.getText().toString());
-                        int g = parseColorValue(inputG.getText().toString());
-                        int b = parseColorValue(inputB.getText().toString());
-                        int color = Color.rgb(r, g, b);
-                        dialogColor[0] = color;
-                        preview.setBackgroundColor(color);
-                        colorPickerView.setPureColor(color);
-                        colorPickerView.selectByHsvColor(color);
-                    } catch (Exception ignored) {}
-                }
-            };
-            inputR.setOnFocusChangeListener(updateColor);
-            inputG.setOnFocusChangeListener(updateColor);
-            inputB.setOnFocusChangeListener(updateColor);
 
             AlertDialog pickerDialog = new AlertDialog.Builder(this)
                     .setView(pickerView)
                     .create();
 
-            btnCancel.setOnClickListener(v2 -> pickerDialog.dismiss());
-            btnOk.setOnClickListener(v2 -> {
+            btnCancel.setOnClickListener(x -> pickerDialog.dismiss());
+            btnOk.setOnClickListener(x -> {
                 selectedColor[0] = dialogColor[0];
-                ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+                ((GradientDrawable) colorPreview.getBackground().mutate())
+                        .setColor(selectedColor[0]);
                 pickerDialog.dismiss();
             });
 
             pickerDialog.show();
         });
 
-
-
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
                 .create();
 
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+
         view.findViewById(R.id.btnCreate).setOnClickListener(v -> {
+
             String name = inputName.getText().toString().trim();
             String desc = inputDesc.getText().toString().trim();
+            String region = inputRegion.getText().toString().trim();
 
             if (name.isEmpty()) {
                 inputName.setError("Name required");
                 return;
             }
 
-            repo.createTeam(name, desc, selectedColor[0], (ok, msg) -> {
+            repo.createTeam(name, desc, selectedColor[0], region, (ok, msg) -> {
                 ToastUtils.show(this, ok ? "Team created." : msg);
                 if (ok) dialog.dismiss();
             });
@@ -236,6 +222,7 @@ public class TeamsActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
 
     private void showTeamDetailsDialog(Team team) {
         View view = getLayoutInflater().inflate(R.layout.dialog_team_details, null);
@@ -297,19 +284,27 @@ public class TeamsActivity extends AppCompatActivity {
     }
 
     private void showEditTeamDialog(Team team) {
+
         View view = getLayoutInflater().inflate(R.layout.dialog_create_team, null);
 
+        TextView dialogTitle = view.findViewById(R.id.dialogTitle);
         EditText inputName = view.findViewById(R.id.inputTeamName);
         EditText inputDesc = view.findViewById(R.id.inputTeamDesc);
         EditText inputRegion = view.findViewById(R.id.inputTeamRegion);
         View colorPreview = view.findViewById(R.id.viewColorPreview);
         Button btnPickColor = view.findViewById(R.id.btnPickColor);
+        Button btnSave = view.findViewById(R.id.btnCreate);
+
+        dialogTitle.setText("Edit Team");
+        btnSave.setText("Save");
 
         inputName.setText(team.getName());
         inputDesc.setText(team.getDescription());
+        inputRegion.setText(team.getRegion());
+        final int[] selectedColor = { team.getColor() };
 
-        final int[] selectedColor = {team.getColor()};
-        ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+        ((GradientDrawable) colorPreview.getBackground().mutate())
+                .setColor(selectedColor[0]);
 
         btnPickColor.setOnClickListener(v -> {
             View pickerView = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
@@ -321,7 +316,7 @@ public class TeamsActivity extends AppCompatActivity {
             Button btnCancel = pickerView.findViewById(R.id.btnCancel);
             Button btnOk = pickerView.findViewById(R.id.btnOk);
 
-            final int[] dialogColor = {selectedColor[0]};
+            final int[] dialogColor = { selectedColor[0] };
             preview.setBackgroundColor(dialogColor[0]);
 
             inputR.setText(String.valueOf(Color.red(dialogColor[0])));
@@ -329,74 +324,61 @@ public class TeamsActivity extends AppCompatActivity {
             inputB.setText(String.valueOf(Color.blue(dialogColor[0])));
 
             colorPickerView.setColorListener((ColorEnvelopeListener) (ColorEnvelope envelope, boolean fromUser) -> {
-                int color = envelope.getColor();
-                dialogColor[0] = color;
-                preview.setBackgroundColor(color);
-                inputR.setText(String.valueOf(Color.red(color)));
-                inputG.setText(String.valueOf(Color.green(color)));
-                inputB.setText(String.valueOf(Color.blue(color)));
+                int c = envelope.getColor();
+                dialogColor[0] = c;
+                preview.setBackgroundColor(c);
+                inputR.setText(String.valueOf(Color.red(c)));
+                inputG.setText(String.valueOf(Color.green(c)));
+                inputB.setText(String.valueOf(Color.blue(c)));
             });
-
-            View.OnFocusChangeListener updateColor = (v1, hasFocus) -> {
-                if (!hasFocus) {
-                    try {
-                        int r = parseColorValue(inputR.getText().toString());
-                        int g = parseColorValue(inputG.getText().toString());
-                        int b = parseColorValue(inputB.getText().toString());
-                        int color = Color.rgb(r, g, b);
-                        dialogColor[0] = color;
-                        preview.setBackgroundColor(color);
-                        colorPickerView.setPureColor(color);
-                        colorPickerView.selectByHsvColor(color);
-                    } catch (Exception ignored) {}
-                }
-            };
-            inputR.setOnFocusChangeListener(updateColor);
-            inputG.setOnFocusChangeListener(updateColor);
-            inputB.setOnFocusChangeListener(updateColor);
 
             AlertDialog pickerDialog = new AlertDialog.Builder(this)
                     .setView(pickerView)
                     .create();
 
-            btnCancel.setOnClickListener(v2 -> pickerDialog.dismiss());
-            btnOk.setOnClickListener(v2 -> {
+            btnCancel.setOnClickListener(x -> pickerDialog.dismiss());
+            btnOk.setOnClickListener(x -> {
                 selectedColor[0] = dialogColor[0];
-                ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
+                ((GradientDrawable) colorPreview.getBackground().mutate())
+                        .setColor(selectedColor[0]);
                 pickerDialog.dismiss();
             });
 
             pickerDialog.show();
         });
 
-
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
                 .create();
 
-        view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
-        view.findViewById(R.id.btnCreate).setOnClickListener(v -> {
-            String name = inputName.getText().toString().trim();
-            String desc = inputDesc.getText().toString().trim();
+        view.findViewById(R.id.btnCancel)
+                .setOnClickListener(v -> dialog.dismiss());
 
-            if (name.isEmpty()) {
+        btnSave.setOnClickListener(v -> {
+
+            String newName = inputName.getText().toString().trim();
+            String newDesc = inputDesc.getText().toString().trim();
+            String newRegion = inputRegion.getText().toString().trim();
+
+            if (newName.isEmpty()) {
                 inputName.setError("Name required");
                 return;
             }
 
-            team.setName(name);
-            team.setDescription(desc);
+            team.setName(newName);
+            team.setDescription(newDesc);
+            team.setRegion(newRegion);
             team.setColor(selectedColor[0]);
 
             repo.updateTeam(team, (ok, msg) -> {
                 ToastUtils.show(this, ok ? "Team updated." : msg);
+                if (ok) dialog.dismiss();
             });
-
-            dialog.dismiss();
         });
 
         dialog.show();
     }
+
 
     private int parseColorValue(String text) {
         if (text == null || text.isEmpty()) return 0;

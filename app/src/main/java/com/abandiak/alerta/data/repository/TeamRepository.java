@@ -41,7 +41,7 @@ public class TeamRepository {
                 .addOnFailureListener(l::onError);
     }
 
-    public void createTeam(String name, String desc, int color, SimpleCallback cb) {
+    public void createTeam(String name, String desc, int color, String region, SimpleCallback cb) {
         if (uid == null) {
             cb.onResult(false, "Not signed in");
             return;
@@ -57,7 +57,7 @@ public class TeamRepository {
                     String lastName = userDoc.getString("lastName");
                     String fullName = ((firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "")).trim();
 
-                    Team t = new Team(id, name, desc, code, uid, fullName, now, color);
+                    Team t = new Team(id, name, desc, code, uid, fullName, now, color, region);
 
                     WriteBatch batch = db.batch();
                     DocumentReference team = teamDoc(id);

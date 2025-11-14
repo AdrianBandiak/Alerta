@@ -7,12 +7,14 @@ public class Team {
     private String code;
     private String createdBy;
     private String createdByName;
+    private String region;
     private long createdAt;
     private int color;
 
     public Team() {}
 
-    public Team(String id, String name, String description, String code, String createdBy, String createdByName, long createdAt, int color) {
+    public Team(String id, String name, String description, String code,
+                String createdBy, String createdByName, long createdAt, int color, String region) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -21,7 +23,9 @@ public class Team {
         this.createdByName = createdByName;
         this.createdAt = createdAt;
         this.color = color;
+        this.region = region;
     }
+
 
     public String getId() { return id; }
     public String getName() { return name; }
@@ -40,4 +44,6 @@ public class Team {
     public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
     public void setColor(int color) { this.color = color; }
+    public String getRegion() { return region; }
+    public void setRegion(String region) { this.region = region; }
 }

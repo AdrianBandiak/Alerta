@@ -311,18 +311,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final MaterialAutoCompleteTextView inputTeam = sheet.findViewById(R.id.input_team);
 
         String[] types = new String[]{"INFO", "HAZARD", "CRITICAL", "TEAM"};
-        inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                R.layout.list_item_dropdown,
+                types
+        );
+        inputType.setAdapter(adapter);
+
+        inputType.setDropDownBackgroundDrawable(
+                ContextCompat.getDrawable(this, R.drawable.bg_dropdown_alerta)
+        );
+
 
         inputType.setOnItemClickListener((parent, view, position, id) -> {
             String selected = parent.getItemAtPosition(position).toString();
+
             if ("TEAM".equals(selected)) {
                 layoutTeam.setVisibility(View.VISIBLE);
                 loadUserTeams(inputTeam);
+                inputTeam.setDropDownBackgroundDrawable(
+                        ContextCompat.getDrawable(this, R.drawable.bg_dropdown_alerta)
+                );
             } else {
                 layoutTeam.setVisibility(View.GONE);
                 inputTeam.setText("");
             }
         });
+
 
         LatLng target = map.getCameraPosition().target;
         inputLat.setText(String.format(Locale.US, "%.6f", target.latitude));
@@ -802,7 +817,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         String name = d.getString("name");
                         if (name != null) teamNames.add(name);
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, teamNames);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            this,
+                            R.layout.list_item_dropdown,
+                            teamNames
+                    );
                     inputTeam.setAdapter(adapter);
                 })
                 .addOnFailureListener(e -> {

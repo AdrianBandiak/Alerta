@@ -3,10 +3,11 @@
     android:id="@+id/dropdown_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="48dp"
+    android:minHeight="40dp"
     android:gravity="center_vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:textSize="16sp"
+    android:textSize="12sp"
     android:fontFamily="@font/inter"
+    android:textStyle="normal"
     android:textColor="#212121"/>

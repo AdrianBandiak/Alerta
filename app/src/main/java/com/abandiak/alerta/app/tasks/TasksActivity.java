@@ -180,20 +180,29 @@ public class TasksActivity extends AppCompatActivity {
         AutoCompleteTextView inputTeam = dialogView.findViewById(R.id.inputTaskTeam);
         TextInputLayout layoutSelectTeam = dialogView.findViewById(R.id.layoutSelectTeam);
 
+        inputTeam.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
+
         String[] priorities = getResources().getStringArray(R.array.task_priorities);
 
         ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(
                 this,
-                android.R.layout.simple_list_item_1,
+                R.layout.list_item_dropdown,
                 priorities
         );
 
         inputPriority.setAdapter(priorityAdapter);
+        inputPriority.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
         inputPriority.setOnClickListener(v -> inputPriority.showDropDown());
 
 
         String[] types = {"NORMAL", "TEAM"};
-        inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.list_item_dropdown,
+                types
+        );
+        inputType.setAdapter(typeAdapter);
+        inputType.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
         inputType.setOnClickListener(v -> inputType.showDropDown());
 
         inputType.setOnItemClickListener((parent, view, position, id) -> {
@@ -334,8 +343,12 @@ public class TasksActivity extends AppCompatActivity {
                         String name = d.getString("name");
                         if (name != null) names.add(name);
                     }
-                    inputTeam.setAdapter(new ArrayAdapter<>(this,
-                            android.R.layout.simple_list_item_1, names));
+                    ArrayAdapter<String> teamAdapter = new ArrayAdapter<>(
+                            this,
+                            R.layout.list_item_dropdown,
+                            names
+                    );
+                    inputTeam.setAdapter(teamAdapter);
                 });
     }
 
@@ -353,6 +366,8 @@ public class TasksActivity extends AppCompatActivity {
         AutoCompleteTextView inputTeam = dialogView.findViewById(R.id.inputTaskTeam);
         TextInputLayout layoutTeam = dialogView.findViewById(R.id.layoutSelectTeam);
 
+        inputTeam.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
+
         inputTitle.setText(task.getTitle());
         inputDesc.setText(task.getDescription());
         inputPriority.setText(task.getPriority());
@@ -361,11 +376,23 @@ public class TasksActivity extends AppCompatActivity {
         inputType.setText(task.getType());
 
         String[] priorities = getResources().getStringArray(R.array.task_priorities);
-        inputPriority.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, priorities));
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.list_item_dropdown,
+                priorities
+        );
+        inputPriority.setAdapter(priorityAdapter);
+        inputPriority.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
         inputPriority.setOnClickListener(v -> inputPriority.showDropDown());
 
         String[] types = {"NORMAL", "TEAM"};
-        inputType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types));
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.list_item_dropdown,
+                types
+        );
+        inputType.setAdapter(typeAdapter);
+        inputType.setDropDownBackgroundResource(R.drawable.bg_dropdown_alerta);
         inputType.setOnClickListener(v -> inputType.showDropDown());
 
         if ("TEAM".equals(task.getType())) {
@@ -390,7 +417,6 @@ public class TasksActivity extends AppCompatActivity {
         AlertDialog dialog = new AlertDialog.Builder(this).setView(dialogView).create();
 
         dialogView.findViewById(R.id.btnCreate).setOnClickListener(v -> {
-
             String newTitle = inputTitle.getText().toString().trim();
             String newDesc = inputDesc.getText().toString().trim();
             String newPriority = inputPriority.getText().toString().trim();
@@ -423,6 +449,7 @@ public class TasksActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
+
 
     private String getTeamNameById(String teamId) {
         return "";

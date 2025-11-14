@@ -20,11 +20,10 @@
         android:paddingBottom="12dp" />
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="@style/AlertaTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Task name"
-        app:hintTextColor="#B0B0B0">
+        android:hint="Task name">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputTaskTitle"
@@ -32,69 +31,64 @@
             android:layout_height="46dp"
             android:inputType="textCapSentences"
             android:textColor="@color/text_primary"
-            android:textColorHint="#B0B0B0"
-            android:textSize="10sp"/>
+            android:textColorHint="@color/text_secondary"
+            android:textSize="12sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutTaskType"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/AlertaTextInput.Dropdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Task type"
         app:endIconMode="dropdown_menu"
-        app:endIconTint="@color/alerta_primary"
-        app:hintTextColor="@color/text_secondary">
+        app:endIconTint="@color/alerta_primary">
 
         <AutoCompleteTextView
             android:id="@+id/inputTaskType"
             android:layout_width="match_parent"
             android:layout_height="46dp"
+            android:paddingStart="12dp"
             android:inputType="none"
-            android:focusable="false"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"
-            android:textSize="10sp"
-            android:paddingStart="12dp"/>
+            android:focusable="false"
+            android:textSize="12sp"/>
     </com.google.android.material.textfield.TextInputLayout>
-
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutSelectTeam"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/AlertaTextInput.Dropdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:visibility="gone"
         android:hint="Select team"
         app:endIconMode="dropdown_menu"
-        app:endIconTint="@color/alerta_primary"
-        app:hintTextColor="@color/text_secondary">
+        app:endIconTint="@color/alerta_primary">
 
         <AutoCompleteTextView
             android:id="@+id/inputTaskTeam"
             android:layout_width="match_parent"
             android:layout_height="46dp"
+            android:paddingStart="12dp"
             android:inputType="none"
-            android:focusable="false"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"
-            android:textSize="10sp"
-            android:paddingStart="12dp"/>
+            android:focusable="false"
+            android:textSize="12sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 
-
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="@style/AlertaTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Description"
-        app:hintTextColor="#B0B0B0">
+        android:hint="Description">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputTaskDescription"
@@ -103,8 +97,8 @@
             android:gravity="top|start"
             android:inputType="textMultiLine|textCapSentences"
             android:textColor="@color/text_primary"
-            android:textColorHint="#B0B0B0"
-            android:textSize="10sp"/>
+            android:textColorHint="@color/text_secondary"
+            android:textSize="12sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -116,13 +110,12 @@
         android:weightSum="2">
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/AlertaTextInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
-            android:hint="Start date"
-            app:hintTextColor="#B0B0B0">
+            android:hint="Start date">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputTaskStartDate"
@@ -131,19 +124,18 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
-                android:textSize="10sp"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="12sp"
                 android:drawableEnd="@drawable/ic_calendar_red"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/AlertaTextInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
-            android:hint="End date"
-            app:hintTextColor="#B0B0B0">
+            android:hint="End date">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputTaskEndDate"
@@ -152,15 +144,14 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
-                android:textSize="10sp"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="12sp"
                 android:drawableEnd="@drawable/ic_calendar_red"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/AlertaTextInput.Dropdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -172,15 +163,14 @@
             android:id="@+id/inputTaskPriority"
             android:layout_width="match_parent"
             android:layout_height="46dp"
+            android:paddingStart="12dp"
             android:inputType="none"
             android:focusable="false"
             android:textColor="@color/text_primary"
-            android:textColorHint="#B0B0B0"
-            android:textSize="10sp"
-            android:paddingStart="12dp"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="12sp"
             android:entries="@array/task_priorities"/>
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -196,7 +186,7 @@
             android:layout_height="wrap_content"
             android:text="Cancel"
             android:textColor="@color/text_secondary"
-            android:textSize="10sp"/>
+            android:textSize="12sp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreate"
@@ -207,7 +197,7 @@
             android:layout_marginStart="8dp"
             app:backgroundTint="@color/alerta_primary"
             android:textColor="@color/white"
-            android:textSize="10sp"/>
+            android:textSize="12sp"/>
     </LinearLayout>
 
 </LinearLayout>

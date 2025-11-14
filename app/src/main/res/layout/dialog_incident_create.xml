@@ -25,11 +25,10 @@
             android:paddingBottom="16dp" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/incident_title"
-            app:hintTextColor="#B0B0B0">
+            android:hint="@string/incident_title">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_title"
@@ -37,17 +36,16 @@
                 android:layout_height="46dp"
                 android:inputType="textCapSentences"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
+                android:textColorHint="@color/hint_color_selector"
                 android:textSize="12sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/incident_description"
-            app:hintTextColor="#B0B0B0">
+            android:hint="@string/incident_description">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_description"
@@ -56,19 +54,17 @@
                 android:gravity="top|start"
                 android:inputType="textMultiLine|textCapSentences"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
+                android:textColorHint="@color/hint_color_selector"
                 android:textSize="12sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/AlertaTextInput.Dropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="@string/incident_type"
-            app:endIconMode="dropdown_menu"
-            app:endIconTint="@color/alerta_primary"
-            app:hintTextColor="#B0B0B0">
+            app:endIconMode="dropdown_menu">
 
             <AutoCompleteTextView
                 android:id="@+id/input_type"
@@ -81,20 +77,19 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
+                android:textColorHint="@color/hint_color_selector"
                 android:textSize="12sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_team"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/AlertaTextInput.Dropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Team"
             android:visibility="gone"
-            app:endIconMode="dropdown_menu"
-            app:hintTextColor="#B0B0B0">
+            android:hint="Team"
+            app:endIconMode="dropdown_menu">
 
             <AutoCompleteTextView
                 android:id="@+id/input_team"
@@ -103,10 +98,9 @@
                 android:focusable="false"
                 android:gravity="center_vertical"
                 android:textColor="@color/text_primary"
-                android:textColorHint="#B0B0B0"
+                android:textColorHint="@color/hint_color_selector"
                 android:textSize="12sp" />
         </com.google.android.material.textfield.TextInputLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -116,13 +110,12 @@
             android:weightSum="2">
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
-                android:hint="Lat"
-                app:hintTextColor="#B0B0B0">
+                android:hint="Lat">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_lat"
@@ -130,18 +123,17 @@
                     android:layout_height="46dp"
                     android:inputType="numberDecimal|numberSigned"
                     android:textColor="@color/text_primary"
-                    android:textColorHint="#B0B0B0"
+                    android:textColorHint="@color/hint_color_selector"
                     android:textSize="12sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
-                android:hint="Lng"
-                app:hintTextColor="#B0B0B0">
+                android:hint="Lng">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_lng"
@@ -149,7 +141,7 @@
                     android:layout_height="46dp"
                     android:inputType="numberDecimal|numberSigned"
                     android:textColor="@color/text_primary"
-                    android:textColorHint="#B0B0B0"
+                    android:textColorHint="@color/hint_color_selector"
                     android:textSize="12sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -187,7 +179,6 @@
                 android:visibility="gone"
                 android:layout_marginBottom="8dp"
                 android:contentDescription="@string/photo_preview" />
-
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_remove_photo"
