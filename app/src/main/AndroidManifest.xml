@@ -3,9 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.abandiak.alerta">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,16 +11,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
-    <uses-permission
-        android:name="android.permission.READ_MEDIA_IMAGES"
-        tools:targetApi="33"
-        tools:ignore="SelectedPhotoAccess" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS"
-        tools:targetApi="33" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:targetApi="33" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:targetApi="33" />
 
     <application
         android:name=".AlertaApp"
@@ -33,18 +24,12 @@
         android:roundIcon="@mipmap/ic_launcher_alerta"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="false"
         android:theme="@style/Theme.Alerta">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/maps_api_key" />
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/maps_api_key" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher_alerta" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/alerta_primary" />
 
         <provider
@@ -52,8 +37,7 @@
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
 
@@ -70,21 +54,11 @@
             android:exported="false"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 
-        <activity
-            android:name=".app.map.MapActivity"
-            android:exported="false" />
-        <activity
-            android:name=".app.tasks.TasksActivity"
-            android:exported="false" />
-        <activity
-            android:name=".app.teams.TeamsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".app.more.MoreActivity"
-            android:exported="false" />
-        <activity
-            android:name=".app.home.HomeActivity"
-            android:exported="false" />
+        <activity android:name=".app.map.MapActivity" android:exported="false" />
+        <activity android:name=".app.tasks.TasksActivity" android:exported="false" />
+        <activity android:name=".app.teams.TeamsActivity" android:exported="false" />
+        <activity android:name=".app.more.MoreActivity" android:exported="false" />
+        <activity android:name=".app.home.HomeActivity" android:exported="false" />
 
         <activity
             android:name=".app.auth.RegisterActivity"
@@ -94,10 +68,15 @@
         <activity
             android:name=".app.auth.LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+
+        <activity
+            android:name=".app.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Alerta.NoSplash">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
