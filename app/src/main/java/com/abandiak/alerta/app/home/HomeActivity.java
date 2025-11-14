@@ -332,6 +332,14 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 verified,
                                 createdBy
                         );
+
+                        String teamId = d.getString("teamId");
+                        Long teamColorLong = d.getLong("teamColor");
+
+                        if ("TEAM".equals(t)) {
+                            if (teamId != null) item.setTeamId(teamId);
+                            if (teamColorLong != null) item.setTeamColor(teamColorLong.intValue());
+                        }
                         allItems.add(item);
                     }
                     applySearchFilter();

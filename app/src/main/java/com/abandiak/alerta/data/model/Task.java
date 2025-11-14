@@ -1,6 +1,7 @@
 package com.abandiak.alerta.data.model;
 
 public class Task {
+
     private String id;
     private String title;
     private String createdBy;
@@ -12,17 +13,25 @@ public class Task {
     private String priority;
     private String endDate;
 
+    private String type = "NORMAL";
+    private String teamId;
+    private Integer teamColor;
+
     public Task() {
     }
 
-    public Task(String id, String title, String createdBy, String time, boolean completed, String date) {
+    public Task(String id, String title, String createdBy, String time,
+                boolean completed, String date) {
+
         this.id = id;
         this.title = title;
         this.createdBy = createdBy;
         this.time = time;
         this.completed = completed;
         this.date = date;
+        this.type = "NORMAL"; // default
     }
+
 
     public String getId() {
         return id;
@@ -94,5 +103,29 @@ public class Task {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
+    }
+
+    public Integer getTeamColor() {
+        return teamColor;
+    }
+
+    public void setTeamColor(Integer teamColor) {
+        this.teamColor = teamColor;
     }
 }

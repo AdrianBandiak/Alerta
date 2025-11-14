@@ -67,6 +67,26 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         h.textTitle.setText("[#" + idShort + "] " + t.getTitle());
         h.textMeta.setText(t.getTime());
 
+        if ("TEAM".equals(t.getType())) {
+            h.icon.setImageResource(R.drawable.ic_shield);
+
+            if (t.getTeamColor() != null) {
+                h.icon.setColorFilter(t.getTeamColor(), android.graphics.PorterDuff.Mode.SRC_IN);
+            } else {
+                h.icon.setColorFilter(
+                        h.itemView.getContext().getColor(R.color.alerta_primary),
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                );
+            }
+
+        } else {
+            h.icon.setImageResource(R.drawable.ic_task);
+            h.icon.setColorFilter(
+                    h.itemView.getContext().getColor(R.color.alerta_primary),
+                    android.graphics.PorterDuff.Mode.SRC_IN
+            );
+        }
+
         applyTaskStyle(h, t.isCompleted());
 
         h.checkDone.setOnCheckedChangeListener(null);
@@ -89,16 +109,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     private void applyTaskStyle(TaskViewHolder h, boolean completed) {
-        int iconColor = h.itemView.getContext().getColor(
-                completed ? R.color.status_online_bg : R.color.alerta_primary
-        );
-
-        h.icon.setColorFilter(iconColor, android.graphics.PorterDuff.Mode.SRC_IN);
-
         float alpha = completed ? 0.5f : 1f;
+
         h.itemView.setAlpha(alpha);
         h.textTitle.setAlpha(alpha);
         h.textMeta.setAlpha(alpha);
+        h.icon.setAlpha(alpha);
     }
 
     @Override

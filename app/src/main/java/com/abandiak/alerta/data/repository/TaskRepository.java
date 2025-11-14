@@ -23,8 +23,14 @@ public class TaskRepository {
 
 
     public void addTask(Task task, OnTaskAddedListener listener) {
+
+        Log.d(TAG, "Adding task: id=" + task.getId()
+                + ", type=" + task.getType()
+                + ", teamId=" + task.getTeamId()
+                + ", teamColor=" + task.getTeamColor());
+
         tasksRef.document(task.getId())
-                .set(task)
+                .set(task, SetOptions.merge())  // IMPORTANT FIX
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to add task", e);
@@ -32,15 +38,16 @@ public class TaskRepository {
                 });
     }
 
-
     public void getTasksForToday(OnTasksLoadedListener listener) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         tasksRef.whereEqualTo("createdBy", currentUserId)
                 .whereEqualTo("date", today)
                 .get()
-                .addOnSuccessListener(snapshots ->
-                        listener.onSuccess(snapshots.toObjects(Task.class)))
+                .addOnSuccessListener(snapshots -> {
+                    List<Task> list = snapshots.toObjects(Task.class);
+                    listener.onSuccess(list);
+                })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to load tasks for today", e);
                     listener.onError(e);
@@ -59,11 +66,11 @@ public class TaskRepository {
                         return;
                     }
                     if (snapshots != null) {
-                        listener.onSuccess(snapshots.toObjects(Task.class));
+                        List<Task> list = snapshots.toObjects(Task.class);
+                        listener.onSuccess(list);
                     }
                 });
     }
-
 
     public void updateTaskCompletion(String taskId, boolean completed) {
         tasksRef.document(taskId)
@@ -73,8 +80,13 @@ public class TaskRepository {
     }
 
     public void updateTask(Task task, OnTaskUpdatedListener listener) {
+
+        Log.d(TAG, "Updating task: id=" + task.getId()
+                + ", type=" + task.getType()
+                + ", teamId=" + task.getTeamId());
+
         tasksRef.document(task.getId())
-                .set(task, SetOptions.merge())
+                .set(task, SetOptions.merge())  // merge is important!
                 .addOnSuccessListener(aVoid -> listener.onUpdated(true))
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to update task", e);
@@ -82,21 +94,21 @@ public class TaskRepository {
                 });
     }
 
-
     public void deleteTask(String id, OnTaskDeletedListener listener) {
-        Log.d("TASK_DELETE", "Trying to delete task: " + id);
+
+        Log.d(TAG, "Trying to delete task: " + id);
+
         tasksRef.document(id)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("TASK_DELETE", "Deleted successfully: " + id);
+                    Log.d(TAG, "Deleted successfully: " + id);
                     listener.onDeleted(true);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("TASK_DELETE", "Delete failed: " + id, e);
+                    Log.e(TAG, "Delete failed: " + id, e);
                     listener.onDeleted(false);
                 });
     }
-
 
 
     public String getCurrentUserId() {
