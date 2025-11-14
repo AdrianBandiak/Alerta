@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,7 +21,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private EditText emailInput, passwordInput, confirmPasswordInput;
     private Button registerButton;

@@ -24,6 +24,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Team;
@@ -39,7 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class TeamsActivity extends AppCompatActivity {
+public class TeamsActivity extends BaseActivity {
 
     private BottomNavigationView bottomNav;
     private View emptyState;
@@ -97,7 +98,6 @@ public class TeamsActivity extends AppCompatActivity {
                     startActivity(new Intent(this, MoreActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 }
-                overridePendingTransition(0, 0);
                 return id == R.id.nav_teams;
             });
         }

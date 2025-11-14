@@ -22,6 +22,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.bumptech.glide.Glide;
@@ -33,7 +34,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.Objects;
 
-public class MoreActivity extends AppCompatActivity {
+public class MoreActivity extends BaseActivity {
 
     private BottomNavigationView bottomNav;
     private FirebaseAuth auth;
@@ -161,7 +162,6 @@ public class MoreActivity extends AppCompatActivity {
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
-                overridePendingTransition(0, 0);
             }
             return true;
         });

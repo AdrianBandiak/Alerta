@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CompleteProfileActivity extends AppCompatActivity {
+public class CompleteProfileActivity extends BaseActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;

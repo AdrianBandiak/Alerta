@@ -30,13 +30,14 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.profile.CompleteProfileActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     private TextView textViewRegisterLink;
     private FirebaseAuth firebaseAuth;

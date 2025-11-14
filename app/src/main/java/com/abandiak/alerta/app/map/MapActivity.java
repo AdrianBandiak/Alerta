@@ -40,6 +40,7 @@ import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Incident;
@@ -77,7 +78,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
     private BottomNavigationView bottomNav;
@@ -155,7 +156,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 } else if (id == R.id.nav_more) {
                     startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 }
-                overridePendingTransition(0, 0);
                 return id == R.id.nav_map;
             });
         }
@@ -865,7 +865,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_map);
-        overridePendingTransition(0, 0);
     }
 
 

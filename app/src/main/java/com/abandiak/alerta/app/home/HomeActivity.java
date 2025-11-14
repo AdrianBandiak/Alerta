@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.app.tasks.TaskAdapter;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
 import com.abandiak.alerta.core.utils.SystemBars;
@@ -64,7 +65,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
     private static final String HOME_MAP_TAG = "home_map_full";
     private static final String REGION_SAME_AS_MAP = "PL-MA";
@@ -112,21 +113,18 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             Intent i = new Intent(this, MapActivity.class);
             i.putExtra("open_create_incident", true);
             startActivity(i);
-            overridePendingTransition(0, 0);
         });
 
         findViewById(R.id.btnCreateTask).setOnClickListener(v -> {
             Intent i = new Intent(this, TasksActivity.class);
             i.putExtra("open_create_task", true);
             startActivity(i);
-            overridePendingTransition(0, 0);
         });
 
         findViewById(R.id.btnJoinTeam).setOnClickListener(v -> {
             Intent i = new Intent(this, TeamsActivity.class);
             i.putExtra("open_join_team", true);
             startActivity(i);
-            overridePendingTransition(0, 0);
         });
 
 
@@ -227,22 +225,18 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (id == R.id.nav_map) {
                 startActivity(new Intent(this, MapActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.nav_tasks) {
                 startActivity(new Intent(this, TasksActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.nav_teams) {
                 startActivity(new Intent(this, TeamsActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.nav_more) {
                 startActivity(new Intent(this, MoreActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                overridePendingTransition(0, 0);
                 return true;
             }
             return false;
@@ -467,7 +461,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_home);
-        overridePendingTransition(0, 0);
     }
 
     @Override

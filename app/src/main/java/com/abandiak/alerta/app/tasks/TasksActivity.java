@@ -22,6 +22,7 @@ import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
+import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Task;
@@ -43,7 +44,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
-public class TasksActivity extends AppCompatActivity {
+public class TasksActivity extends BaseActivity {
 
     private TaskAdapter adapter;
     private TaskRepository repo;
@@ -76,7 +77,6 @@ public class TasksActivity extends AppCompatActivity {
                     startActivity(new Intent(this, MoreActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 }
-                overridePendingTransition(0, 0);
                 return id == R.id.nav_tasks;
             });
         }
