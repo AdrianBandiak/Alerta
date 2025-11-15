@@ -1,9 +1,7 @@
 package com.abandiak.alerta.app.auth;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -19,13 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
@@ -129,7 +121,7 @@ public class LoginActivity extends BaseActivity {
         textViewRegisterLink.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
-        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in_translate);
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         logo.setVisibility(View.VISIBLE);
         root.setVisibility(View.VISIBLE);
         root.startAnimation(fadeIn);

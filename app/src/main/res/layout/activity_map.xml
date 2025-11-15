@@ -30,59 +30,87 @@
             app:cardUseCompatPadding="false"
             android:layout_gravity="center">
 
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chips_filters"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="2dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
                 app:singleLine="true"
-                app:chipSpacingHorizontal="12dp">
+                app:singleSelection="false"
+                app:chipSpacingHorizontal="8dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_info"
                     style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:includeFontPadding="false"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="13sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:text="@string/map_filters_info"
                     app:chipBackgroundColor="@color/chip_info_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/blue_700" />
+                    app:chipIconTint="@color/blue_700"/>
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_hazard"
                     style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:includeFontPadding="false"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="13sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:text="@string/map_filters_hazard"
                     app:chipBackgroundColor="@color/chip_hazard_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/amber_700" />
+                    app:chipIconTint="@color/amber_700"/>
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_critical"
                     style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:includeFontPadding="false"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="13sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:text="@string/map_filters_critical"
                     app:chipBackgroundColor="@color/chip_critical_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/red_700" />
+                    app:chipIconTint="@color/red_700"/>
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_team"
                     style="@style/App.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:includeFontPadding="false"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="13sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:text="TEAM"
                     app:chipBackgroundColor="@color/chip_team_selector"
                     app:chipIcon="@drawable/ic_dot"
-                    app:chipIconTint="@color/green_700" />
+                    app:chipIconTint="@color/green_700"/>
             </com.google.android.material.chip.ChipGroup>
+
 
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <FrameLayout
         android:id="@+id/map_container"
@@ -120,6 +148,7 @@
             android:textColor="#212121"/>
     </FrameLayout>
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddMarkerFab"
         android:layout_width="wrap_content"
@@ -140,13 +169,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/white"
-        android:paddingBottom="0dp"
         android:fitsSystemWindows="true"
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_tint"
         app:itemTextColor="@color/bottom_nav_text_tint"
         app:itemActiveIndicatorStyle="@style/AlertaNavIndicatorNone"
         app:itemRippleColor="@color/bottom_nav_ripple" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

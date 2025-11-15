@@ -14,7 +14,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void startActivity(Intent intent) {
         super.startActivity(intent);
         overridePendingTransition(
-                R.anim.fade_in_translate,
+                R.anim.fade_in,
                 R.anim.fade_out
         );
     }
@@ -23,7 +23,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void startActivity(Intent intent, @Nullable Bundle options) {
         super.startActivity(intent, options);
         overridePendingTransition(
-                R.anim.fade_in_translate,
+                R.anim.fade_in,
                 R.anim.fade_out
         );
     }
@@ -32,8 +32,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
         overridePendingTransition(
-                R.anim.fade_in_translate,
+                R.anim.fade_in,
                 R.anim.fade_out
         );
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        overridePendingTransition(
+                R.anim.fade_in,
+                R.anim.fade_out
+        );
+    }
+
 }
