@@ -1,61 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#1A000000"
-    app:strokeWidth="1dp"
-    android:foreground="?attr/selectableItemBackground">
+    android:orientation="horizontal"
+    android:padding="14dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_team_card"
+    android:gravity="center_vertical">
+
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_team_icon"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iconTeam"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_team"
+            android:layout_gravity="center"
+            app:tint="@color/alerta_primary"/>
+    </FrameLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="14dp">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="14dp">
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_team"
-            app:tint="@color/alerta_primary" />
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/textTeamName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="10dp">
+            android:text="Team name"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="@font/inter"
+            android:letterSpacing="0.01"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/textName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Team Alerta"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:fontFamily="@font/inter" />
 
-            <TextView
-                android:id="@+id/textMeta"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5 members • 3 in progress"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:fontFamily="@font/inter" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/textTeamSecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Code: XXXXXX • 12 Dec 2025"
+            android:textColor="#9A9A9A"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="3dp"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_chevron_right"
-            app:tint="@color/gray_400"/>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/gray_400"/>
+</LinearLayout>

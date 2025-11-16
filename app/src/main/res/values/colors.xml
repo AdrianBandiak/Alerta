@@ -41,5 +41,6 @@
     <color name="gray_500">#9E9E9E</color>
 
     <color name="green_700">#388E3C</color>
+    <color name="team_icon_background">#F4F4F6</color>
 
 </resources>

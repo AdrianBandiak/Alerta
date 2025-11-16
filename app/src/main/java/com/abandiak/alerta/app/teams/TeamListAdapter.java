@@ -51,20 +51,27 @@ public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.TeamVH
     public void onBindViewHolder(@NonNull TeamVH h, int position) {
         Team t = items.get(position);
 
-        h.textName.setText(t.getName() == null ? "Unnamed team" : t.getName());
+        h.textName.setText(t.getName());
+
+        h.textName.setSelected(true);
+        h.textName.setHorizontalFadingEdgeEnabled(true);
+        h.textName.setFadingEdgeLength(40);
 
         String code = t.getCode() == null ? "—" : t.getCode();
-        String meta = "Code: " + code;
+        String info = "Code: " + code;
+
         if (t.getCreatedAt() > 0) {
             String date = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                     .format(new Date(t.getCreatedAt()));
-            meta = meta + " • " + date;
+            info += " • " + date;
         }
-        h.textMeta.setText(meta);
+        h.textMeta.setText(info);
 
-        int color = t.getColor() != 0 ? t.getColor() :
-                h.itemView.getContext().getColor(R.color.alerta_primary);
-        ImageViewCompat.setImageTintList(h.icon, ColorStateList.valueOf(color));
+        int teamColor = (t.getColor() != 0)
+                ? t.getColor()
+                : h.itemView.getContext().getColor(R.color.alerta_primary);
+
+        ImageViewCompat.setImageTintList(h.icon, ColorStateList.valueOf(teamColor));
 
         h.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onTeamClick(t);
@@ -82,9 +89,9 @@ public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.TeamVH
 
         TeamVH(@NonNull View v) {
             super(v);
-            icon = v.findViewById(R.id.icon);
-            textName = v.findViewById(R.id.textName);
-            textMeta = v.findViewById(R.id.textMeta);
+            icon = v.findViewById(R.id.iconTeam);
+            textName = v.findViewById(R.id.textTeamName);
+            textMeta = v.findViewById(R.id.textTeamSecondary);
         }
     }
 }
