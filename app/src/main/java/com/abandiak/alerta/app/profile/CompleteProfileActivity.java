@@ -52,10 +52,21 @@ public class CompleteProfileActivity extends BaseActivity {
         MaterialButton btnSave = findViewById(R.id.btnSave);
 
         String[] genders = {"Male", "Female", "Prefer not to say"};
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, genders);
-        inputGender.setAdapter(adapter);
+
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.list_item_dropdown,
+                genders
+        );
+
+        inputGender.setAdapter(genderAdapter);
+
+        inputGender.setDropDownBackgroundDrawable(
+                ContextCompat.getDrawable(this, R.drawable.bg_dropdown_alerta)
+        );
+
         inputGender.setOnClickListener(v -> inputGender.showDropDown());
+
 
         btnSave.setOnClickListener(v -> {
             String first = inputFirst.getText().toString().trim();

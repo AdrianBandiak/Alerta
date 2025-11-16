@@ -51,16 +51,14 @@
                 android:layout_marginTop="24dp" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:startIconDrawable="@drawable/ic_email"
                 app:startIconTint="@color/hint_grey"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/hint_grey"
-                app:hintTextColor="@color/text_secondary"
-                app:boxStrokeColor="@color/text_secondary">
+                app:endIconTint="@color/hint_grey">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextEmail"
@@ -76,16 +74,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:startIconDrawable="@drawable/ic_password_lock"
                 app:startIconTint="@color/hint_grey"
                 app:endIconMode="password_toggle"
-                app:endIconTint="@color/hint_grey"
-                app:hintTextColor="@color/text_secondary"
-                app:boxStrokeColor="@color/text_secondary">
+                app:endIconTint="@color/hint_grey">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextPassword"

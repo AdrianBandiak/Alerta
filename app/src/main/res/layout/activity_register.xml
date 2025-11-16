@@ -55,7 +55,7 @@
                 android:fontFamily="@font/inter" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -69,12 +69,12 @@
                     android:hint="@string/hint_email"
                     android:inputType="textEmailAddress"
                     android:textSize="12sp"
-                    android:textColorHint="@color/hint_grey"
                     android:fontFamily="@font/inter" />
             </com.google.android.material.textfield.TextInputLayout>
 
+
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -90,12 +90,11 @@
                     android:hint="@string/hint_password"
                     android:inputType="textPassword"
                     android:textSize="12sp"
-                    android:textColorHint="@color/hint_grey"
                     android:fontFamily="@font/inter" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                style="@style/AlertaTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -111,7 +110,6 @@
                     android:hint="@string/label_confirm_password"
                     android:inputType="textPassword"
                     android:textSize="12sp"
-                    android:textColorHint="@color/hint_grey"
                     android:fontFamily="@font/inter" />
             </com.google.android.material.textfield.TextInputLayout>
 

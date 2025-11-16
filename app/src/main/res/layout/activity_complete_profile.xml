@@ -80,10 +80,11 @@
                 android:focusable="false"
                 android:cursorVisible="false"
                 android:padding="12dp"
-                android:dropDownHeight="wrap_content"
-                android:dropDownWidth="match_parent"
+                android:dropDownWidth="280dp"
                 android:dropDownVerticalOffset="4dp"
-                android:dropDownHorizontalOffset="0dp" />
+                android:dropDownHorizontalOffset="0dp"
+                />
+
         </com.google.android.material.textfield.TextInputLayout>
 
 
