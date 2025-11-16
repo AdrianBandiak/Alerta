@@ -1,10 +1,13 @@
 package com.abandiak.alerta.app.more;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -70,6 +73,8 @@ public class MoreActivity extends BaseActivity {
             intent.putExtra("edit_mode", true);
             startActivity(intent);
         });
+
+        findViewById(R.id.btnAbout).setOnClickListener(v -> showAboutDialog());
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
             auth.signOut();
@@ -166,6 +171,55 @@ public class MoreActivity extends BaseActivity {
             return true;
         });
     }
+
+    private void showAboutDialog() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_about_alerta, null);
+
+        TextView content = view.findViewById(R.id.textAboutContent);
+        TextView github = view.findViewById(R.id.textGitHub);
+
+        content.setText(Html.fromHtml(getAboutText(), Html.FROM_HTML_MODE_LEGACY));
+
+        github.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AdrianBandiak/Alerta"));
+            startActivity(i);
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialog.show();
+    }
+
+
+    private String getAboutText() {
+
+        return "<h2><b>About Alerta</b></h2>"
+
+                + "<p><b>Alerta</b> is a modern emergency coordination app built to help people stay "
+                + "safe, informed, and connected during unexpected or high-risk events. Designed with "
+                + "speed, clarity, and user experience in mind, Alerta enables you to instantly report "
+                + "incidents, receive real-time alerts, and collaborate with local communities or "
+                + "emergency teams. All in one unified platform.</p>"
+
+                + "<br><b>Main features:</b><br>"
+                + "• Instant incident reporting with photos, GPS & verification<br>"
+                + "• Live map with dynamic clustering and category filtering<br>"
+                + "• Team-based coordination and assignment tools<br>"
+                + "• Task creation for organized crisis response<br>"
+                + "• Offline-first architecture for unstable environments<br>"
+                + "• Clean, accessible and modern Material Design UI<br><br>"
+
+                + "<p>Alerta empowers communities to communicate faster, act smarter, and stay aligned "
+                + "when it matters most.</p>";
+    }
+
 
     @Override
     protected void onResume() {
