@@ -5,21 +5,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.annotation.Nullable;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.auth.LoginActivity;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
+import com.abandiak.alerta.app.profile.CompleteProfileActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
 import com.abandiak.alerta.core.utils.BaseActivity;
@@ -39,6 +35,7 @@ public class MoreActivity extends BaseActivity {
     private BottomNavigationView bottomNav;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+
     private ShapeableImageView imageProfile;
     private TextView textName, textEmail;
 
@@ -46,15 +43,15 @@ public class MoreActivity extends BaseActivity {
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Uri uri = result.getData().getData();
-                    uploadProfileImage(uri);
+                    if (uri != null) uploadProfileImage(uri);
                 }
             });
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SystemBars.apply(this);
 
+        SystemBars.apply(this);
         setContentView(R.layout.activity_more);
 
         auth = FirebaseAuth.getInstance();
@@ -67,8 +64,12 @@ public class MoreActivity extends BaseActivity {
         loadUserData();
 
         imageProfile.setOnClickListener(v -> openImagePicker());
-        findViewById(R.id.textEditProfile).setOnClickListener(v ->
-                ToastUtils.show(this, "Edit profile coming soon!"));
+
+        findViewById(R.id.textEditProfile).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CompleteProfileActivity.class);
+            intent.putExtra("edit_mode", true);
+            startActivity(intent);
+        });
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
             auth.signOut();
@@ -87,91 +88,89 @@ public class MoreActivity extends BaseActivity {
 
     private void uploadProfileImage(Uri uri) {
 
-        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        String uid = Objects.requireNonNull(auth.getCurrentUser()).getUid();
 
         FirebaseStorage.getInstance()
                 .getReference("profile_pics/" + uid + "/profile.jpg")
                 .putFile(uri)
                 .addOnSuccessListener(task -> {
 
-                    task.getStorage().getDownloadUrl()
-                            .addOnSuccessListener(downloadUri -> {
+                    task.getStorage().getDownloadUrl().addOnSuccessListener(downloadUri -> {
 
-                                FirebaseFirestore.getInstance()
-                                        .collection("users")
-                                        .document(uid)
-                                        .update("photoUrl", downloadUri.toString());
+                        db.collection("users")
+                                .document(uid)
+                                .update("photoUrl", downloadUri.toString());
 
-                                imageProfile.setImageURI(uri);
+                        imageProfile.setImageURI(uri);
+                        imageProfile.setStrokeWidth(0);
 
-                                imageProfile.setStrokeWidth(0);
+                        ToastUtils.show(this, "Profile picture updated!");
+                    });
 
-                                ToastUtils.show(this, "Profile picture updated!");
-                            });
                 })
-                .addOnFailureListener(e -> {
-                    ToastUtils.show(this, "Upload failed: " + e.getMessage());
-                });
+                .addOnFailureListener(e ->
+                        ToastUtils.show(this, "Upload failed: " + e.getMessage()));
     }
-
-
 
     private void loadUserData() {
         String uid = auth.getCurrentUser().getUid();
 
-        db.collection("users").document(uid).get()
+        db.collection("users").document(uid)
+                .get()
                 .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
+                    if (!doc.exists()) return;
 
-                        textName.setText(doc.getString("firstName") + " " + doc.getString("lastName"));
-                        textEmail.setText(auth.getCurrentUser().getEmail());
+                    String first = doc.getString("firstName");
+                    String last = doc.getString("lastName");
 
-                        String photoUrl = doc.getString("photoUrl");
+                    textName.setText(first + " " + last);
+                    textEmail.setText(auth.getCurrentUser().getEmail());
 
-                        if (photoUrl != null && !photoUrl.isEmpty()) {
+                    String photoUrl = doc.getString("photoUrl");
 
-                            Glide.with(this)
-                                    .load(photoUrl)
-                                    .centerCrop()
-                                    .into(imageProfile);
+                    if (photoUrl != null && !photoUrl.isEmpty()) {
+                        Glide.with(this)
+                                .load(photoUrl)
+                                .centerCrop()
+                                .into(imageProfile);
 
-                            imageProfile.setStrokeWidth(0);
+                        imageProfile.setStrokeWidth(0);
 
-                        } else {
-
-                            imageProfile.setImageResource(R.drawable.ic_person_placeholder);
-                            imageProfile.setStrokeWidth(6);
-                        }
+                    } else {
+                        imageProfile.setImageResource(R.drawable.ic_person_placeholder);
+                        imageProfile.setStrokeWidth(6);
                     }
                 });
     }
 
-
-
     private void setupBottomNav() {
         bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav == null) return;
+
         bottomNav.setSelectedItemId(R.id.nav_more);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             Intent intent = null;
+
             if (id == R.id.nav_home) intent = new Intent(this, HomeActivity.class);
             else if (id == R.id.nav_map) intent = new Intent(this, MapActivity.class);
             else if (id == R.id.nav_tasks) intent = new Intent(this, TasksActivity.class);
             else if (id == R.id.nav_teams) intent = new Intent(this, TeamsActivity.class);
+
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
+
             return true;
         });
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
+        loadUserData();
         if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_more);
     }
-
 }

@@ -6,10 +6,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
@@ -27,99 +25,119 @@ public class CompleteProfileActivity extends BaseActivity {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_gray));
-        new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightStatusBars(true);
+    private EditText inputFirst, inputLast, inputCountry, inputCity, inputPostal, inputStreet, inputHome;
+    private AutoCompleteTextView inputGender;
+    private boolean editMode = false;
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_profile);
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
-
-        EditText inputFirst = findViewById(R.id.inputFirstName);
-        EditText inputLast = findViewById(R.id.inputLastName);
-        EditText inputCountry = findViewById(R.id.inputCountry);
-        EditText inputCity = findViewById(R.id.inputCity);
-        EditText inputPostal = findViewById(R.id.inputPostalCode);
-        EditText inputStreet = findViewById(R.id.inputStreet);
-        EditText inputHome = findViewById(R.id.inputHomeNumber);
-        AutoCompleteTextView inputGender = findViewById(R.id.inputGender);
+        inputFirst = findViewById(R.id.inputFirstName);
+        inputLast = findViewById(R.id.inputLastName);
+        inputCountry = findViewById(R.id.inputCountry);
+        inputCity = findViewById(R.id.inputCity);
+        inputPostal = findViewById(R.id.inputPostalCode);
+        inputStreet = findViewById(R.id.inputStreet);
+        inputHome = findViewById(R.id.inputHomeNumber);
+        inputGender = findViewById(R.id.inputGender);
         MaterialButton btnSave = findViewById(R.id.btnSave);
 
-        String[] genders = {"Male", "Female", "Prefer not to say"};
+        editMode = getIntent().getBooleanExtra("edit_mode", false);
 
-        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(
+        if (editMode) {
+            ((android.widget.TextView) findViewById(R.id.textTitle)).setText("Edit your profile");
+            btnSave.setText("Save changes");
+        }
+
+        String[] genders = {"Male", "Female", "Prefer not to say"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 R.layout.list_item_dropdown,
                 genders
         );
-
-        inputGender.setAdapter(genderAdapter);
-
+        inputGender.setAdapter(adapter);
         inputGender.setDropDownBackgroundDrawable(
                 ContextCompat.getDrawable(this, R.drawable.bg_dropdown_alerta)
         );
 
-        inputGender.setOnClickListener(v -> inputGender.showDropDown());
+        if (editMode) loadExistingUserData();
 
+        btnSave.setOnClickListener(v -> saveProfile());
+    }
 
-        btnSave.setOnClickListener(v -> {
-            String first = inputFirst.getText().toString().trim();
-            String last = inputLast.getText().toString().trim();
-            String country = inputCountry.getText().toString().trim();
-            String city = inputCity.getText().toString().trim();
-            String postal = inputPostal.getText().toString().trim();
-            String street = inputStreet.getText().toString().trim();
-            String home = inputHome.getText().toString().trim();
-            String gender = inputGender.getText().toString().trim();
+    private void loadExistingUserData() {
+        String uid = auth.getCurrentUser().getUid();
 
-            if (first.isEmpty() || last.isEmpty() || country.isEmpty() || city.isEmpty()) {
-                ToastUtils.show(this, "Please fill all required fields.");
-                return;
-            }
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
 
-            String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-            if (uid == null) {
-                ToastUtils.show(this, "User not logged in.");
-                return;
-            }
+                        inputFirst.setText(doc.getString("firstName"));
+                        inputLast.setText(doc.getString("lastName"));
+                        inputCountry.setText(doc.getString("country"));
+                        inputCity.setText(doc.getString("city"));
+                        inputPostal.setText(doc.getString("postalCode"));
+                        inputStreet.setText(doc.getString("street"));
+                        inputHome.setText(doc.getString("homeNumber"));
 
-            Map<String, Object> profile = new HashMap<>();
-            profile.put("firstName", first);
-            profile.put("lastName", last);
-            profile.put("country", country);
-            profile.put("city", city);
-            profile.put("postalCode", postal);
-            profile.put("street", street);
-            profile.put("homeNumber", home);
-            profile.put("gender", gender);
-            profile.put("profileCompleted", true);
+                        String gender = doc.getString("gender");
+                        if (gender != null) {
+                            inputGender.setText(gender, false);
+                        }
+                    }
+                })
+                .addOnFailureListener(e ->
+                        ToastUtils.show(this, "Failed to load profile: " + e.getMessage()));
+    }
 
-            db.collection("users").document(uid)
-                    .update(profile)
-                    .addOnSuccessListener(a -> {
-                        ToastUtils.show(this, "Profile saved successfully!");
+    private void saveProfile() {
+        String first = inputFirst.getText().toString().trim();
+        String last = inputLast.getText().toString().trim();
+        String country = inputCountry.getText().toString().trim();
+        String city = inputCity.getText().toString().trim();
+        String postal = inputPostal.getText().toString().trim();
+        String street = inputStreet.getText().toString().trim();
+        String home = inputHome.getText().toString().trim();
+        String gender = inputGender.getText().toString().trim();
+
+        if (first.isEmpty() || last.isEmpty() || country.isEmpty() || city.isEmpty()) {
+            ToastUtils.show(this, "Please fill all required fields.");
+            return;
+        }
+
+        String uid = auth.getCurrentUser().getUid();
+
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("firstName", first);
+        profile.put("lastName", last);
+        profile.put("country", country);
+        profile.put("city", city);
+        profile.put("postalCode", postal);
+        profile.put("street", street);
+        profile.put("homeNumber", home);
+        profile.put("gender", gender);
+        profile.put("profileCompleted", true);
+
+        db.collection("users").document(uid)
+                .update(profile)
+                .addOnSuccessListener(a -> {
+
+                    ToastUtils.show(this, "Profile saved!");
+
+                    if (editMode) {
+                        finish();
+                    } else {
                         startActivity(new Intent(this, HomeActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
                         finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        db.collection("users").document(uid)
-                                .set(profile)
-                                .addOnSuccessListener(a2 -> {
-                                    ToastUtils.show(this, "Profile saved successfully!");
-                                    startActivity(new Intent(this, HomeActivity.class)
-                                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-                                    finish();
-                                })
-                                .addOnFailureListener(err ->
-                                        ToastUtils.show(this, "Failed to save profile. Try again."));
-                    });
-        });
+                    }
+                })
+                .addOnFailureListener(e ->
+                        ToastUtils.show(this, "Failed: " + e.getMessage()));
     }
+
 }
