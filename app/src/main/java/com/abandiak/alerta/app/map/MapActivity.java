@@ -248,7 +248,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(50.0614, 19.9366), 11f));
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
@@ -830,7 +829,25 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                 });
     }
 
+    private void centerOnUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
+        fused.getLastLocation()
+                .addOnSuccessListener(loc -> {
+                    if (loc != null) {
+                        LatLng me = new LatLng(loc.getLatitude(), loc.getLongitude());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(me, 14f));
+                    } else {
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(50.0614, 19.9366), 11f));
+                    }
+                });
+    }
 
     private void ensureLocationPermission() {
         boolean fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -841,13 +858,21 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     private void enableMyLocationLayer() {
         if (map == null) return;
-        try { map.setMyLocationEnabled(true); } catch (SecurityException ignored) { }
+
+        try {
+            map.setMyLocationEnabled(true);
+        } catch (SecurityException ignored) {}
+
+        centerOnUserLocation();
     }
+
 
     private void onLocationPermissionsResult(Map<String, Boolean> result) {
         boolean grantedFine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
         boolean grantedCoarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
-        if (grantedFine || grantedCoarse) enableMyLocationLayer();
+        if (grantedFine || grantedCoarse) {
+            enableMyLocationLayer();
+        }
     }
 
     @Override

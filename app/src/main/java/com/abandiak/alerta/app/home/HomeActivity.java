@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -267,8 +269,6 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(50.0614, 19.9366), 11f));
-
         clusterManager = new ClusterManager<>(this, map);
         renderer = new IncidentRenderer(this, map, clusterManager);
         clusterManager.setRenderer(renderer);
@@ -410,8 +410,13 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         fused.getLastLocation()
                 .addOnSuccessListener(this, (Location loc) -> {
                     if (loc != null) {
-                        LatLng me = new LatLng(loc.getLatitude(), loc.getLongitude());
+                        double lat = loc.getLatitude();
+                        double lng = loc.getLongitude();
+
+                        LatLng me = new LatLng(lat, lng);
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(me, 13f));
+
+                        updateCityName(lat, lng);
                     }
                 });
     }
@@ -433,6 +438,39 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             }
         });
     }
+
+    private void updateCityName(double lat, double lng) {
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                String city = addresses.get(0).getLocality();
+                String village = addresses.get(0).getSubLocality();
+                String adminArea = addresses.get(0).getAdminArea();
+                String display;
+
+                if (city != null) {
+                    display = city;
+                } else if (village != null) {
+                    display = village;
+                } else if (adminArea != null) {
+                    display = adminArea;
+                } else {
+                    display = "Unknown";
+                }
+
+                TextView textLocation = findViewById(R.id.textLocation);
+                textLocation.setText(display);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            TextView textLocation = findViewById(R.id.textLocation);
+            textLocation.setText("Unknown");
+        }
+    }
+
 
     private void updateCurrentDateTime(TextView textTime) {
         if (textTime == null) return;
