@@ -127,6 +127,25 @@
         <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
+    <style name="Alerta.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconSize">22dp</item>
+        <item name="itemTextAppearanceActive">@style/Alerta.BottomNav.Text</item>
+        <item name="itemTextAppearanceInactive">@style/Alerta.BottomNav.Text</item>
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">2dp</item>
+        <item name="itemActiveIndicatorStyle">@style/AlertaNavIndicatorNone</item>
+        <item name="itemRippleColor">@color/bottom_nav_ripple</item>
+        <item name="itemIconTint">@color/bottom_nav_icon_tint</item>
+        <item name="itemTextColor">@color/bottom_nav_text_tint</item>
+    </style>
+
+    <style name="Alerta.BottomNav.Text">
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.015</item>
+    </style>
+
+
     <style name="Alerta.TextInputLayout.Amber" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/amber_700</item>
         <item name="boxStrokeWidthFocused">2dp</item>

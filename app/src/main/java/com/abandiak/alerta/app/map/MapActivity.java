@@ -37,6 +37,7 @@ import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.cluster.IncidentItem;
 import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
+import com.abandiak.alerta.app.messages.MessagesActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
@@ -147,17 +148,38 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             bottomNav.setSelectedItemId(R.id.nav_map);
             bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
+
                 if (id == R.id.nav_home) {
-                    startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                } else if (id == R.id.nav_tasks) {
-                    startActivity(new Intent(this, TasksActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                } else if (id == R.id.nav_teams) {
-                    startActivity(new Intent(this, TeamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                } else if (id == R.id.nav_more) {
-                    startActivity(new Intent(this, MoreActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    startActivity(new Intent(this, HomeActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    return true;
                 }
-                return id == R.id.nav_map;
+                if (id == R.id.nav_map) return true;
+
+                if (id == R.id.nav_tasks) {
+                    startActivity(new Intent(this, TasksActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    return true;
+                }
+                if (id == R.id.nav_teams) {
+                    startActivity(new Intent(this, TeamsActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    return true;
+                }
+                if (id == R.id.nav_messages) {
+                    startActivity(new Intent(this, MessagesActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    return true;
+                }
+                if (id == R.id.nav_more) {
+                    startActivity(new Intent(this, MoreActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    return true;
+                }
+
+                return false;
             });
+
         }
 
         SupportMapFragment frag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);

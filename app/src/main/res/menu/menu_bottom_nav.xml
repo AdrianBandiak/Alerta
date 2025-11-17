@@ -17,6 +17,10 @@
         android:icon="@drawable/ic_group"
         android:title="Teams"/>
     <item
+        android:id="@+id/nav_messages"
+        android:icon="@drawable/ic_messages"
+        android:title="Messages" />
+    <item
         android:id="@+id/nav_more"
         android:icon="@drawable/ic_menu"
         android:title="More"/>

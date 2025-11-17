@@ -24,6 +24,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.abandiak.alerta.app.messages.MessagesActivity;
 import com.abandiak.alerta.app.tasks.TaskAdapter;
 import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.data.model.Task;
@@ -224,26 +226,37 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) return true;
+
             if (id == R.id.nav_map) {
                 startActivity(new Intent(this, MapActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
-            } else if (id == R.id.nav_tasks) {
+            }
+            if (id == R.id.nav_tasks) {
                 startActivity(new Intent(this, TasksActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
-            } else if (id == R.id.nav_teams) {
+            }
+            if (id == R.id.nav_teams) {
                 startActivity(new Intent(this, TeamsActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
-            } else if (id == R.id.nav_more) {
+            }
+            if (id == R.id.nav_messages) {
+                startActivity(new Intent(this, MessagesActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                return true;
+            }
+            if (id == R.id.nav_more) {
                 startActivity(new Intent(this, MoreActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
             }
+
             return false;
         });
     }
+
 
 
     private void attachMap() {

@@ -18,6 +18,7 @@ import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.auth.LoginActivity;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
+import com.abandiak.alerta.app.messages.MessagesActivity;
 import com.abandiak.alerta.app.profile.CompleteProfileActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.app.teams.TeamsActivity;
@@ -167,6 +168,7 @@ public class MoreActivity extends BaseActivity {
             else if (id == R.id.nav_map) intent = new Intent(this, MapActivity.class);
             else if (id == R.id.nav_tasks) intent = new Intent(this, TasksActivity.class);
             else if (id == R.id.nav_teams) intent = new Intent(this, TeamsActivity.class);
+            else if (id == R.id.nav_messages) intent = new Intent(this, MessagesActivity.class);
 
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

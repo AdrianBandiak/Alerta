@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.map.MapActivity;
+import com.abandiak.alerta.app.messages.MessagesActivity;
 import com.abandiak.alerta.app.more.MoreActivity;
 import com.abandiak.alerta.app.tasks.TasksActivity;
 import com.abandiak.alerta.core.utils.BaseActivity;
@@ -93,6 +94,9 @@ public class TeamsActivity extends BaseActivity {
                             .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_tasks) {
                     startActivity(new Intent(this, TasksActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                } else if (id == R.id.nav_messages) {
+                    startActivity(new Intent(this, MessagesActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 } else if (id == R.id.nav_more) {
                     startActivity(new Intent(this, MoreActivity.class)

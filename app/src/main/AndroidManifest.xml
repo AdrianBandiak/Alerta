@@ -59,6 +59,8 @@
         <activity android:name=".app.teams.TeamsActivity" android:exported="false" />
         <activity android:name=".app.more.MoreActivity" android:exported="false" />
         <activity android:name=".app.home.HomeActivity" android:exported="false" />
+        <activity android:name=".app.messages.MessagesActivity" android:exported="false" />
+
 
         <activity
             android:name=".app.auth.RegisterActivity"
