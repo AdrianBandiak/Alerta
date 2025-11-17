@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.abandiak.alerta.app.messages.teams.MessagesTeamsFragment;
+
 public class MessagesPagerAdapter extends FragmentStateAdapter {
 
     public MessagesPagerAdapter(@NonNull FragmentActivity activity) {

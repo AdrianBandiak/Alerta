@@ -10,11 +10,13 @@
     android:gravity="center_vertical">
 
     <FrameLayout
+        android:id="@+id/iconBackground"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="@drawable/bg_team_icon"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:gravity="center">
+
 
         <ImageView
             android:id="@+id/iconTeam"

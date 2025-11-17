@@ -1,6 +1,7 @@
 package com.abandiak.alerta.data.model;
 
 public class Team {
+
     private String id;
     private String name;
     private String description;
@@ -11,10 +12,16 @@ public class Team {
     private long createdAt;
     private int color;
 
-    public Team() {}
+    private String lastMessage;
+    private long lastTimestamp;
+
+    public Team() {
+    }
 
     public Team(String id, String name, String description, String code,
-                String createdBy, String createdByName, long createdAt, int color, String region) {
+                String createdBy, String createdByName, long createdAt,
+                int color, String region) {
+
         this.id = id;
         this.name = name;
         this.description = description;
@@ -24,26 +31,54 @@ public class Team {
         this.createdAt = createdAt;
         this.color = color;
         this.region = region;
+
+        this.lastMessage = "";
+        this.lastTimestamp = 0;
     }
 
 
     public String getId() { return id; }
+
     public String getName() { return name; }
+
     public String getDescription() { return description; }
+
     public String getCode() { return code; }
+
     public String getCreatedBy() { return createdBy; }
+
     public String getCreatedByName() { return createdByName; }
+
     public long getCreatedAt() { return createdAt; }
+
     public int getColor() { return color; }
 
-    public void setId(String id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
-    public void setDescription(String description) { this.description = description; }
-    public void setCode(String code) { this.code = code; }
-    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
-    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
-    public void setColor(int color) { this.color = color; }
     public String getRegion() { return region; }
+
+    public String getLastMessage() { return lastMessage; }   // NEW
+
+    public long getLastTimestamp() { return lastTimestamp; } // NEW
+
+
+    public void setId(String id) { this.id = id; }
+
+    public void setName(String name) { this.name = name; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public void setCode(String code) { this.code = code; }
+
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
+
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+    public void setColor(int color) { this.color = color; }
+
     public void setRegion(String region) { this.region = region; }
+
+    public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; } // NEW
+
+    public void setLastTimestamp(long lastTimestamp) { this.lastTimestamp = lastTimestamp; } // NEW
 }

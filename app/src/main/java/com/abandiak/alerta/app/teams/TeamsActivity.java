@@ -218,10 +218,16 @@ public class TeamsActivity extends BaseActivity {
                 return;
             }
 
-            repo.createTeam(name, desc, selectedColor[0], region, (ok, msg) -> {
-                ToastUtils.show(this, ok ? "Team created." : msg);
-                if (ok) dialog.dismiss();
+            repo.createTeam(name, desc, selectedColor[0], region, (ok, teamIdOrMsg) -> {
+                if (ok) {
+                    repo.initializeTeamChat(teamIdOrMsg);
+                    ToastUtils.show(this, "Team created.");
+                    dialog.dismiss();
+                } else {
+                    ToastUtils.show(this, teamIdOrMsg);
+                }
             });
+
         });
 
         dialog.show();

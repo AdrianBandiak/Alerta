@@ -1,8 +1,9 @@
-package com.abandiak.alerta.app.messages;
+package com.abandiak.alerta.app.messages.teams;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -10,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
-import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +50,15 @@ public class TeamChatsAdapter extends RecyclerView.Adapter<TeamChatsAdapter.Team
         h.textLastMessage.setText(entry.getLastMessage());
         h.textTime.setText(entry.getFormattedTime());
 
-        if (entry.getAvatarUrl() != null && !entry.getAvatarUrl().isEmpty()) {
-            Glide.with(h.itemView.getContext())
-                    .load(entry.getAvatarUrl())
-                    .centerCrop()
-                    .into(h.imageAvatar);
-        } else {
-            h.imageAvatar.setImageResource(R.drawable.ic_team);
-        }
+        h.imageTeamIcon.setImageResource(R.drawable.ic_group);
+        h.imageTeamIcon.setColorFilter(entry.getTeamColor());  // <- THIS IS THE CORRECT BEHAVIOR
 
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onTeamChatClick(entry);
         });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -72,14 +68,17 @@ public class TeamChatsAdapter extends RecyclerView.Adapter<TeamChatsAdapter.Team
     static class TeamViewHolder extends RecyclerView.ViewHolder {
 
         TextView textTeamName, textLastMessage, textTime;
-        ImageView imageAvatar;
+        FrameLayout iconBackground;
+        ImageView imageTeamIcon;
 
-        public TeamViewHolder(@NonNull View v) {
+        TeamViewHolder(@NonNull View v) {
             super(v);
             textTeamName = v.findViewById(R.id.textTeamName);
             textLastMessage = v.findViewById(R.id.textLastMessage);
             textTime = v.findViewById(R.id.textTime);
-            imageAvatar = v.findViewById(R.id.imageAvatar);
+            iconBackground = v.findViewById(R.id.iconBackground);
+            imageTeamIcon = v.findViewById(R.id.iconTeam);
         }
+
     }
 }
