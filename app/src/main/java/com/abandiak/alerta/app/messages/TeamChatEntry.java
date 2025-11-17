@@ -4,24 +4,24 @@ public class TeamChatEntry {
 
     private String teamId;
     private String teamName;
-    private int teamColor;
+    private String avatarUrl;
     private String lastMessage;
     private long lastTimestamp;
 
-    public TeamChatEntry() {}
+    public TeamChatEntry() { }
 
-    public TeamChatEntry(String teamId, String teamName, int teamColor,
+    public TeamChatEntry(String teamId, String teamName, String avatarUrl,
                          String lastMessage, long lastTimestamp) {
         this.teamId = teamId;
         this.teamName = teamName;
-        this.teamColor = teamColor;
+        this.avatarUrl = avatarUrl;
         this.lastMessage = lastMessage;
         this.lastTimestamp = lastTimestamp;
     }
 
     public String getTeamId() { return teamId; }
     public String getTeamName() { return teamName; }
-    public int getTeamColor() { return teamColor; }
+    public String getAvatarUrl() { return avatarUrl; }
     public String getLastMessage() { return lastMessage; }
     public long getLastTimestamp() { return lastTimestamp; }
 

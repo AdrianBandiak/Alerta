@@ -2,6 +2,7 @@ package com.abandiak.alerta.app.messages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
@@ -27,7 +28,11 @@ public class MessagesActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
+
         SystemBars.apply(this);
+
         setContentView(R.layout.activity_messages);
 
         tabLayout = findViewById(R.id.tabLayout);
@@ -50,23 +55,24 @@ public class MessagesActivity extends BaseActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_home)
+            if (id == R.id.nav_home) {
                 startActivity(new Intent(this, HomeActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-            else if (id == R.id.nav_map)
+            } else if (id == R.id.nav_map) {
                 startActivity(new Intent(this, MapActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-            else if (id == R.id.nav_tasks)
+            } else if (id == R.id.nav_tasks) {
                 startActivity(new Intent(this, TasksActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-            else if (id == R.id.nav_teams)
+            } else if (id == R.id.nav_teams) {
                 startActivity(new Intent(this, TeamsActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-            else if (id == R.id.nav_more)
+            } else if (id == R.id.nav_more) {
                 startActivity(new Intent(this, MoreActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+            }
 
-            return true;
+            return id == R.id.nav_messages;
         });
     }
 
@@ -78,4 +84,3 @@ public class MessagesActivity extends BaseActivity {
         }
     }
 }
-

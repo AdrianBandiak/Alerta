@@ -3,8 +3,8 @@ package com.abandiak.alerta.app.messages;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,23 +15,20 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DMChatsAdapter extends RecyclerView.Adapter<DMChatsAdapter.DMViewHolder> {
+public class TeamChatsAdapter extends RecyclerView.Adapter<TeamChatsAdapter.TeamViewHolder> {
 
-    public <E> DMChatsAdapter() {
+    public interface OnTeamChatClickListener {
+        void onTeamChatClick(TeamChatEntry chat);
     }
 
-    public interface OnChatClickListener {
-        void onChatClick(DMChatEntry chat);
-    }
+    private final List<TeamChatEntry> items = new ArrayList<>();
+    private OnTeamChatClickListener listener;
 
-    private final List<DMChatEntry> items = new ArrayList<>();
-    private OnChatClickListener listener;
-
-    public void setOnChatClickListener(OnChatClickListener l) {
+    public void setOnTeamChatClickListener(OnTeamChatClickListener l) {
         this.listener = l;
     }
 
-    public void submit(List<DMChatEntry> list) {
+    public void submit(List<TeamChatEntry> list) {
         items.clear();
         if (list != null) items.addAll(list);
         notifyDataSetChanged();
@@ -39,32 +36,31 @@ public class DMChatsAdapter extends RecyclerView.Adapter<DMChatsAdapter.DMViewHo
 
     @NonNull
     @Override
-    public DMViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TeamViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_chat_dm, parent, false);
-        return new DMViewHolder(v);
+                .inflate(R.layout.item_chat_team, parent, false);
+        return new TeamViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DMViewHolder h, int position) {
-        DMChatEntry entry = items.get(position);
+    public void onBindViewHolder(@NonNull TeamViewHolder h, int position) {
+        TeamChatEntry entry = items.get(position);
 
-        h.textName.setText(entry.getDisplayName());
+        h.textTeamName.setText(entry.getTeamName());
         h.textLastMessage.setText(entry.getLastMessage());
         h.textTime.setText(entry.getFormattedTime());
 
-        // Avatar
         if (entry.getAvatarUrl() != null && !entry.getAvatarUrl().isEmpty()) {
             Glide.with(h.itemView.getContext())
                     .load(entry.getAvatarUrl())
                     .centerCrop()
                     .into(h.imageAvatar);
         } else {
-            h.imageAvatar.setImageResource(R.drawable.ic_person_placeholder);
+            h.imageAvatar.setImageResource(R.drawable.ic_team);
         }
 
         h.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onChatClick(entry);
+            if (listener != null) listener.onTeamChatClick(entry);
         });
     }
 
@@ -73,14 +69,14 @@ public class DMChatsAdapter extends RecyclerView.Adapter<DMChatsAdapter.DMViewHo
         return items.size();
     }
 
-    static class DMViewHolder extends RecyclerView.ViewHolder {
+    static class TeamViewHolder extends RecyclerView.ViewHolder {
 
-        TextView textName, textLastMessage, textTime;
+        TextView textTeamName, textLastMessage, textTime;
         ImageView imageAvatar;
 
-        public DMViewHolder(@NonNull View v) {
+        public TeamViewHolder(@NonNull View v) {
             super(v);
-            textName = v.findViewById(R.id.textName);
+            textTeamName = v.findViewById(R.id.textTeamName);
             textLastMessage = v.findViewById(R.id.textLastMessage);
             textTime = v.findViewById(R.id.textTime);
             imageAvatar = v.findViewById(R.id.imageAvatar);

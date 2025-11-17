@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,28 +5,37 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="4dp"
-        app:tabIndicatorColor="@color/alerta_primary"
-        app:tabIndicatorHeight="3dp"
-        app:tabSelectedTextColor="@color/alerta_primary"
-        app:tabTextColor="@color/text_secondary"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        app:tabRippleColor="@android:color/transparent"/>
+        android:fitsSystemWindows="true">
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            app:tabIndicatorColor="@color/alerta_primary"
+            app:tabIndicatorHeight="3dp"
+            app:tabSelectedTextColor="@color/alerta_primary"
+            app:tabTextColor="@color/text_secondary"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabRippleColor="@android:color/transparent"
+            style="@style/Alerta.TabLayout"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="80dp"
-        android:layout_marginTop="48dp"
         android:paddingHorizontal="12dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginBottom="70dp"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
@@ -38,4 +46,5 @@
         android:fitsSystemWindows="true"
         style="@style/Alerta.BottomNav"
         app:menu="@menu/menu_bottom_nav" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
