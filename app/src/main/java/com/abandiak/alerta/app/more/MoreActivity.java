@@ -78,9 +78,14 @@ public class MoreActivity extends BaseActivity {
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
             auth.signOut();
-            startActivity(new Intent(this, LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-            finish();
+
+            FirebaseFirestore.getInstance().terminate().addOnCompleteListener(task -> {
+                FirebaseFirestore.getInstance().clearPersistence();
+
+                startActivity(new Intent(this, LoginActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                finish();
+            });
         });
 
         setupBottomNav();
