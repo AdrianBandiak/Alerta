@@ -1,11 +1,11 @@
-package com.abandiak.alerta.app.messages.teams;
+package com.abandiak.alerta.app.messages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
+import com.abandiak.alerta.app.messages.teams.TeamChatActivity;
+import com.abandiak.alerta.app.messages.teams.TeamChatEntry;
+import com.abandiak.alerta.app.messages.teams.TeamChatsAdapter;
 import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -44,13 +46,13 @@ public class MessagesTeamsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new TeamChatsAdapter();
+        recyclerView.setAdapter(adapter);
+
         adapter.setOnTeamChatClickListener(chat -> {
             Intent i = new Intent(getContext(), TeamChatActivity.class);
             i.putExtra("teamId", chat.getTeamId());
             startActivity(i);
         });
-
-        recyclerView.setAdapter(adapter);
 
         teamRepo = new TeamRepository();
         listenForTeams();
@@ -59,6 +61,7 @@ public class MessagesTeamsFragment extends Fragment {
     }
 
     private void listenForTeams() {
+
         listenerReg = teamRepo.listenMyTeams(new TeamRepository.TeamsListener() {
             @Override
             public void onSuccess(List<Team> list) {
@@ -67,21 +70,26 @@ public class MessagesTeamsFragment extends Fragment {
 
                 for (Team t : list) {
 
-                    long ts = t.getLastTimestamp() > 0
-                            ? t.getLastTimestamp()
-                            : 0;
+                    long lastTs = t.getLastTimestampMillis();
+                    long createdTs = t.getCreatedAtMillis();
 
-                    TeamChatEntry entry = new TeamChatEntry(
+                    long finalTs = lastTs > 0 ? lastTs : createdTs;
+
+                    String lastMsg = t.getLastMessage();
+                    if (lastMsg == null || lastMsg.trim().isEmpty()) {
+                        lastMsg = "No messages yet";
+                    }
+
+                    chats.add(new TeamChatEntry(
                             t.getId(),
                             t.getName(),
-                            t.getLastMessage() == null ? "" : t.getLastMessage(),
-                            ts,
+                            lastMsg,
+                            finalTs,
                             t.getColor()
-                    );
-
-
-                    chats.add(entry);
+                    ));
                 }
+
+                chats.sort((a, b) -> Long.compare(b.getLastTimestamp(), a.getLastTimestamp()));
 
                 adapter.submit(chats);
             }

@@ -10,7 +10,9 @@ public class TeamChatEntry {
 
     public TeamChatEntry() {}
 
-    public TeamChatEntry(String teamId, String teamName, String lastMessage, long lastTimestamp, int teamColor) {
+    public TeamChatEntry(String teamId, String teamName,
+                         String lastMessage, long lastTimestamp, int teamColor) {
+
         this.teamId = teamId;
         this.teamName = teamName;
         this.lastMessage = lastMessage;
@@ -26,7 +28,8 @@ public class TeamChatEntry {
 
     public String getFormattedTime() {
         if (lastTimestamp <= 0) return "";
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm");
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("HH:mm");
         return sdf.format(new java.util.Date(lastTimestamp));
     }
 

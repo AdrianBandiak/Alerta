@@ -1,36 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:fontFamily="@font/inter"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="false">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerTeamMessages"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="56dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
+        app:titleTextColor="@color/black"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_scrollFlags="scroll|enterAlways" />
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <EditText
-            android:id="@+id/inputTeamMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTeamMessages"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:minHeight="48dp"
-            android:hint="Message" />
+            android:padding="12dp"
+            android:clipToPadding="false"/>
 
-        <ImageButton
-            android:id="@+id/btnSendTeamMessage"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_send"
-            android:background="@null" />
+        <LinearLayout
+            android:id="@+id/chatInputBar"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@color/white"
+            android:layout_marginBottom="20dp"
+            android:elevation="8dp">
+
+            <EditText
+                android:id="@+id/inputTeamMessage"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="Message..."
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_chat_input"
+                android:textColor="@color/black"
+                android:textColorHint="@color/text_secondary"
+                android:maxLines="3"/>
+
+            <ImageButton
+                android:id="@+id/btnSendTeamMessage"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_send_button"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_send"
+                app:tint="@color/white"/>
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

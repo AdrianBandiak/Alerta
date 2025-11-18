@@ -7,8 +7,10 @@ public class ChatMessage {
     private String text;
     private long createdAt;
 
-    public ChatMessage() {
-    }
+    private String senderName;
+    private String senderAvatar;
+
+    public ChatMessage() {}
 
     public ChatMessage(String id, String senderId, String text, long createdAt) {
         this.id = id;
@@ -17,19 +19,20 @@ public class ChatMessage {
         this.createdAt = createdAt;
     }
 
-    public String getId() {
-        return id;
+    public ChatMessage(String id, String senderId, String text, long createdAt,
+                       String senderName, String senderAvatar) {
+        this.id = id;
+        this.senderId = senderId;
+        this.text = text;
+        this.createdAt = createdAt;
+        this.senderName = senderName;
+        this.senderAvatar = senderAvatar;
     }
 
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
+    public String getId() { return id; }
+    public String getSenderId() { return senderId; }
+    public String getText() { return text; }
+    public long getCreatedAt() { return createdAt; }
+    public String getSenderName() { return senderName; }
+    public String getSenderAvatar() { return senderAvatar; }
 }

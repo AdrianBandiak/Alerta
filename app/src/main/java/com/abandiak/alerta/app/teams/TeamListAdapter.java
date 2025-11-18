@@ -60,9 +60,10 @@ public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.TeamVH
         String code = t.getCode() == null ? "—" : t.getCode();
         String info = "Code: " + code;
 
-        if (t.getCreatedAt() > 0) {
+        if (t.getCreatedAt() != null) {
+            long ms = t.getCreatedAt().toDate().getTime();
             String date = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                    .format(new Date(t.getCreatedAt()));
+                    .format(new Date(ms));
             info += " • " + date;
         }
         h.textMeta.setText(info);

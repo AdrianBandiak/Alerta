@@ -31,6 +31,7 @@ import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerView;
@@ -255,8 +256,13 @@ public class TeamsActivity extends BaseActivity {
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-        String date = team.getCreatedAt() > 0 ? sdf.format(new java.util.Date(team.getCreatedAt())) : "—";
+        Timestamp ts = team.getCreatedAt();
+        String date = (ts != null)
+                ? sdf.format(ts.toDate())
+                : "—";
+
         textCreatedAt.setText("Created at: " + date);
+
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)

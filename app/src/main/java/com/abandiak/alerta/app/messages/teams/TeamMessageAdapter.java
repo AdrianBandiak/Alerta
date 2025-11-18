@@ -3,6 +3,7 @@ package com.abandiak.alerta.app.messages.teams;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.data.model.ChatMessage;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +24,21 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private String currentUid;
     private List<ChatMessage> messages = new ArrayList<>();
 
+    private String currentUserAvatar = null;
+    private String currentUserName = "You";
+
     public TeamMessageAdapter(String currentUid) {
         this.currentUid = currentUid;
+    }
+
+    public void setCurrentUserAvatar(String url) {
+        this.currentUserAvatar = url;
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentUserName(String name) {
+        this.currentUserName = name;
+        notifyDataSetChanged();
     }
 
     public void submitList(List<ChatMessage> newList) {
@@ -54,13 +69,31 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
         ChatMessage msg = messages.get(position);
 
-        if (h instanceof SentHolder) {
-            ((SentHolder) h).text.setText(msg.getText());
+        if (holder instanceof SentHolder) {
+            SentHolder h = (SentHolder) holder;
+
+            h.text.setText(msg.getText());
+            h.name.setText(currentUserName);
+
+            Glide.with(h.avatar.getContext())
+                    .load(currentUserAvatar)
+                    .placeholder(R.drawable.ic_avatar_placeholder)
+                    .into(h.avatar);
+
         } else {
-            ((ReceivedHolder) h).text.setText(msg.getText());
+            ReceivedHolder h = (ReceivedHolder) holder;
+
+            h.text.setText(msg.getText());
+            h.name.setText(msg.getSenderName());
+
+            Glide.with(h.avatar.getContext())
+                    .load(msg.getSenderAvatar())
+                    .placeholder(R.drawable.ic_avatar_placeholder)
+                    .into(h.avatar);
         }
     }
 
@@ -70,20 +103,26 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     static class SentHolder extends RecyclerView.ViewHolder {
-        TextView text;
+        TextView text, name;
+        ImageView avatar;
 
         public SentHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.textMessage);
+            name = itemView.findViewById(R.id.textName);
+            avatar = itemView.findViewById(R.id.avatar);
         }
     }
 
     static class ReceivedHolder extends RecyclerView.ViewHolder {
-        TextView text;
+        TextView text, name;
+        ImageView avatar;
 
         public ReceivedHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.textMessage);
+            name = itemView.findViewById(R.id.textName);
+            avatar = itemView.findViewById(R.id.avatar);
         }
     }
 }

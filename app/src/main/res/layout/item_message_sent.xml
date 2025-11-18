@@ -1,10 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textMessage"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_msg_sent"
-    android:padding="10dp"
-    android:layout_margin="6dp"
-    android:textColor="@android:color/white"
-    android:layout_gravity="end"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginVertical="4dp"
+    android:gravity="end">
+
+    <TextView
+        android:id="@+id/textMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="@drawable/bg_bubble_sent"
+        android:textColor="@color/white"
+        android:maxWidth="0dp"
+        app:layout_constraintWidth_percent="0.7" />
+
+</LinearLayout>

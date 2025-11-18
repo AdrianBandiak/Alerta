@@ -47,4 +47,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         );
     }
 
+    public void finishWithAnimation() {
+        finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
 }

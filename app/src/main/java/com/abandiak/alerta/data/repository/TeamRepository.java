@@ -1,207 +1,215 @@
 package com.abandiak.alerta.data.repository;
 
-import android.util.Log;
+import androidx.annotation.Nullable;
 
 import com.abandiak.alerta.data.model.Team;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TeamRepository {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String uid = FirebaseAuth.getInstance().getUid();
 
-    private CollectionReference teams() { return db.collection("teams"); }
-    private DocumentReference teamDoc(String id) { return teams().document(id); }
-    private DocumentReference codeDoc(String code) { return db.collection("team_codes").document(code); }
+    public interface TeamsListener {
+        void onSuccess(List<Team> list);
+        void onError(Exception e);
+    }
 
-    public interface TeamsListener { void onSuccess(List<Team> list); void onError(Exception e); }
-    public interface SimpleCallback { void onResult(boolean ok, String messageOrId); }
+    public ListenerRegistration listenMyTeams(TeamsListener listener) {
+        if (uid == null) return null;
 
-    public ListenerRegistration listenMyTeams(TeamsListener l) {
-        assert uid != null;
-        return teams()
+        return db.collection("teams")
                 .whereArrayContains("membersIndex", uid)
-                .addSnapshotListener((snap, e) -> {
-                    if (e != null) {
-                        l.onError(e);
+                .addSnapshotListener((snap, err) -> {
+
+                    if (err != null) {
+                        listener.onError(err);
                         return;
                     }
-                    l.onSuccess(
-                            snap == null
-                                    ? Collections.emptyList()
-                                    : snap.toObjects(Team.class)
-                    );
+                    if (snap == null) return;
+
+                    List<Team> list = new ArrayList<>();
+                    for (DocumentSnapshot d : snap.getDocuments()) {
+
+                        Team t = d.toObject(Team.class);
+                        if (t != null) {
+                            t.setId(d.getId());
+                            list.add(t);
+                        }
+                    }
+                    listener.onSuccess(list);
                 });
     }
 
-    public void getMyTeams(TeamsListener l) {
-        assert uid != null;
-        teams()
-                .whereArrayContains("membersIndex", uid)
-                .get()
-                .addOnSuccessListener(s -> l.onSuccess(s.toObjects(Team.class)))
-                .addOnFailureListener(l::onError);
+    public interface CreateTeamCallback {
+        void onComplete(boolean success, String teamIdOrError);
     }
+
+    public void createTeam(String name, String desc, int color, String region,
+                           CreateTeamCallback callback) {
+
+        if (uid == null) {
+            callback.onComplete(false, "Not logged in.");
+            return;
+        }
+
+        String code = generateTeamCode();
+        DocumentReference teamRef = db.collection("teams").document();
+        String teamId = teamRef.getId();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("description", desc);
+        data.put("color", color);
+        data.put("code", code);
+        data.put("region", region);
+
+        data.put("createdBy", uid);
+        data.put("createdByName", "");
+        data.put("createdAt", Timestamp.now());
+
+        data.put("lastMessage", "");
+        data.put("lastTimestamp", null);
+
+        data.put("membersIndex", Collections.singletonList(uid));
+
+        teamRef.set(data)
+                .continueWithTask(task -> {
+
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    Map<String, Object> member = new HashMap<>();
+                    member.put("role", "owner");
+                    member.put("joinedAt", Timestamp.now());
+
+                    return teamRef.collection("members")
+                            .document(uid)
+                            .set(member);
+                })
+                .continueWithTask(task -> {
+
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    Map<String, Object> codeMap = new HashMap<>();
+                    codeMap.put("teamId", teamId);
+
+                    return db.collection("team_codes")
+                            .document(code)
+                            .set(codeMap);
+                })
+                .addOnSuccessListener(aVoid -> callback.onComplete(true, teamId))
+                .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
+    }
+
 
     public void initializeTeamChat(String teamId) {
 
-        DocumentReference ref = teamDoc(teamId);
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("text", "Chat created");
+        msg.put("senderId", uid);
+        msg.put("createdAt", Timestamp.now());
 
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("lastMessage", "");
-        fields.put("lastTimestamp", 0);
-
-        ref.set(fields, SetOptions.merge());
-
-        ref.collection("messages")
-                .document("init")
-                .set(new HashMap<String, Object>() {{
-                    put("system", "Chat initialized");
-                    put("createdAt", FieldValue.serverTimestamp());
-                }});
+        db.collection("teams")
+                .document(teamId)
+                .collection("messages")
+                .add(msg);
     }
 
-    public void createTeam(String name, String desc, int color, String region, SimpleCallback cb) {
-        if (uid == null) {
-            cb.onResult(false, "Not signed in");
+    public interface UpdateTeamCallback {
+        void onComplete(boolean ok, String msg);
+    }
+
+    public void updateTeam(Team team, UpdateTeamCallback callback) {
+
+        if (team.getId() == null) {
+            callback.onComplete(false, "Missing ID.");
             return;
         }
 
-        String id = UUID.randomUUID().toString();
-        String code = genCode();
-        long now = System.currentTimeMillis();
+        Map<String, Object> update = new HashMap<>();
+        update.put("name", team.getName());
+        update.put("description", team.getDescription());
+        update.put("region", team.getRegion());
+        update.put("color", team.getColor());
 
-        db.collection("users").document(uid)
+        db.collection("teams")
+                .document(team.getId())
+                .update(update)
+                .addOnSuccessListener(aVoid -> callback.onComplete(true, "OK"))
+                .addOnFailureListener(e -> callback.onComplete(false, e.getMessage()));
+    }
+
+    public interface DeleteTeamCallback {
+        void onComplete(boolean success);
+    }
+
+    public void deleteTeam(String teamId, DeleteTeamCallback cb) {
+
+        db.collection("teams")
+                .document(teamId)
+                .delete()
+                .addOnSuccessListener(v -> cb.onComplete(true))
+                .addOnFailureListener(e -> cb.onComplete(false));
+    }
+
+    public interface JoinCallback {
+        void onComplete(boolean ok, String msg);
+    }
+
+    public void joinByCode(String code, JoinCallback callback) {
+
+        db.collection("team_codes")
+                .document(code)
                 .get()
-                .addOnSuccessListener(userDoc -> {
+                .addOnSuccessListener(doc -> {
 
-                    String firstName = userDoc.getString("firstName");
-                    String lastName = userDoc.getString("lastName");
-                    String fullName = ((firstName != null ? firstName : "") + " " +
-                            (lastName != null ? lastName : "")).trim();
+                    if (!doc.exists()) {
+                        callback.onComplete(false, "Invalid code.");
+                        return;
+                    }
 
-                    Team t = new Team(id, name, desc, code, uid, fullName, now, color, region);
+                    String teamId = doc.getString("teamId");
+                    if (teamId == null) {
+                        callback.onComplete(false, "Invalid mapping.");
+                        return;
+                    }
 
-                    WriteBatch batch = db.batch();
-                    DocumentReference team = teamDoc(id);
+                    DocumentReference teamRef = db.collection("teams").document(teamId);
 
-                    batch.set(team, t);
+                    teamRef.update("membersIndex", FieldValue.arrayUnion(uid))
+                            .addOnSuccessListener(aVoid -> {
 
-                    batch.update(team, "membersIndex", Arrays.asList(uid));
+                                teamRef.collection("members")
+                                        .document(uid)
+                                        .set(Collections.singletonMap("joinedAt", Timestamp.now()));
 
-                    batch.set(team.collection("members").document(uid),
-                            new HashMap<String, Object>() {{
-                                put("role", "owner");
-                                put("joinedAt", now);
-                            }});
-
-                    batch.set(codeDoc(code),
-                            new HashMap<String, Object>() {{
-                                put("teamId", id);
-                            }});
-
-                    batch.commit()
-                            .addOnSuccessListener(v -> {
-                                cb.onResult(true, id);
+                                callback.onComplete(true, "OK");
                             })
-                            .addOnFailureListener(e -> {
-                                Log.e("TEAM_CREATE", "", e);
-                                cb.onResult(false, "Create failed");
-                            });
-
+                            .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("TEAM_CREATE", "Failed to get user profile", e);
-                    cb.onResult(false, "Failed to get user profile");
-                });
+                .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
     }
 
-    public void joinByCode(String rawCode, SimpleCallback cb) {
-        if (uid == null) {
-            cb.onResult(false, "Not signed in");
-            return;
-        }
+    private String generateTeamCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder();
 
-        String code = rawCode.trim().toUpperCase(Locale.ROOT);
-
-        codeDoc(code).get().addOnSuccessListener(doc -> {
-            if (!doc.exists()) {
-                cb.onResult(false, "Invalid code");
-                return;
-            }
-
-            String teamId = doc.getString("teamId");
-            if (teamId == null) {
-                cb.onResult(false, "Invalid code");
-                return;
-            }
-
-            DocumentReference team = teamDoc(teamId);
-            long now = System.currentTimeMillis();
-
-            db.runTransaction(tr -> {
-                        DocumentSnapshot snapshot = tr.get(team);
-                        if (!snapshot.exists())
-                            throw new FirebaseFirestoreException("Team not found",
-                                    FirebaseFirestoreException.Code.NOT_FOUND);
-
-                        List<String> idx = (List<String>) snapshot.get("membersIndex");
-                        if (idx == null) idx = new ArrayList<>();
-
-                        if (idx.contains(uid))
-                            throw new FirebaseFirestoreException("Already in team",
-                                    FirebaseFirestoreException.Code.ABORTED);
-
-                        tr.set(team.collection("members").document(uid),
-                                new HashMap<String, Object>() {{
-                                    put("role", "member");
-                                    put("joinedAt", now);
-                                }}, SetOptions.merge());
-
-                        idx.add(uid);
-                        tr.update(team, "membersIndex", idx);
-
-                        return null;
-                    })
-                    .addOnSuccessListener(v -> cb.onResult(true, teamId))
-                    .addOnFailureListener(e -> {
-                        if (e.getMessage() != null && e.getMessage().contains("Already"))
-                            cb.onResult(false, "You are already in this team");
-                        else
-                            cb.onResult(false, "Join failed");
-                    });
-
-        }).addOnFailureListener(e -> cb.onResult(false, "Join failed"));
-    }
-
-    private String genCode() {
-        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        StringBuilder sb = new StringBuilder(6);
-        Random r = ThreadLocalRandom.current();
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++) {
             sb.append(chars.charAt(r.nextInt(chars.length())));
+        }
         return sb.toString();
     }
 
-    public void updateTeam(Team team, SimpleCallback cb) {
-        teamDoc(team.getId())
-                .set(team, SetOptions.merge())
-                .addOnSuccessListener(v -> cb.onResult(true, "Updated"))
-                .addOnFailureListener(e -> cb.onResult(false, "Update failed"));
-    }
-
-    public void deleteTeam(String teamId, java.util.function.Consumer<Boolean> cb) {
-        teamDoc(teamId)
-                .delete()
-                .addOnSuccessListener(v -> cb.accept(true))
-                .addOnFailureListener(e -> cb.accept(false));
-    }
-
-    public String currentUid() {
-        return uid;
+    public DocumentReference getTeamRef(String teamId) {
+        return db.collection("teams").document(teamId);
     }
 }

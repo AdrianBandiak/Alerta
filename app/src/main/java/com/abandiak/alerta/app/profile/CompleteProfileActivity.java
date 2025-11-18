@@ -16,6 +16,7 @@ import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class CompleteProfileActivity extends BaseActivity {
 
     private EditText inputFirst, inputLast, inputCountry, inputCity, inputPostal, inputStreet, inputHome;
     private AutoCompleteTextView inputGender;
+
     private boolean editMode = false;
 
     @Override
@@ -36,6 +38,7 @@ public class CompleteProfileActivity extends BaseActivity {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+
         inputFirst = findViewById(R.id.inputFirstName);
         inputLast = findViewById(R.id.inputLastName);
         inputCountry = findViewById(R.id.inputCountry);
@@ -69,13 +72,13 @@ public class CompleteProfileActivity extends BaseActivity {
         btnSave.setOnClickListener(v -> saveProfile());
     }
 
+
     private void loadExistingUserData() {
         String uid = auth.getCurrentUser().getUid();
 
         db.collection("users").document(uid).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-
                         inputFirst.setText(doc.getString("firstName"));
                         inputLast.setText(doc.getString("lastName"));
                         inputCountry.setText(doc.getString("country"));
@@ -94,7 +97,9 @@ public class CompleteProfileActivity extends BaseActivity {
                         ToastUtils.show(this, "Failed to load profile: " + e.getMessage()));
     }
 
+
     private void saveProfile() {
+
         String first = inputFirst.getText().toString().trim();
         String last = inputLast.getText().toString().trim();
         String country = inputCountry.getText().toString().trim();
@@ -123,10 +128,10 @@ public class CompleteProfileActivity extends BaseActivity {
         profile.put("profileCompleted", true);
 
         db.collection("users").document(uid)
-                .update(profile)
+                .set(profile, SetOptions.merge())
                 .addOnSuccessListener(a -> {
 
-                    ToastUtils.show(this, "Profile saved!");
+                    ToastUtils.show(this, editMode ? "Profile updated!" : "Profile saved!");
 
                     if (editMode) {
                         finish();
@@ -139,5 +144,4 @@ public class CompleteProfileActivity extends BaseActivity {
                 .addOnFailureListener(e ->
                         ToastUtils.show(this, "Failed: " + e.getMessage()));
     }
-
 }

@@ -1,5 +1,8 @@
 package com.abandiak.alerta.data.model;
 
+import com.google.firebase.Timestamp;
+import java.util.List;
+
 public class Team {
 
     private String id;
@@ -9,17 +12,19 @@ public class Team {
     private String createdBy;
     private String createdByName;
     private String region;
-    private long createdAt;
+
+    private Timestamp createdAt;
     private int color;
 
     private String lastMessage;
-    private long lastTimestamp;
+    private Timestamp lastTimestamp;
 
-    public Team() {
-    }
+    private List<String> membersIndex;
+
+    public Team() {}
 
     public Team(String id, String name, String description, String code,
-                String createdBy, String createdByName, long createdAt,
+                String createdBy, String createdByName, Timestamp createdAt,
                 int color, String region) {
 
         this.id = id;
@@ -33,52 +38,41 @@ public class Team {
         this.region = region;
 
         this.lastMessage = "";
-        this.lastTimestamp = 0;
+        this.lastTimestamp = null;
     }
 
+    public void setId(String id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setDescription(String description) { this.description = description; }
+    public void setRegion(String region) { this.region = region; }
+    public void setColor(int color) { this.color = color; }
+    public void setCreatedAt(Timestamp ts) { this.createdAt = ts; }
+
+    public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
+    public void setLastTimestamp(Timestamp lastTimestamp) { this.lastTimestamp = lastTimestamp; }
+
+    public void setMembersIndex(List<String> membersIndex) { this.membersIndex = membersIndex; }
 
     public String getId() { return id; }
-
     public String getName() { return name; }
-
     public String getDescription() { return description; }
-
     public String getCode() { return code; }
-
     public String getCreatedBy() { return createdBy; }
-
     public String getCreatedByName() { return createdByName; }
-
-    public long getCreatedAt() { return createdAt; }
-
+    public Timestamp getCreatedAt() { return createdAt; }
     public int getColor() { return color; }
-
     public String getRegion() { return region; }
 
-    public String getLastMessage() { return lastMessage; }   // NEW
+    public String getLastMessage() { return lastMessage; }
+    public Timestamp getLastTimestamp() { return lastTimestamp; }
 
-    public long getLastTimestamp() { return lastTimestamp; } // NEW
+    public List<String> getMembersIndex() { return membersIndex; }
 
+    public long getLastTimestampMillis() {
+        return lastTimestamp != null ? lastTimestamp.toDate().getTime() : 0;
+    }
 
-    public void setId(String id) { this.id = id; }
-
-    public void setName(String name) { this.name = name; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public void setCode(String code) { this.code = code; }
-
-    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
-
-    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
-
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
-
-    public void setColor(int color) { this.color = color; }
-
-    public void setRegion(String region) { this.region = region; }
-
-    public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; } // NEW
-
-    public void setLastTimestamp(long lastTimestamp) { this.lastTimestamp = lastTimestamp; } // NEW
+    public long getCreatedAtMillis() {
+        return createdAt != null ? createdAt.toDate().getTime() : 0;
+    }
 }

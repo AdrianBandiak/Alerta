@@ -1,6 +1,5 @@
 package com.abandiak.alerta.data.repository;
 
-import com.abandiak.alerta.data.model.ChatMessage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.EventListener;
@@ -37,7 +36,7 @@ public class ChatRepository {
         message.put("text", text);
         message.put("createdAt", FieldValue.serverTimestamp());
 
-        chatRef.collection("messages").add(message);
+        chatRef.collection("messages").document().set(message);
 
         Map<String, Object> meta = new HashMap<>();
         meta.put("participants", Arrays.asList(currentUid, otherUserId));
@@ -47,24 +46,30 @@ public class ChatRepository {
         chatRef.set(meta, SetOptions.merge());
     }
 
-    public void sendTeamMessage(String teamId, String text) {
-        if (currentUid == null) return;
+    public void sendTeamMessage(String teamId, String text,
+                                String senderId, String senderName, String senderAvatar) {
 
-        DocumentReference teamRef = teams().document(teamId);
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("senderId", senderId);
+        msg.put("senderName", senderName);
+        msg.put("senderAvatar", senderAvatar);
+        msg.put("text", text);
+        msg.put("createdAt", FieldValue.serverTimestamp());
 
-        Map<String, Object> message = new HashMap<>();
-        message.put("senderId", currentUid);
-        message.put("text", text);
-        message.put("createdAt", FieldValue.serverTimestamp());
+        db.collection("teams")
+                .document(teamId)
+                .collection("messages")
+                .add(msg);
 
-        teamRef.collection("messages").add(message);
-
-        Map<String, Object> meta = new HashMap<>();
-        meta.put("lastMessage", text);
-        meta.put("lastTimestamp", FieldValue.serverTimestamp());
-
-        teamRef.set(meta, SetOptions.merge());
+        // Update summary
+        db.collection("teams")
+                .document(teamId)
+                .update(
+                        "lastMessage", text,
+                        "lastTimestamp", FieldValue.serverTimestamp()
+                );
     }
+
 
 
     public ListenerRegistration listenForDmMessages(
@@ -101,7 +106,6 @@ public class ChatRepository {
                 .orderBy("lastTimestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(listener);
     }
-
 
     public ListenerRegistration listenForTeamChatList(
             List<String> userTeams,

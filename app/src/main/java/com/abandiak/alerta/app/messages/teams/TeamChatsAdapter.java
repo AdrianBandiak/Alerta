@@ -51,7 +51,7 @@ public class TeamChatsAdapter extends RecyclerView.Adapter<TeamChatsAdapter.Team
         h.textTime.setText(entry.getFormattedTime());
 
         h.imageTeamIcon.setImageResource(R.drawable.ic_group);
-        h.imageTeamIcon.setColorFilter(entry.getTeamColor());  // <- THIS IS THE CORRECT BEHAVIOR
+        h.imageTeamIcon.setColorFilter(entry.getTeamColor());
 
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onTeamChatClick(entry);
