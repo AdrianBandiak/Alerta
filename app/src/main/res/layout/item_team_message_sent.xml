@@ -18,15 +18,15 @@
             android:layout_height="wrap_content"
             android:text="You"
             android:textColor="@color/text_secondary"
-            android:textSize="11sp"
-            android:paddingEnd="6dp"/>
+            android:textSize="10sp"
+            android:paddingEnd="6dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="300dp"
             android:background="@drawable/bg_message_sent"
-            android:padding="10dp"
-            android:maxWidth="260dp">
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/textMessage"
@@ -34,7 +34,8 @@
                 android:layout_height="wrap_content"
                 android:text="Message"
                 android:textColor="@color/white"
-                android:textSize="15sp"/>
+                android:textSize="12sp"
+                android:maxWidth="300dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -44,5 +45,6 @@
         android:layout_height="32dp"
         android:layout_marginStart="6dp"
         android:src="@drawable/ic_person_placeholder"
-        android:background="@drawable/bg_avatar_circle"/>
+        android:background="@drawable/bg_avatar_circle" />
+
 </LinearLayout>

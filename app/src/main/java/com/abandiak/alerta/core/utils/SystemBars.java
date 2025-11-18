@@ -1,8 +1,8 @@
 package com.abandiak.alerta.core.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 
 import androidx.core.content.ContextCompat;
@@ -27,18 +27,21 @@ public class SystemBars {
                 ContextCompat.getColor(activity, R.color.status_bar_gray)
         );
 
-        new WindowInsetsControllerCompat(window, decorView)
-                .setAppearanceLightStatusBars(true);
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(window, decorView);
+        controller.setAppearanceLightStatusBars(true);
+    }
 
-        View statusBar = new View(activity);
-        int height = activity.getResources().getDimensionPixelSize(
-                activity.getResources().getIdentifier("status_bar_height", "dimen", "android")
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier(
+                "status_bar_height", "dimen", "android"
         );
-        statusBar.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                height
-        ));
-        statusBar.setBackgroundColor(ContextCompat.getColor(activity, R.color.status_bar_gray));
-        ((ViewGroup) decorView).addView(statusBar);
+
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+
+        return result;
     }
 }

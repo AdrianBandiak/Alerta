@@ -2,9 +2,12 @@ package com.abandiak.alerta.app.messages.teams;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +17,7 @@ import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.data.model.ChatMessage;
 import com.abandiak.alerta.data.repository.ChatRepository;
 import com.abandiak.alerta.data.repository.TeamRepository;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.Timestamp;
@@ -51,6 +55,29 @@ public class TeamChatActivity extends BaseActivity {
         SystemBars.apply(this);
         setContentView(R.layout.activity_team_chat);
 
+        AppBarLayout appBar = findViewById(R.id.appBar);
+        ViewCompat.setOnApplyWindowInsetsListener(appBar, (v, insets) -> {
+            int status = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(0, status, 0, 0);
+            return insets;
+        });
+
+        View chatContainer = findViewById(R.id.chatInputContainer);
+        ViewCompat.setOnApplyWindowInsetsListener(chatContainer, (v, insets) -> {
+            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+
+            int px24 = (int) (24 * getResources().getDisplayMetrics().density);
+
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    v.getPaddingTop(),
+                    v.getPaddingRight(),
+                    bottom > 0 ? bottom : px24
+            );
+
+            return insets;
+        });
+
         db = FirebaseFirestore.getInstance();
         teamId = getIntent().getStringExtra("teamId");
         currentUid = FirebaseAuth.getInstance().getUid();
@@ -72,34 +99,25 @@ public class TeamChatActivity extends BaseActivity {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-
                         String first = doc.getString("firstName");
                         String last = doc.getString("lastName");
-
-                        currentUserName = ((first != null ? first : "") + " " +
-                                (last != null ? last : "")).trim();
-
+                        currentUserName = ((first != null ? first : "") + " " + (last != null ? last : "")).trim();
                         currentUserAvatar = doc.getString("photoUrl");
-
                         adapter.setCurrentUserAvatar(currentUserAvatar);
                         adapter.setCurrentUserName(currentUserName);
                     }
                 });
     }
 
-
     private void setupToolbar() {
         MaterialToolbar topBar = findViewById(R.id.topBar);
 
         topBar.setNavigationOnClickListener(v -> finishWithAnimation());
-        topBar.setTitle("");
 
         teamRepo.getTeamRef(teamId).get().addOnSuccessListener(doc -> {
             String name = doc.getString("name");
             if (name != null) topBar.setTitle(name);
         });
-
-        topBar.inflateMenu(R.menu.menu_team_chat);
 
         topBar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_members) {
@@ -127,7 +145,7 @@ public class TeamChatActivity extends BaseActivity {
         String text = inputMessage.getText().toString().trim();
         if (TextUtils.isEmpty(text)) return;
 
-        if (currentUserName == null || currentUserName.isEmpty()) currentUserName = "Unknown";
+        if (currentUserName.isEmpty()) currentUserName = "Unknown";
         if (currentUserAvatar == null) currentUserAvatar = "";
 
         chatRepo.sendTeamMessage(
@@ -141,7 +159,6 @@ public class TeamChatActivity extends BaseActivity {
         inputMessage.setText("");
     }
 
-
     private void listenForMessages() {
         msgListener = chatRepo.listenForTeamMessages(teamId, (snap, err) -> {
             if (err != null || snap == null) return;
@@ -149,20 +166,19 @@ public class TeamChatActivity extends BaseActivity {
             List<ChatMessage> list = new ArrayList<>();
 
             for (DocumentSnapshot d : snap.getDocuments()) {
-
                 String senderId = d.getString("senderId");
                 String text = d.getString("text");
+
+                if ("Chat created".equals(text)) continue;
 
                 Timestamp ts = d.getTimestamp("createdAt");
                 long createdAtMillis = ts != null ? ts.toDate().getTime() : 0;
 
-
                 if (senderId == null) {
-                    String sysText = text != null ? text : "System";
                     list.add(new ChatMessage(
                             d.getId(),
                             "system",
-                            sysText,
+                            text != null ? text : "System",
                             createdAtMillis,
                             "System",
                             null
@@ -170,33 +186,27 @@ public class TeamChatActivity extends BaseActivity {
                     continue;
                 }
 
-
                 String senderName = d.getString("senderName");
                 String senderAvatar = d.getString("senderAvatar");
 
                 if (senderName == null) senderName = "Unknown";
                 if (senderAvatar == null) senderAvatar = "";
 
-                ChatMessage msg = new ChatMessage(
+                list.add(new ChatMessage(
                         d.getId(),
                         senderId,
                         text,
                         createdAtMillis,
                         senderName,
                         senderAvatar
-                );
-
-                list.add(msg);
+                ));
             }
 
             list.sort((a, b) -> Long.compare(a.getCreatedAt(), b.getCreatedAt()));
-
             adapter.submitList(list);
             recyclerView.scrollToPosition(list.size() - 1);
         });
     }
-
-
 
     private void showMembersSheet() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);

@@ -4,28 +4,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:fontFamily="@font/inter"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fitsSystemWindows="false">
+    android:fontFamily="@font/inter">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topBar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:background="?attr/colorSurface"
-        android:elevation="4dp"
-        app:titleTextColor="@color/black"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:layout_scrollFlags="scroll|enterAlways" />
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="0dp"
+        android:stateListAnimator="@null">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:minHeight="?attr/actionBarSize"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/ChatTitleStyle"
+            app:titleTextColor="@color/black"
+            app:menu="@menu/menu_team_chat"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1A000000"/> <!-- 10% white black -->
+    </com.google.android.material.appbar.AppBarLayout>
+
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -36,40 +51,47 @@
             android:padding="12dp"
             android:clipToPadding="false"/>
 
-        <LinearLayout
-            android:id="@+id/chatInputBar"
+
+        <FrameLayout
+            android:id="@+id/chatInputContainer"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:background="@color/white"
-            android:layout_marginBottom="20dp"
-            android:elevation="8dp">
+            android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/inputTeamMessage"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:hint="Message..."
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/bg_chat_input"
-                android:textColor="@color/black"
-                android:textColorHint="@color/text_secondary"
-                android:maxLines="3"/>
+            <LinearLayout
+                android:id="@+id/chatInputBar"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:background="@color/white"
+                android:elevation="8dp">
 
-            <ImageButton
-                android:id="@+id/btnSendTeamMessage"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_send_button"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_send"
-                app:tint="@color/white"/>
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/inputTeamMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Message..."
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/bg_chat_input"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/text_secondary"
+                    android:maxLines="3"/>
+
+                <ImageButton
+                    android:id="@+id/btnSendTeamMessage"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_send_button"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_send"
+                    app:tint="@color/white"/>
+
+            </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 
