@@ -133,7 +133,13 @@ public class TeamChatActivity extends BaseActivity {
 
     private void setupUI() {
         recyclerView = findViewById(R.id.recyclerTeamMessages);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        LinearLayoutManager lm = new LinearLayoutManager(this);
+
+        lm.setReverseLayout(false);
+        lm.setStackFromEnd(false);
+
+        recyclerView.setLayoutManager(lm);
 
         adapter = new TeamMessageAdapter(currentUid);
         recyclerView.setAdapter(adapter);
@@ -143,6 +149,7 @@ public class TeamChatActivity extends BaseActivity {
 
         btnSend.setOnClickListener(v -> sendMessage());
     }
+
 
     private void sendMessage() {
         String text = inputMessage.getText().toString().trim();
@@ -207,7 +214,7 @@ public class TeamChatActivity extends BaseActivity {
 
             list.sort((a, b) -> Long.compare(a.getCreatedAt(), b.getCreatedAt()));
             adapter.submitList(list);
-            recyclerView.scrollToPosition(list.size() - 1);
+            recyclerView.post(() -> recyclerView.smoothScrollToPosition(list.size() - 1));
         });
     }
 

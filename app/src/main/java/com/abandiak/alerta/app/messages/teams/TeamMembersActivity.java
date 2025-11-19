@@ -2,7 +2,6 @@ package com.abandiak.alerta.app.messages.teams;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -13,9 +12,18 @@ import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.messages.dm.DMChatActivity;
 import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
+import com.abandiak.alerta.data.repository.ChatRepository;
 import com.abandiak.alerta.data.repository.TeamRepository;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TeamMembersActivity extends BaseActivity {
 
@@ -56,9 +64,32 @@ public class TeamMembersActivity extends BaseActivity {
         recycler.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new TeamMembersAdapter(member -> {
-            Intent i = new Intent(this, DMChatActivity.class);
-            i.putExtra("userId", member.getUid());
-            startActivity(i);
+
+            String otherUid = member.getUid();
+            String currentUid = FirebaseAuth.getInstance().getUid();
+            if (currentUid == null) return;
+
+            ChatRepository repo = new ChatRepository();
+            String chatId = repo.dmChatIdFor(currentUid, otherUid);
+
+            Map<String, Object> meta = new HashMap<>();
+            meta.put("participants", Arrays.asList(currentUid, otherUid));
+            meta.put("lastMessage", "New chat");
+
+            meta.put("lastTimestamp", System.currentTimeMillis());
+            meta.put("lastTimestampServer", FieldValue.serverTimestamp());
+
+
+            FirebaseFirestore.getInstance()
+                    .collection("dm_chats")
+                    .document(chatId)
+                    .set(meta, SetOptions.merge())
+                    .addOnSuccessListener(unused -> {
+
+                        Intent i = new Intent(this, DMChatActivity.class);
+                        i.putExtra("otherUserId", otherUid);
+                        startActivity(i);
+                    });
         });
 
         recycler.setAdapter(adapter);
@@ -71,4 +102,3 @@ public class TeamMembersActivity extends BaseActivity {
         });
     }
 }
-

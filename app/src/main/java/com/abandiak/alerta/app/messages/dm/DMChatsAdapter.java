@@ -3,6 +3,7 @@ package com.abandiak.alerta.app.messages.dm;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,81 +11,68 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
 import com.bumptech.glide.Glide;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DMChatsAdapter extends RecyclerView.Adapter<DMChatsAdapter.ViewHolder> {
+public class DMChatsAdapter extends RecyclerView.Adapter<DMChatsAdapter.ChatHolder> {
 
-    public interface OnChatClickListener {
-        void onChatClick(DMChatEntry chat);
+    public interface OnChatClick {
+        void onClick(DMChatEntry chat);
     }
 
-    private List<DMChatEntry> chats = new ArrayList<>();
-    private OnChatClickListener listener;
+    private List<DMChatEntry> items = new ArrayList<>();
+    private final OnChatClick listener;
 
-    public DMChatsAdapter(OnChatClickListener listener) {
+    public DMChatsAdapter(OnChatClick listener) {
         this.listener = listener;
     }
 
-    public void submitList(List<DMChatEntry> newList) {
-        this.chats = newList;
+    public void submitList(List<DMChatEntry> list) {
+        items = list != null ? list : new ArrayList<>();
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public DMChatsAdapter.ViewHolder onCreateViewHolder(
-            @NonNull ViewGroup parent,
-            int viewType) {
-
-        View view = LayoutInflater.from(parent.getContext())
+    public ChatHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_dm_chat, parent, false);
-
-        return new ViewHolder(view);
+        return new ChatHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(
-            @NonNull DMChatsAdapter.ViewHolder holder,
-            int position) {
+    public void onBindViewHolder(@NonNull ChatHolder h, int pos) {
+        DMChatEntry entry = items.get(pos);
 
-        DMChatEntry chat = chats.get(position);
+        h.name.setText(entry.getOtherUserName());
+        h.lastMessage.setText(entry.getLastMessage());
 
-        holder.textName.setText(chat.getOtherUserName());
-        holder.textLastMessage.setText(chat.getLastMessage());
+        Glide.with(h.avatar.getContext())
+                .load(entry.getAvatarUrl())
+                .placeholder(R.drawable.ic_avatar_placeholder)
+                .into(h.avatar);
 
-        if (chat.getAvatarUrl() != null && !chat.getAvatarUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(chat.getAvatarUrl())
-                    .placeholder(R.drawable.ic_person_placeholder)
-                    .into(holder.imageAvatar);
-        } else {
-            holder.imageAvatar.setImageResource(R.drawable.ic_person_placeholder);
-        }
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onChatClick(chat);
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null)
+                listener.onClick(entry);
         });
     }
 
     @Override
     public int getItemCount() {
-        return chats.size();
+        return items.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ChatHolder extends RecyclerView.ViewHolder {
+        ImageView avatar;
+        TextView name, lastMessage;
 
-        ShapeableImageView imageAvatar;
-        TextView textName, textLastMessage;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            imageAvatar = itemView.findViewById(R.id.imageAvatar);
-            textName = itemView.findViewById(R.id.textName);
-            textLastMessage = itemView.findViewById(R.id.textLastMessage);
+        ChatHolder(View v) {
+            super(v);
+            avatar = v.findViewById(R.id.imageAvatar);
+            name = v.findViewById(R.id.textName);
+            lastMessage = v.findViewById(R.id.textLastMessage);
         }
     }
 }

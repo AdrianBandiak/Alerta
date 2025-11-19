@@ -35,4 +35,7 @@ public class ChatMessage {
     public long getCreatedAt() { return createdAt; }
     public String getSenderName() { return senderName; }
     public String getSenderAvatar() { return senderAvatar; }
+
+    public void setSenderName(String senderName) { this.senderName = senderName; }
+    public void setSenderAvatar(String senderAvatar) { this.senderAvatar = senderAvatar; }
 }

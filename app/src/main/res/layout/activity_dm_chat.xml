@@ -1,36 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fontFamily="@font/inter">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerMessages"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:orientation="horizontal">
+        android:background="@color/white"
+        android:stateListAnimator="@null"
+        android:elevation="0dp">
 
-        <EditText
-            android:id="@+id/inputMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:minHeight="?attr/actionBarSize"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:titleCentered="false"
+            app:titleTextColor="@color/black">
+
+            <ImageView
+                android:id="@+id/headerAvatar"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_avatar_circle"
+                android:src="@drawable/ic_avatar_placeholder"/>
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1A000000"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerDmMessages"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:minHeight="48dp"
-            android:hint="Message" />
+            android:padding="12dp"
+            android:clipToPadding="false"/>
 
-        <ImageButton
-            android:id="@+id/btnSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_send"
-            android:background="@null" />
+        <LinearLayout
+            android:id="@+id/chatInputBar"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@color/white"
+            android:elevation="8dp">
 
+            <EditText
+                android:id="@+id/inputMessage"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="Message..."
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_chat_input"
+                android:textColor="@color/black"
+                android:textColorHint="@color/text_secondary"
+                android:maxLines="3"/>
+
+            <ImageButton
+                android:id="@+id/btnSendMessage"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_send_button"
+                android:src="@drawable/ic_send"
+                app:tint="@color/white"/>
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

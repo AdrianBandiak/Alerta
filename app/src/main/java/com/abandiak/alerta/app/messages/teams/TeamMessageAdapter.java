@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
@@ -42,8 +43,28 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void submitList(List<ChatMessage> newList) {
-        this.messages = newList;
-        notifyDataSetChanged();
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return messages.size(); }
+            @Override public int getNewListSize() { return newList.size(); }
+
+            @Override
+            public boolean areItemsTheSame(int oldPos, int newPos) {
+                return messages.get(oldPos).getId()
+                        .equals(newList.get(newPos).getId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldPos, int newPos) {
+                ChatMessage a = messages.get(oldPos);
+                ChatMessage b = newList.get(newPos);
+
+                return a.getText().equals(b.getText()) &&
+                        a.getCreatedAt() == b.getCreatedAt();
+            }
+        });
+
+        messages = new ArrayList<>(newList);
+        diff.dispatchUpdatesTo(this);
     }
 
     @Override
@@ -58,13 +79,11 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @NonNull ViewGroup parent, int viewType) {
 
         if (viewType == TYPE_SENT) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_team_message_sent, parent, false);
-            return new SentHolder(v);
+            return new SentHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_team_message_sent, parent, false));
         } else {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_team_message_received, parent, false);
-            return new ReceivedHolder(v);
+            return new ReceivedHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_team_message_received, parent, false));
         }
     }
 
