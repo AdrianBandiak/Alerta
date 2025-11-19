@@ -12,11 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abandiak.alerta.R;
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TeamMembersAdapter extends RecyclerView.Adapter<TeamMembersAdapter.Holder> {
+
+    private final String currentUid = FirebaseAuth.getInstance().getUid();
 
     public interface OnMemberDmClick {
         void onDmClick(TeamMemberEntry member);
@@ -54,8 +57,14 @@ public class TeamMembersAdapter extends RecyclerView.Adapter<TeamMembersAdapter.
                 .placeholder(R.drawable.ic_avatar_placeholder)
                 .into(h.avatar);
 
-        h.btnDm.setOnClickListener(v -> listener.onDmClick(m));
+        if (m.getUid().equals(currentUid)) {
+            h.btnDm.setVisibility(View.INVISIBLE);
+        } else {
+            h.btnDm.setVisibility(View.VISIBLE);
+            h.btnDm.setOnClickListener(v -> listener.onDmClick(m));
+        }
     }
+
 
     @Override
     public int getItemCount() {

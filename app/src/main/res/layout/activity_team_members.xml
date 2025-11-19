@@ -31,9 +31,7 @@
             app:titleTextAppearance="@style/TeamMembersTitle"
 
             app:subtitleTextAppearance="@style/TeamMembersSubtitle"
-            app:subtitleTextColor="#7A7A7A"
-
-            app:menu="@menu/menu_team_members"/>
+            app:subtitleTextColor="#7A7A7A" />
 
         <View
             android:layout_width="match_parent"
