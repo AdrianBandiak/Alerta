@@ -1,6 +1,7 @@
 package com.abandiak.alerta.app.messages.dm;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -71,8 +72,24 @@ public class DMChatActivity extends BaseActivity {
         setupRecycler();
         setupSendButton();
 
+        View chatContainer = findViewById(R.id.chatInputContainer);
+        ViewCompat.setOnApplyWindowInsetsListener(chatContainer, (v, insets) -> {
+            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            int px24 = (int) (24 * getResources().getDisplayMetrics().density);
+
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    v.getPaddingTop(),
+                    v.getPaddingRight(),
+                    bottom > 0 ? bottom : px24
+            );
+
+            return insets;
+        });
+
         loadOtherUserInfo(this::loadCurrentUserInfo);
     }
+
 
     private void setupToolbar() {
         topBar = findViewById(R.id.topBar);
