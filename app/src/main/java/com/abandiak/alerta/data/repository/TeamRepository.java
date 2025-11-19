@@ -1,7 +1,10 @@
 package com.abandiak.alerta.data.repository;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
+import com.abandiak.alerta.app.messages.teams.TeamMemberEntry;
 import com.abandiak.alerta.data.model.Team;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -109,7 +112,6 @@ public class TeamRepository {
                 .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
     }
 
-
     public void initializeTeamChat(String teamId) {
 
         Map<String, Object> msg = new HashMap<>();
@@ -196,6 +198,118 @@ public class TeamRepository {
                             .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
                 })
                 .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
+    }
+
+    public void getFullTeamMembers(String teamId, OnMembersLoaded callback) {
+
+        Log.e("MEMBERS_DEBUG", "------------------------------------------");
+        Log.e("MEMBERS_DEBUG", "getFullTeamMembers() CALLED");
+        Log.e("MEMBERS_DEBUG", "TEAM ID = " + teamId);
+        Log.e("MEMBERS_DEBUG", "Firestore instance = " + db);
+
+        db.collection("teams")
+                .document(teamId)
+                .collection("members")
+                .get()
+                .addOnSuccessListener(memberSnap -> {
+
+                    Log.e("MEMBERS_DEBUG", "Members found: " + memberSnap.size());
+
+                    if (memberSnap.isEmpty()) {
+                        callback.onLoaded(new ArrayList<>());
+                        return;
+                    }
+
+                    List<TeamMemberEntry> result = new ArrayList<>();
+                    int total = memberSnap.size();
+
+                    for (DocumentSnapshot doc : memberSnap) {
+
+                        String userId = doc.getId();
+                        Timestamp ts = doc.getTimestamp("joinedAt");
+                        long joinedAt = ts != null ? ts.toDate().getTime() : 0;
+
+                        Log.e("MEMBERS_DEBUG", "------------------------------------------");
+                        Log.e("MEMBERS_DEBUG", "Member UID = " + userId);
+                        Log.e("MEMBERS_DEBUG", "Fetching from: /users/" + userId);
+
+                        db.collection("users")
+                                .document(userId)
+                                .get()
+                                .addOnSuccessListener(userDoc -> {
+
+                                    if (!userDoc.exists()) {
+                                        Log.e("MEMBERS_DEBUG", "!!! USER DOC DOES NOT EXIST !!!");
+                                        result.add(new TeamMemberEntry(
+                                                userId,
+                                                userId.substring(0, 6) + "...",
+                                                "",
+                                                joinedAt
+                                        ));
+                                    } else {
+
+                                        Log.e("MEMBERS_DEBUG", "UserDoc EXISTS");
+
+                                        String first = userDoc.getString("firstName");
+                                        String last = userDoc.getString("lastName");
+                                        String avatar = userDoc.getString("photoUrl");
+
+                                        Log.e("MEMBERS_DEBUG", "firstName = " + first);
+                                        Log.e("MEMBERS_DEBUG", "lastName  = " + last);
+                                        Log.e("MEMBERS_DEBUG", "avatar    = " + avatar);
+
+                                        String fullName = "";
+
+                                        if ((first != null && !first.isEmpty()) ||
+                                                (last != null && !last.isEmpty())) {
+                                            fullName = ((first != null ? first : "") + " " +
+                                                    (last != null ? last : "")).trim();
+                                        } else {
+                                            fullName = userId.substring(0, 6) + "...";
+                                        }
+
+                                        result.add(new TeamMemberEntry(
+                                                userId,
+                                                fullName,
+                                                avatar,
+                                                joinedAt
+                                        ));
+                                    }
+
+                                    if (result.size() == total) {
+                                        result.sort(Comparator.comparingLong(TeamMemberEntry::getJoinedAt));
+                                        Log.e("MEMBERS_DEBUG", "ALL LOADED → CALLBACK");
+                                        callback.onLoaded(result);
+                                    }
+                                })
+
+                                .addOnFailureListener(e -> {
+                                    Log.e("MEMBERS_DEBUG", "ERROR fetching user " + userId + ": " + e);
+
+                                    result.add(new TeamMemberEntry(
+                                            userId,
+                                            userId.substring(0, 6) + "...",
+                                            "",
+                                            joinedAt
+                                    ));
+
+                                    if (result.size() == total) {
+                                        result.sort(Comparator.comparingLong(TeamMemberEntry::getJoinedAt));
+                                        callback.onLoaded(result);
+                                    }
+                                });
+                    }
+                })
+
+                .addOnFailureListener(e -> {
+                    Log.e("MEMBERS_DEBUG", "ERROR → Cannot read members subcollection: ", e);
+                    callback.onLoaded(new ArrayList<>());
+                });
+    }
+
+
+    public interface OnMembersLoaded {
+        void onLoaded(List<TeamMemberEntry> list);
     }
 
     private String generateTeamCode() {

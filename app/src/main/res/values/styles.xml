@@ -258,5 +258,18 @@
         <item name="android:fontFamily">@font/inter</item>
     </style>
 
+    <style name="TeamMembersTitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.015</item>
+    </style>
+
+    <style name="TeamMembersSubtitle" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.005</item>
+    </style>
+
 
 </resources>

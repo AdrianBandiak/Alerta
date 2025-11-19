@@ -1,5 +1,6 @@
 package com.abandiak.alerta.app.messages.teams;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -121,7 +122,9 @@ public class TeamChatActivity extends BaseActivity {
 
         topBar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_members) {
-                showMembersSheet();
+                Intent i = new Intent(this, TeamMembersActivity.class);
+                i.putExtra("teamId", teamId);
+                startActivity(i);
                 return true;
             }
             return false;
