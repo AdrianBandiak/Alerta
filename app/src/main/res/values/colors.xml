@@ -22,6 +22,7 @@
     <color name="chip_info_bg">#E3F2FD</color>
     <color name="chip_hazard_bg">#FFF8E1</color>
     <color name="chip_critical_bg">#FFEBEE</color>
+    <color name="chip_team_bg">#F1F8F1</color>
 
     <color name="searchbar_background">#F1F3F4</color>
 

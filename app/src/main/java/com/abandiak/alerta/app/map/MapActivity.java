@@ -1,37 +1,31 @@
 package com.abandiak.alerta.app.map;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.graphics.Typeface;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
@@ -179,14 +173,24 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                 return false;
             });
-
         }
 
-        SupportMapFragment frag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment frag =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (frag != null) frag.getMapAsync(this);
 
         ChipGroup chips = findViewById(R.id.chips_filters);
         if (chips != null) {
+
+            chips.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            chips.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            adjustChipsToSingleLine(chips);
+                        }
+                    });
+
             chips.setOnCheckedStateChangeListener((group, checkedIds) -> {
                 java.util.List<String> selectedTypes = new java.util.ArrayList<>();
 
@@ -202,7 +206,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                     filterByTypes(selectedTypes);
                 }
             });
-
         }
 
         FloatingActionButton fabAdd = findViewById(R.id.btnAddMarkerFab);
@@ -469,15 +472,12 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
 
-
-
     private void setFilter(String type) {
         if (!type.equals(currentType)) {
             currentType = type;
             subscribeIncidents();
         }
     }
-
 
 
     private void subscribeIncidents() {
@@ -553,7 +553,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                     clusterManager.cluster();
                 });
     }
-
 
 
     private void showPhotoSourceChooser() {
@@ -786,9 +785,10 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                     });
         }
 
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
+        String uid =
+                FirebaseAuth.getInstance().getCurrentUser() != null
+                        ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                        : null;
 
         if (!item.isVerified() && uid != null && uid.equals(item.getCreatedBy())) {
             btnDelete.setVisibility(View.VISIBLE);
@@ -814,6 +814,38 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         }
 
         dialog.show();
+    }
+
+    private void adjustChipsToSingleLine(ChipGroup chipGroup) {
+        int groupWidth = chipGroup.getWidth();
+        int paddingH = chipGroup.getPaddingLeft() + chipGroup.getPaddingRight();
+        int availableWidth = groupWidth - paddingH;
+
+        if (availableWidth <= 0) return;
+
+        int totalChipsWidth = 0;
+        int childCount = chipGroup.getChildCount();
+
+        for (int i = 0; i < childCount; i++) {
+            View child = chipGroup.getChildAt(i);
+            child.measure(
+                    View.MeasureSpec.UNSPECIFIED,
+                    View.MeasureSpec.UNSPECIFIED
+            );
+            totalChipsWidth += child.getMeasuredWidth();
+        }
+
+        int chipSpacingPx = dp(4);
+        int totalSpacing = chipSpacingPx * Math.max(0, childCount - 1);
+        int totalWithSpacing = totalChipsWidth + totalSpacing;
+
+        Log.e("CHIP_DEBUG", "------------------------------------------");
+        Log.e("CHIP_DEBUG", "ChipGroup width: " + groupWidth);
+        Log.e("CHIP_DEBUG", "ChipGroup horizontal padding: " + paddingH);
+        Log.e("CHIP_DEBUG", "Chip spacing (H): " + chipSpacingPx);
+        Log.e("CHIP_DEBUG", "TOTAL chips+spacing width: " + totalWithSpacing);
+        Log.e("CHIP_DEBUG", "AVAILABLE width (group - padding): " + availableWidth);
+        Log.e("CHIP_DEBUG", "------------------------------------------");
     }
 
 
@@ -915,11 +947,9 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (registration != null) registration.remove();
     }
-
 }
