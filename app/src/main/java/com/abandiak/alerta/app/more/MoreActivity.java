@@ -220,12 +220,13 @@ public class MoreActivity extends BaseActivity {
                 + "• Live map with dynamic clustering and category filtering<br>"
                 + "• Team-based coordination and assignment tools<br>"
                 + "• Task creation for organized crisis response<br>"
-                + "• Offline-first architecture for unstable environments<br>"
+                + "• Real-time team chats and private direct messaging system<br>"
                 + "• Clean, accessible and modern Material Design UI<br><br>"
 
                 + "<p>Alerta empowers communities to communicate faster, act smarter, and stay aligned "
                 + "when it matters most.</p>";
     }
+
 
 
     @Override
