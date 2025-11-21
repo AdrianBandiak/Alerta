@@ -10,7 +10,6 @@ public class Team {
     private String description;
     private String code;
     private String createdBy;
-    private String createdByName;
     private String region;
 
     private Timestamp createdAt;
@@ -32,7 +31,6 @@ public class Team {
         this.description = description;
         this.code = code;
         this.createdBy = createdBy;
-        this.createdByName = createdByName;
         this.createdAt = createdAt;
         this.color = color;
         this.region = region;
@@ -46,6 +44,10 @@ public class Team {
     public void setDescription(String description) { this.description = description; }
     public void setRegion(String region) { this.region = region; }
     public void setColor(int color) { this.color = color; }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
     public void setCreatedAt(Timestamp ts) { this.createdAt = ts; }
 
     public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
@@ -58,7 +60,6 @@ public class Team {
     public String getDescription() { return description; }
     public String getCode() { return code; }
     public String getCreatedBy() { return createdBy; }
-    public String getCreatedByName() { return createdByName; }
     public Timestamp getCreatedAt() { return createdAt; }
     public int getColor() { return color; }
     public String getRegion() { return region; }

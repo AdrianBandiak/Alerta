@@ -72,7 +72,7 @@ public class TeamRepository {
         data.put("region", region);
 
         data.put("createdBy", uid);
-        data.put("createdByName", "");
+        data.put("createdByName", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
         data.put("createdAt", Timestamp.now());
 
         data.put("lastMessage", "");

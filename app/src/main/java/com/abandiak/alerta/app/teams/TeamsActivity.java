@@ -32,6 +32,7 @@ import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerView;
@@ -249,10 +250,32 @@ public class TeamsActivity extends BaseActivity {
                 ? "No description provided."
                 : team.getDescription());
         textCode.setText("Code: " + (team.getCode() == null ? "—" : team.getCode()));
-        String createdBy = (team.getCreatedByName() != null && !team.getCreatedByName().isEmpty())
-                ? team.getCreatedByName()
-                : "Unknown";
-        textCreatedBy.setText("Created by: " + createdBy);
+        textCreatedBy.setText("Created by: ...");
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(team.getCreatedBy())
+                .get()
+                .addOnSuccessListener(userDoc -> {
+                    if (!userDoc.exists()) {
+                        textCreatedBy.setText("Created by: Unknown");
+                        return;
+                    }
+
+                    String first = userDoc.getString("firstName");
+                    String last  = userDoc.getString("lastName");
+
+                    String full = ((first != null ? first : "") + " " +
+                            (last != null ? last : "")).trim();
+
+                    if (full.isEmpty()) full = "Unknown";
+
+                    textCreatedBy.setText("Created by: " + full);
+                })
+                .addOnFailureListener(e -> {
+                    textCreatedBy.setText("Created by: Unknown");
+                });
+
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
