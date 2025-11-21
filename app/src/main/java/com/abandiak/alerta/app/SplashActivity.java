@@ -10,12 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.auth.LoginActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 
 public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SystemBars.apply(this);
+
         setContentView(R.layout.activity_splash);
 
         View logo = findViewById(R.id.logoImage);
@@ -58,11 +62,9 @@ public class SplashActivity extends AppCompatActivity {
                 .start();
     }
 
-
     private void goToLogin() {
         startActivity(new Intent(this, LoginActivity.class));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
     }
 }
-
