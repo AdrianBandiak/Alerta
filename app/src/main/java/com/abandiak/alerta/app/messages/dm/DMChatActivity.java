@@ -37,7 +37,6 @@ public class DMChatActivity extends BaseActivity {
     private DMMessageAdapter adapter;
 
     private EditText input;
-    private ImageButton btnSend;
 
     private ListenerRegistration listener;
 
@@ -121,7 +120,7 @@ public class DMChatActivity extends BaseActivity {
 
     private void setupSendButton() {
         input = findViewById(R.id.inputMessage);
-        btnSend = findViewById(R.id.btnSendMessage);
+        ImageButton btnSend = findViewById(R.id.btnSendMessage);
 
         btnSend.setOnClickListener(v -> {
             String text = input.getText().toString().trim();

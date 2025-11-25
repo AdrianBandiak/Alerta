@@ -82,23 +82,15 @@ public class ChatRepository {
 
                                 chatRef.collection("messages")
                                         .add(message)
-                                        .addOnSuccessListener(msg -> {
-                                            Log.e("DM_DEBUG", "MESSAGE ADDED SUCCESS: id=" + msg.getId());
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("DM_DEBUG", "ERROR adding message: " + e.getMessage(), e);
-                                        });
+                                        .addOnSuccessListener(msg -> Log.e("DM_DEBUG", "MESSAGE ADDED SUCCESS: id=" + msg.getId()))
+                                        .addOnFailureListener(e -> Log.e("DM_DEBUG", "ERROR adding message: " + e.getMessage(), e));
 
                                 if (callback != null) callback.onCreated(existedBefore);
                             })
-                            .addOnFailureListener(e -> {
-                                Log.e("DM_DEBUG", "ERROR chatRef.set(): " + e.getMessage(), e);
-                            });
+                            .addOnFailureListener(e -> Log.e("DM_DEBUG", "ERROR chatRef.set(): " + e.getMessage(), e));
 
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("DM_DEBUG", "ERROR chatRef.get(): " + e.getMessage(), e);
-                });
+                .addOnFailureListener(e -> Log.e("DM_DEBUG", "ERROR chatRef.get(): " + e.getMessage(), e));
     }
 
 

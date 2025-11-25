@@ -3,12 +3,7 @@ package com.abandiak.alerta;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,9 +21,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationTokenSource;
 
 import com.google.android.material.appbar.MaterialToolbar;
-
-import java.util.List;
-import java.util.Locale;
 
 public class MapFullScreenActivity extends AppCompatActivity implements OnMapReadyCallback {
 

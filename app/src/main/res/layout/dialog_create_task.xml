@@ -37,7 +37,6 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutTaskType"
         style="@style/AlertaTextInput.Dropdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -106,6 +105,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:baselineAligned="false"
         android:orientation="horizontal"
         android:weightSum="2">
 

@@ -3,7 +3,6 @@
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
@@ -16,9 +15,7 @@
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#99000000</color>
     <color name="hint_grey">#9E9E9E</color>
-    <color name="neutral_bg">#F5F5F5</color>
 
-    <color name="chip_all_bg">#F5F6F8</color>
     <color name="chip_info_bg">#E3F2FD</color>
     <color name="chip_hazard_bg">#FFF8E1</color>
     <color name="chip_critical_bg">#FFEBEE</color>
@@ -26,22 +23,17 @@
 
     <color name="searchbar_background">#F1F3F4</color>
 
-    <color name="chip_online_bg">#1FE53935</color>
-    <color name="chip_offline_bg">#1AF44336</color>
-    <color name="gray_border">#33000000</color>
     <color name="status_online_bg">#4CAF50</color>
     <color name="status_offline_bg">#F44336</color>
 
     <color name="task_background_light">#FAFAFA</color>
     <color name="status_bar_gray">#F2F2F2</color>
 
-    <color name="gray_100">#F5F5F5</color>
     <color name="gray_200">#EEEEEE</color>
     <color name="gray_300">#E0E0E0</color>
     <color name="gray_400">#BDBDBD</color>
     <color name="gray_500">#9E9E9E</color>
 
     <color name="green_700">#388E3C</color>
-    <color name="team_icon_background">#F4F4F6</color>
 
 </resources>

@@ -63,36 +63,12 @@
         <item name="android:foreground">@null</item>
     </style>
 
-    <style name="TextAppearance.Alerta.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
-        <item name="fontFamily">@font/inter</item>
-    </style>
-
-    <style name="TextAppearance.Alerta.SubBarTitle" parent="TextAppearance.Material3.TitleMedium">
-        <item name="fontFamily">@font/inter</item>
-    </style>
-
-    <style name="TextAppearance.Alerta.Chip" parent="TextAppearance.Material3.LabelMedium">
-        <item name="fontFamily">@font/inter</item>
-        <item name="android:textColor">@color/alerta_primary</item>
-    </style>
-
-    <style name="Alerta.Chip" parent="Widget.Material3.Chip.Assist">
-        <item name="android:textAppearance">@style/TextAppearance.Alerta.Chip</item>
-        <item name="chipIconVisible">false</item>
-        <item name="rippleColor">@color/outline</item>
-    </style>
-
     <style name="Alerta.Card.Base" parent="Widget.Material3.CardView.Elevated">
         <item name="android:stateListAnimator">@null</item>
         <item name="cardBackgroundColor">@color/white</item>
     </style>
 
     <style name="Alerta.Card.Elevated" parent="Alerta.Card.Base" />
-
-    <style name="Alerta.Card.Outlined" parent="Alerta.Card.Base">
-        <item name="strokeColor">@color/outline</item>
-        <item name="strokeWidth">1dp</item>
-    </style>
 
     <style name="AlertaNavIndicatorNone">
         <item name="android:width">0dp</item>
@@ -117,14 +93,6 @@
     <style name="Alerta.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textColor">@color/amber_700</item>
         <item name="rippleColor">@color/outline</item>
-    </style>
-
-    <style name="Alerta.BottomNav.ActiveIndicator" parent="">
-        <item name="android:insetLeft">0dp</item>
-        <item name="android:insetRight">0dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:insetBottom">0dp</item>
-        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
     <style name="Alerta.BottomNav" parent="Widget.Material3.BottomNavigationView">
@@ -165,24 +133,6 @@
     </style>
 
 
-    <style name="Alerta.TextInputLayout.Amber" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/amber_700</item>
-        <item name="boxStrokeWidthFocused">2dp</item>
-        <item name="android:textCursorDrawable">@null</item>
-        <item name="cursorColor">@color/amber_700</item>
-        <item name="hintTextColor">@color/amber_700</item>
-        <item name="startIconTint">@color/amber_700</item>
-        <item name="endIconTint">@color/amber_700</item>
-        <item name="colorControlActivated">@color/amber_700</item>
-    </style>
-
-    <style name="Alerta.DropdownItem" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:fontFamily">@font/inter</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:padding">12dp</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
     <style name="AlertaTextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="hintTextColor">@color/hint_color_selector</item>
         <item name="android:textColorHint">@color/hint_color_selector</item>
@@ -222,15 +172,6 @@
     <style name="AlertaSwitchOverlay" parent="">
         <item name="colorPrimary">@color/alerta_primary</item>
         <item name="colorSecondary">@color/alerta_primary</item>
-    </style>
-
-    <style name="Theme.Alerta.Splash" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="fontFamily">@font/inter</item>
-        <item name="android:fontFamily">@font/inter</item>
     </style>
 
     <style name="Theme.Alerta.NoSplash" parent="Theme.Material3.Light.NoActionBar">

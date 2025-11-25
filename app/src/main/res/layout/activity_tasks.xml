@@ -10,7 +10,6 @@
     tools:context=".app.tasks.TasksActivity">
 
     <LinearLayout
-        android:id="@+id/headerSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -21,10 +20,9 @@
         android:background="@android:color/transparent">
 
         <TextView
-            android:id="@+id/textHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My tasks"
+            android:text="@string/my_tasks"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -35,7 +33,7 @@
             android:id="@+id/textHeaderSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="0 in progress • 0 completed"
+            android:text="@string/_0_in_progress_0_completed"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:fontFamily="@font/inter"
@@ -65,18 +63,17 @@
         android:paddingHorizontal="24dp">
 
         <ImageView
-            android:id="@+id/imageEmpty"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_empty_tasks"
             app:tint="@color/gray_400"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:contentDescription="" />
 
         <TextView
-            android:id="@+id/textEmptyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No tasks yet"
+            android:text="@string/no_tasks_yet"
             android:textSize="16sp"
             android:fontFamily="@font/inter"
             android:textStyle="bold"
@@ -84,10 +81,9 @@
             android:layout_marginBottom="4dp" />
 
         <TextView
-            android:id="@+id/textEmptyMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your tasks will appear here once you create them."
+            android:text="@string/your_tasks_will_appear_here_once_you_create_them"
             android:textSize="13sp"
             android:fontFamily="@font/inter"
             android:textColor="@color/gray_500"

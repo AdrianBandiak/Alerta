@@ -29,7 +29,6 @@ public class TeamMembersActivity extends BaseActivity {
 
     private String teamId;
     private TeamMembersAdapter adapter;
-    private RecyclerView recycler;
     private MaterialToolbar topBar;
 
     @Override
@@ -60,7 +59,7 @@ public class TeamMembersActivity extends BaseActivity {
     }
 
     private void setupRecycler() {
-        recycler = findViewById(R.id.recyclerMembers);
+        RecyclerView recycler = findViewById(R.id.recyclerMembers);
         recycler.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new TeamMembersAdapter(member -> {

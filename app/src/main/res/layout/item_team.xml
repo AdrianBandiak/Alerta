@@ -22,6 +22,7 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_team"
             android:layout_gravity="center"
+            android:contentDescription="@string/cd_team_icon"
             app:tint="@color/alerta_primary"/>
     </FrameLayout>
 
@@ -67,5 +68,7 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="@color/gray_400"/>
+        app:tint="@color/gray_400"
+        android:contentDescription="@string/cd_navigate_forward"/>
+
 </LinearLayout>

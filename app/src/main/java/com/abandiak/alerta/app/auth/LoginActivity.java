@@ -31,7 +31,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends BaseActivity {
 
-    private TextView textViewRegisterLink;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore db;
     private TextInputEditText editTextEmail, editTextPassword;
@@ -51,7 +50,7 @@ public class LoginActivity extends BaseActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
+        TextView textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);

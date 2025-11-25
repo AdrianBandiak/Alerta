@@ -10,18 +10,14 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,7 +31,6 @@ import com.abandiak.alerta.core.utils.SystemBars;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -68,6 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
@@ -80,7 +76,6 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
     private Chip chipOnline;
 
     private ClusterManager<IncidentItem> clusterManager;
-    private IncidentRenderer renderer;
 
     private final IncidentRepository incidentRepo = new IncidentRepository();
     private ListenerRegistration registration;
@@ -283,7 +278,7 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         this.map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
         clusterManager = new ClusterManager<>(this, map);
-        renderer = new IncidentRenderer(this, map, clusterManager);
+        IncidentRenderer renderer = new IncidentRenderer(this, map, clusterManager);
         clusterManager.setRenderer(renderer);
 
         map.setOnCameraIdleListener(clusterManager);
@@ -467,11 +462,7 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
                     display = city;
                 } else if (village != null) {
                     display = village;
-                } else if (adminArea != null) {
-                    display = adminArea;
-                } else {
-                    display = "Unknown";
-                }
+                } else display = Objects.requireNonNullElse(adminArea, "Unknown");
 
                 TextView textLocation = findViewById(R.id.textLocation);
                 textLocation.setText(display);

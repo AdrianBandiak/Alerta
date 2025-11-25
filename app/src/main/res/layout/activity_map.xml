@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/map_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -37,7 +36,7 @@
                 android:paddingVertical="4dp"
                 app:singleLine="true"
                 app:singleSelection="false"
-                app:chipSpacingHorizontal="4dp">
+                app:chipSpacingHorizontal="6dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_info"
@@ -98,7 +97,7 @@
                     android:autoSizeMinTextSize="9sp"
                     android:autoSizeMaxTextSize="13sp"
                     android:autoSizeStepGranularity="1sp"
-                    android:text="TEAM"
+                    android:text="@string/team"
                     app:chipBackgroundColor="@color/chip_team_selector"
                     app:chipIcon="@drawable/ic_dot"
                     app:chipIconTint="@color/green_700"/>
@@ -109,19 +108,17 @@
 
 
     <FrameLayout
-        android:id="@+id/map_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
         <ImageView
-            android:id="@+id/centerPin"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
@@ -129,7 +126,6 @@
             android:contentDescription="@string/cd_center_pin"/>
 
         <TextView
-            android:id="@+id/tipMoveMap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"

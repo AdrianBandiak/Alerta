@@ -45,14 +45,14 @@
                     android:textSize="20sp"
                     android:textColor="@color/black"
                     android:fontFamily="@font/inter"
-                    android:text="Incident title" />
+                    android:text="@string/incident_title" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipType"
                     style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CRITICAL"
+                    android:text="@string/critical"
                     android:textStyle="bold"
                     android:textColor="@android:color/white"
                     android:fontFamily="@font/inter"
@@ -75,7 +75,7 @@
                 android:fontFamily="@font/inter"
                 android:lineSpacingExtra="2dp"
                 android:layout_marginTop="6dp"
-                android:text="Description goes here..." />
+                android:text="@string/description_goes_here" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,7 +88,9 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_location_pin"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="@string/cd_location_pin" />
+
 
                 <TextView
                     android:id="@+id/coords_wgs"
@@ -98,7 +100,7 @@
                     android:textSize="13sp"
                     android:fontFamily="@font/inter"
                     android:layout_marginStart="6dp"
-                    android:text="50.02° N, 19.86° E" />
+                    android:text="@string/coords_example" />
             </LinearLayout>
 
             <LinearLayout
@@ -116,7 +118,7 @@
                     android:scaleY="0.85"
                     android:fontFamily="@font/inter"
                     android:textColor="@color/text_secondary"
-                    android:text="Incident verified by authorities"
+                    android:text="@string/incident_verified_by_authorities"
                     android:enabled="false" />
             </LinearLayout>
 
@@ -130,7 +132,7 @@
                 android:id="@+id/logs_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Incident history"
+                android:text="@string/incident_history"
                 android:textStyle="bold"
                 android:textSize="15sp"
                 android:fontFamily="@font/inter"
@@ -186,7 +188,7 @@
                 style="@style/Alerta.Button.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textColor="@color/red_700"
                 app:strokeColor="@color/red_700"
                 app:cornerRadius="20dp"

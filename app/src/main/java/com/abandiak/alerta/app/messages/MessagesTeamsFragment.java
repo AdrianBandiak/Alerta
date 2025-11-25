@@ -26,7 +26,6 @@ import java.util.List;
 
 public class MessagesTeamsFragment extends Fragment {
 
-    private RecyclerView recyclerView;
     private TeamChatsAdapter adapter;
     private TeamRepository teamRepo;
 
@@ -42,7 +41,7 @@ public class MessagesTeamsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_messages_teams, container, false);
 
-        recyclerView = view.findViewById(R.id.recyclerTeamChats);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerTeamChats);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new TeamChatsAdapter();

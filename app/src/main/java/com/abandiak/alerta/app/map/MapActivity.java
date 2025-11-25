@@ -780,9 +780,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                             }
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        ToastUtils.show(this, "Failed to load incident history: " + e.getMessage());
-                    });
+                    .addOnFailureListener(e -> ToastUtils.show(this, "Failed to load incident history: " + e.getMessage()));
         }
 
         String uid =
@@ -792,23 +790,19 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         if (!item.isVerified() && uid != null && uid.equals(item.getCreatedBy())) {
             btnDelete.setVisibility(View.VISIBLE);
-            btnDelete.setOnClickListener(v -> {
-                new AlertDialog.Builder(this)
-                        .setTitle("Delete incident")
-                        .setMessage("Are you sure you want to delete this incident?")
-                        .setPositiveButton("Delete", (d, w) -> {
-                            new IncidentRepository()
-                                    .deleteIncident(item.getId())
-                                    .addOnSuccessListener(unused -> {
-                                        ToastUtils.show(this, "Incident deleted");
-                                        dialog.dismiss();
-                                    })
-                                    .addOnFailureListener(e ->
-                                            ToastUtils.show(this, "Failed to delete: " + e.getMessage()));
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            });
+            btnDelete.setOnClickListener(v -> new AlertDialog.Builder(this)
+                    .setTitle("Delete incident")
+                    .setMessage("Are you sure you want to delete this incident?")
+                    .setPositiveButton("Delete", (d, w) -> new IncidentRepository()
+                            .deleteIncident(item.getId())
+                            .addOnSuccessListener(unused -> {
+                                ToastUtils.show(this, "Incident deleted");
+                                dialog.dismiss();
+                            })
+                            .addOnFailureListener(e ->
+                                    ToastUtils.show(this, "Failed to delete: " + e.getMessage())))
+                    .setNegativeButton("Cancel", null)
+                    .show());
         } else {
             btnDelete.setVisibility(View.GONE);
         }

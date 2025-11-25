@@ -106,6 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -161,7 +162,6 @@
             app:cornerRadius="24dp" />
 
         <LinearLayout
-            android:id="@+id/photo_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"

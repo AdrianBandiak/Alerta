@@ -37,7 +37,6 @@ public class MessagesDMFragment extends Fragment {
         }
     }
 
-    private RecyclerView recyclerView;
     private DMChatsAdapter adapter;
 
     private ListenerRegistration dmListener;
@@ -72,7 +71,7 @@ public class MessagesDMFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_messages_dm, container, false);
 
-        recyclerView = view.findViewById(R.id.recyclerViewDm);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewDm);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new DMChatsAdapter(chat -> {

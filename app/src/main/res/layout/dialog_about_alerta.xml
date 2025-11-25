@@ -7,7 +7,6 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/imgLogo"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/logo_alerta"
@@ -27,7 +26,7 @@
         android:id="@+id/textGitHub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GitHub Repository →"
+        android:text="@string/github_repository"
         android:textColor="@color/alerta_primary"
         android:textSize="15sp"
         android:fontFamily="@font/inter"

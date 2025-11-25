@@ -18,7 +18,8 @@
         android:translationZ="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="" />
 
     <TextView
         android:id="@+id/textMemberName"
@@ -47,6 +48,7 @@
         app:tint="@color/alerta_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/textMemberName"
-        app:layout_constraintBottom_toBottomOf="@id/textMemberName"/>
+        app:layout_constraintBottom_toBottomOf="@id/textMemberName"
+        android:contentDescription="@string/cd_send_direct_message" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

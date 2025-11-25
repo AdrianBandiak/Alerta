@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Choose Team Color"
+            android:text="@string/choose_team_color"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:textSize="20sp"
@@ -52,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="3">
 
@@ -65,7 +66,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="R"
+                    android:text="@string/color_r"
                     android:textColor="#E53935"
                     android:textStyle="bold"
                     android:textSize="20sp" />
@@ -93,7 +94,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="G"
+                    android:text="@string/color_g"
                     android:textColor="#43A047"
                     android:textStyle="bold"
                     android:textSize="20sp" />
@@ -121,7 +122,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="B"
+                    android:text="@string/color_b"
                     android:textColor="#1E88E5"
                     android:textStyle="bold"
                     android:textSize="20sp" />
@@ -151,7 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
@@ -160,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button"
-                android:text="Save Color"
+                android:text="@string/save_color"
                 android:layout_marginStart="10dp"
                 app:backgroundTint="@color/alerta_primary"
                 android:textColor="@color/white"

@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TeamChatActivity extends BaseActivity {
@@ -35,7 +36,6 @@ public class TeamChatActivity extends BaseActivity {
     private TeamMessageAdapter adapter;
 
     private EditText inputMessage;
-    private ImageButton btnSend;
 
     private String teamId;
     private String currentUid;
@@ -137,7 +137,7 @@ public class TeamChatActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         inputMessage = findViewById(R.id.inputTeamMessage);
-        btnSend = findViewById(R.id.btnSendTeamMessage);
+        ImageButton btnSend = findViewById(R.id.btnSendTeamMessage);
 
         btnSend.setOnClickListener(v -> sendMessage());
     }
@@ -189,7 +189,7 @@ public class TeamChatActivity extends BaseActivity {
                 ));
             }
 
-            newList.sort((a, b) -> Long.compare(a.getCreatedAt(), b.getCreatedAt()));
+            newList.sort(Comparator.comparingLong(ChatMessage::getCreatedAt));
 
             adapter.submitList(newList);
 

@@ -22,7 +22,7 @@
             android:id="@+id/textTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Complete your profile"
+            android:text="@string/complete_your_profile"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
@@ -38,7 +38,7 @@
             style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="First name">
+            android:hint="@string/first_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputFirstName"
@@ -52,7 +52,7 @@
             style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Last name"
+            android:hint="@string/last_name"
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Gender">
+            android:hint="@string/gender">
 
             <AutoCompleteTextView
                 android:id="@+id/inputGender"
@@ -92,7 +92,7 @@
             style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Country"
+            android:hint="@string/country"
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -107,6 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -115,7 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="City"
+                android:hint="@string/city"
                 android:layout_marginEnd="6dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -131,7 +132,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Postal code"
+                android:hint="@string/postal_code"
                 android:layout_marginStart="6dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -148,6 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -156,7 +158,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Street"
+                android:hint="@string/street"
                 android:layout_marginEnd="6dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -172,7 +174,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Home number"
+                android:hint="@string/home_number"
                 android:layout_marginStart="6dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -189,7 +191,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="24dp"
-            android:text="Save and Continue"
+            android:text="@string/save_and_continue"
             android:textAllCaps="false"
             android:textColor="@color/white"
             app:backgroundTint="@color/alerta_primary"

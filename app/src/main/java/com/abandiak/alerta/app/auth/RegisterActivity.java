@@ -8,11 +8,9 @@ import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.abandiak.alerta.R;
-import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.core.utils.BaseActivity;
+import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,6 +29,7 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SystemBars.apply(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 

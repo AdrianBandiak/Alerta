@@ -104,21 +104,17 @@ public class MoreActivity extends BaseActivity {
         FirebaseStorage.getInstance()
                 .getReference("profile_pics/" + uid + "/profile.jpg")
                 .putFile(uri)
-                .addOnSuccessListener(task -> {
+                .addOnSuccessListener(task -> task.getStorage().getDownloadUrl().addOnSuccessListener(downloadUri -> {
 
-                    task.getStorage().getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                    db.collection("users")
+                            .document(uid)
+                            .update("photoUrl", downloadUri.toString());
 
-                        db.collection("users")
-                                .document(uid)
-                                .update("photoUrl", downloadUri.toString());
+                    imageProfile.setImageURI(uri);
+                    imageProfile.setStrokeWidth(0);
 
-                        imageProfile.setImageURI(uri);
-                        imageProfile.setStrokeWidth(0);
-
-                        ToastUtils.show(this, "Profile picture updated!");
-                    });
-
-                })
+                    ToastUtils.show(this, "Profile picture updated!");
+                }))
                 .addOnFailureListener(e ->
                         ToastUtils.show(this, "Upload failed: " + e.getMessage()));
     }

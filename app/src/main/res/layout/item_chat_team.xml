@@ -24,7 +24,9 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_group"
             android:layout_gravity="center"
-            app:tint="@color/alerta_primary"/>
+            app:tint="@color/alerta_primary"
+            android:contentDescription="@string/cd_team_icon"/>
+
     </FrameLayout>
 
     <LinearLayout

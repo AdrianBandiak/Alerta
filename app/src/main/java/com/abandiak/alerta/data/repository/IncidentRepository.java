@@ -103,13 +103,10 @@ public class IncidentRepository {
     }
 
     private static ListenerRegistration proxy(final ListenerRegistration[] ref) {
-        return new ListenerRegistration() {
-            @Override
-            public void remove() {
-                if (ref[0] != null) {
-                    ref[0].remove();
-                    ref[0] = null;
-                }
+        return () -> {
+            if (ref[0] != null) {
+                ref[0].remove();
+                ref[0] = null;
             }
         };
     }

@@ -2,8 +2,6 @@ package com.abandiak.alerta.data.repository;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import com.abandiak.alerta.app.messages.teams.TeamMemberEntry;
 import com.abandiak.alerta.data.model.Team;
 import com.google.firebase.Timestamp;

@@ -10,12 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,14 +34,12 @@ import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerView;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
-import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
 public class TeamsActivity extends BaseActivity {
 
-    private BottomNavigationView bottomNav;
     private View emptyState;
     private RecyclerView recycler;
     private TeamListAdapter adapter;
@@ -83,7 +77,7 @@ public class TeamsActivity extends BaseActivity {
         findViewById(R.id.btnCreateTeam).setOnClickListener(v -> showCreateDialog());
         findViewById(R.id.btnJoinTeam).setOnClickListener(v -> showJoinDialog());
 
-        bottomNav = findViewById(R.id.bottomNav);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_teams);
             bottomNav.setOnItemSelectedListener(item -> {
@@ -272,9 +266,7 @@ public class TeamsActivity extends BaseActivity {
 
                     textCreatedBy.setText("Created by: " + full);
                 })
-                .addOnFailureListener(e -> {
-                    textCreatedBy.setText("Created by: Unknown");
-                });
+                .addOnFailureListener(e -> textCreatedBy.setText("Created by: Unknown"));
 
 
 
@@ -304,17 +296,15 @@ public class TeamsActivity extends BaseActivity {
                     .create();
 
             confirmView.findViewById(R.id.btnCancel).setOnClickListener(v2 -> confirmDialog.dismiss());
-            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(v2 -> {
-                repo.deleteTeam(team.getId(), success -> {
-                    if (success) {
-                        ToastUtils.show(this, "Team deleted.");
-                        confirmDialog.dismiss();
-                        dialog.dismiss();
-                    } else {
-                        ToastUtils.show(this, "Failed to delete team.");
-                    }
-                });
-            });
+            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(v2 -> repo.deleteTeam(team.getId(), success -> {
+                if (success) {
+                    ToastUtils.show(this, "Team deleted.");
+                    confirmDialog.dismiss();
+                    dialog.dismiss();
+                } else {
+                    ToastUtils.show(this, "Failed to delete team.");
+                }
+            }));
 
             confirmDialog.show();
         });

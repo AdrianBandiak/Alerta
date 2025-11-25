@@ -29,7 +29,7 @@ public class Task {
         this.time = time;
         this.completed = completed;
         this.date = date;
-        this.type = "NORMAL"; // default
+        this.type = "NORMAL";
     }
 
 

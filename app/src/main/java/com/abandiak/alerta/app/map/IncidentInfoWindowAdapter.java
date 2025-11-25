@@ -4,6 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.abandiak.alerta.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -24,7 +26,7 @@ public class IncidentInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     }
 
     @Override
-    public View getInfoContents(Marker marker) {
+    public View getInfoContents(@NonNull Marker marker) {
         return null;
     }
 }

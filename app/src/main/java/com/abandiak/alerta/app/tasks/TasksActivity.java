@@ -4,15 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -311,9 +308,7 @@ public class TasksActivity extends BaseActivity {
 
                     saveTask(task, dialog);
                 })
-                .addOnFailureListener(e -> {
-                    ToastUtils.show(this, "Error loading team");
-                });
+                .addOnFailureListener(e -> ToastUtils.show(this, "Error loading team"));
     }
 
 

@@ -2,7 +2,6 @@ package com.abandiak.alerta.app.messages;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
@@ -21,8 +20,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MessagesActivity extends BaseActivity {
 
-    private TabLayout tabLayout;
-    private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
 
     @Override
@@ -35,8 +32,8 @@ public class MessagesActivity extends BaseActivity {
 
         setContentView(R.layout.activity_messages);
 
-        tabLayout = findViewById(R.id.tabLayout);
-        viewPager = findViewById(R.id.viewPager);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
 
         viewPager.setAdapter(new MessagesPagerAdapter(this));
 

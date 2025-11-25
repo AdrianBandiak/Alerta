@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -63,18 +62,16 @@ public class AlertaMessagingService extends FirebaseMessagingService {
     }
 
     private void ensureChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel ch = new NotificationChannel(
-                    CH_INCIDENTS,
-                    "Incidents",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
-            ch.setDescription("Notifications for incidents and alerts");
-            ch.enableLights(true);
-            ch.setLightColor(Color.RED);
-            ch.enableVibration(true);
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(ch);
-        }
+        NotificationChannel ch = new NotificationChannel(
+                CH_INCIDENTS,
+                "Incidents",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        ch.setDescription("Notifications for incidents and alerts");
+        ch.enableLights(true);
+        ch.setLightColor(Color.RED);
+        ch.enableVibration(true);
+        NotificationManager nm = getSystemService(NotificationManager.class);
+        if (nm != null) nm.createNotificationChannel(ch);
     }
 }
