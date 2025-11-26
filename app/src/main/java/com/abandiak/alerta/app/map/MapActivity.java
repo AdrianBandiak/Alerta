@@ -700,7 +700,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         double lng = item.getPosition().longitude;
         String latDir = lat >= 0 ? "N" : "S";
         String lngDir = lng >= 0 ? "E" : "W";
-        coordsWgs.setText(String.format(Locale.US, "%.2f° %s, %.2f° %s",
+        coordsWgs.setText(String.format(Locale.US, "%.2f° %s  %.2f° %s",
                 Math.abs(lat), latDir, Math.abs(lng), lngDir));
 
         checkboxVerified.setChecked(item.isVerified());
@@ -790,19 +790,32 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         if (!item.isVerified() && uid != null && uid.equals(item.getCreatedBy())) {
             btnDelete.setVisibility(View.VISIBLE);
-            btnDelete.setOnClickListener(v -> new AlertDialog.Builder(this)
-                    .setTitle("Delete incident")
-                    .setMessage("Are you sure you want to delete this incident?")
-                    .setPositiveButton("Delete", (d, w) -> new IncidentRepository()
+            btnDelete.setOnClickListener(v -> {
+
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_delete_incident, null);
+
+                AlertDialog deleteDialog = new AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create();
+
+                dialogView.findViewById(R.id.btnCancel).setOnClickListener(x -> deleteDialog.dismiss());
+
+                dialogView.findViewById(R.id.btnConfirm).setOnClickListener(x -> {
+                    new IncidentRepository()
                             .deleteIncident(item.getId())
                             .addOnSuccessListener(unused -> {
                                 ToastUtils.show(this, "Incident deleted");
-                                dialog.dismiss();
+                                deleteDialog.dismiss();
+                                dialog.dismiss(); // zamknij bottomsheet
                             })
                             .addOnFailureListener(e ->
-                                    ToastUtils.show(this, "Failed to delete: " + e.getMessage())))
-                    .setNegativeButton("Cancel", null)
-                    .show());
+                                    ToastUtils.show(this, "Failed to delete: " + e.getMessage()));
+                });
+
+                deleteDialog.show();
+            });
+
         } else {
             btnDelete.setVisibility(View.GONE);
         }

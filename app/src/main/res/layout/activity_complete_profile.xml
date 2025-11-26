@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -38,14 +39,17 @@
             style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/first_name">
+            android:hint="@string/first_name"
+            tools:ignore="TextFields">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:minHeight="48dp"
+                android:autofillHints="" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -53,14 +57,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/last_name"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            tools:ignore="TextFields">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputLastName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:minHeight="48dp"
+                android:autofillHints="" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -68,7 +75,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/gender">
+            android:hint="@string/gender"
+            tools:ignore="TextFields">
 
             <AutoCompleteTextView
                 android:id="@+id/inputGender"
@@ -80,27 +88,31 @@
                 android:focusable="false"
                 android:cursorVisible="false"
                 android:padding="12dp"
+                android:hint="@string/gender"
+                android:minHeight="48dp"
+                android:importantForAccessibility="yes"
+                android:autofillHints=""
                 android:dropDownWidth="280dp"
                 android:dropDownVerticalOffset="4dp"
-                android:dropDownHorizontalOffset="0dp"
-                />
-
+                android:dropDownHorizontalOffset="0dp" />
         </com.google.android.material.textfield.TextInputLayout>
-
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/AlertaTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/country"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            tools:ignore="TextFields">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputCountry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:minHeight="48dp"
+                android:autofillHints="" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -117,14 +129,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/city"
-                android:layout_marginEnd="6dp">
+                android:layout_marginEnd="6dp"
+                tools:ignore="TextFields">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:autofillHints="" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -133,7 +148,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/postal_code"
-                android:layout_marginStart="6dp">
+                android:layout_marginStart="6dp"
+                tools:ignore="TextFields">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputPostalCode"
@@ -141,7 +157,9 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPostalAddress"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:autofillHints="" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
@@ -159,14 +177,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/street"
-                android:layout_marginEnd="6dp">
+                android:layout_marginEnd="6dp"
+                tools:ignore="TextFields">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputStreet"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:autofillHints="" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -175,14 +196,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/home_number"
-                android:layout_marginStart="6dp">
+                android:layout_marginStart="6dp"
+                tools:ignore="TextFields">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputHomeNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:autofillHints="" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
@@ -196,6 +220,8 @@
             android:textColor="@color/white"
             app:backgroundTint="@color/alerta_primary"
             app:cornerRadius="50dp"
-            android:fontFamily="@font/inter" />
+            android:fontFamily="@font/inter"
+            tools:ignore="TextContrastCheck" />
+
     </LinearLayout>
 </ScrollView>

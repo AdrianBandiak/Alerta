@@ -36,7 +36,7 @@
                 android:paddingVertical="4dp"
                 app:singleLine="true"
                 app:singleSelection="false"
-                app:chipSpacingHorizontal="6dp">
+                app:chipSpacingHorizontal="3.5dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_info"

@@ -224,23 +224,73 @@ public class TasksActivity extends BaseActivity {
         inputStartDate.setText(today);
 
         inputEndDate.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
-            new DatePickerDialog(this, (view, year, month, day) -> {
-                String date = String.format(Locale.getDefault(), "%04d-%02d-%02d",
-                        year, month + 1, day);
-                inputEndDate.setText(date);
-            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+
+            String start = Objects.requireNonNull(inputStartDate.getText()).toString().trim();
+            if (start.isEmpty()) {
+                ToastUtils.show(this, "Select start date first");
+                return;
+            }
+
+            Calendar startCal = Calendar.getInstance();
+            try {
+                String[] parts = start.split("-");
+                startCal.set(
+                        Integer.parseInt(parts[0]),
+                        Integer.parseInt(parts[1]) - 1,
+                        Integer.parseInt(parts[2]),
+                        0, 0, 0
+                );
+            } catch (Exception e) {
+                ToastUtils.show(this, "Invalid start date");
+                return;
+            }
+
+            Calendar now = Calendar.getInstance();
+
+            DatePickerDialog dp = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        String date = String.format(Locale.getDefault(), "%04d-%02d-%02d",
+                                year, month + 1, day);
+                        inputEndDate.setText(date);
+                    },
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH),
+                    now.get(Calendar.DAY_OF_MONTH)
+            );
+
+            dp.getDatePicker().setMinDate(startCal.getTimeInMillis());
+
+            dp.show();
         });
+
 
         AlertDialog dialog = new AlertDialog.Builder(this).setView(dialogView).create();
 
         dialogView.findViewById(R.id.btnCreate).setOnClickListener(v -> {
 
-            String title = inputTitle.getText().toString().trim();
-            String desc = inputDesc.getText().toString().trim();
+            String title = Objects.requireNonNull(inputTitle.getText()).toString().trim();
+            String desc = Objects.requireNonNull(inputDesc.getText()).toString().trim();
             String priority = inputPriority.getText().toString().trim();
-            String startDate = inputStartDate.getText().toString().trim();
-            String endDate = inputEndDate.getText().toString().trim();
+            String startDate = Objects.requireNonNull(inputStartDate.getText()).toString().trim();
+            String endDate = Objects.requireNonNull(inputEndDate.getText()).toString().trim();
+            if (!endDate.isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    long startMillis = Objects.requireNonNull(sdf.parse(startDate)).getTime();
+                    long endMillis = Objects.requireNonNull(sdf.parse(endDate)).getTime();
+
+                    if (endMillis < startMillis) {
+                        ToastUtils.show(this, "End date cannot be earlier than start date");
+                        return;
+                    }
+
+                } catch (Exception ignored) {
+                    ToastUtils.show(this, "Invalid date format");
+                    return;
+                }
+            }
+
             String type = inputType.getText().toString().trim();
             String teamName = inputTeam.getText().toString().trim();
 
@@ -508,8 +558,25 @@ public class TasksActivity extends BaseActivity {
         });
 
         dialogView.findViewById(R.id.btnDelete).setOnClickListener(v -> {
-            dialog.dismiss();
-            repo.deleteTask(task.getId(), success -> {});
+
+            View deleteView = getLayoutInflater().inflate(R.layout.dialog_delete_task, null);
+
+            AlertDialog deleteDialog = new AlertDialog.Builder(this)
+                    .setView(deleteView)
+                    .setCancelable(true)
+                    .create();
+
+            deleteView.findViewById(R.id.btnCancel).setOnClickListener(x -> deleteDialog.dismiss());
+
+            deleteView.findViewById(R.id.btnConfirm).setOnClickListener(x -> {
+                repo.deleteTask(task.getId(), success -> {
+                    ToastUtils.show(this, "Task deleted");
+                    deleteDialog.dismiss();
+                    dialog.dismiss();
+                });
+            });
+
+            deleteDialog.show();
         });
 
         dialog.show();

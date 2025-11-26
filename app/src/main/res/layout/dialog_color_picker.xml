@@ -69,7 +69,8 @@
                     android:text="@string/color_r"
                     android:textColor="#E53935"
                     android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:labelFor="@id/inputR" />
 
                 <EditText
                     android:id="@+id/inputR"
@@ -80,7 +81,9 @@
                     android:inputType="number"
                     android:maxLength="3"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:autofillHints="" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -97,7 +100,8 @@
                     android:text="@string/color_g"
                     android:textColor="#43A047"
                     android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:labelFor="@id/inputG" />
 
                 <EditText
                     android:id="@+id/inputG"
@@ -108,7 +112,9 @@
                     android:inputType="number"
                     android:maxLength="3"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:autofillHints="" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -125,7 +131,8 @@
                     android:text="@string/color_b"
                     android:textColor="#1E88E5"
                     android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:labelFor="@id/inputB" />
 
                 <EditText
                     android:id="@+id/inputB"
@@ -136,7 +143,9 @@
                     android:inputType="number"
                     android:maxLength="3"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:autofillHints="" />
+
             </LinearLayout>
         </LinearLayout>
 

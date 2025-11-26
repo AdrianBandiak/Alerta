@@ -44,6 +44,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="6dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/ic_person_placeholder"
         android:background="@drawable/bg_avatar_circle" />
 
