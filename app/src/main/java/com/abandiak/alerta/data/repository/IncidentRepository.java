@@ -140,7 +140,7 @@ public class IncidentRepository {
         if (region != null)
             q = q.whereEqualTo("region", region);
 
-        Log.d("MAP_DEBUG", "Final Firestore query built: " + q.toString());
+        Log.d("MAP_DEBUG", "Final Firestore query built: " + q);
         return q.addSnapshotListener(listener);
     }
 }

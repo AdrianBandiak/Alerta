@@ -53,7 +53,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -430,22 +432,42 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
     private void subscribeToTodayTasks() {
+
         if (taskListener != null) taskListener.remove();
 
-        taskListener = taskRepo.listenForTodayTasks(new TaskRepository.OnTasksLoadedListener() {
-            @Override
-            public void onSuccess(List<Task> tasks) {
-                runOnUiThread(() -> {
-                    if (taskAdapter != null) taskAdapter.updateData(tasks);
-                });
-            }
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (uid == null) return;
 
-            @Override
-            public void onError(Exception e) {
-                ToastUtils.show(HomeActivity.this, "Error loading tasks: " + e.getMessage());
-            }
-        });
+        FirebaseFirestore.getInstance()
+                .collection("teams")
+                .whereArrayContains("membersIndex", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<String> teamIds = new ArrayList<>();
+                    for (DocumentSnapshot d : snap) {
+                        teamIds.add(d.getId());
+                    }
+
+                    taskListener = taskRepo.listenForTodayTasksIncludingTeams(
+                            teamIds,
+                            new TaskRepository.OnTasksLoadedListener() {
+                                @Override
+                                public void onSuccess(List<Task> tasks) {
+                                    runOnUiThread(() -> {
+                                        if (taskAdapter != null) taskAdapter.updateData(tasks);
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    ToastUtils.show(HomeActivity.this,
+                                            "Error loading tasks: " + e.getMessage());
+                                }
+                            }
+                    );
+                });
     }
+
 
     private void updateCityName(double lat, double lng) {
         try {
@@ -460,9 +482,8 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
                 if (city != null) {
                     display = city;
-                } else if (village != null) {
-                    display = village;
-                } else display = Objects.requireNonNullElse(adminArea, "Unknown");
+                } else
+                    display = Objects.requireNonNullElseGet(village, () -> Objects.requireNonNullElse(adminArea, "Unknown"));
 
                 TextView textLocation = findViewById(R.id.textLocation);
                 textLocation.setText(display);

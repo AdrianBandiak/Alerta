@@ -5,13 +5,16 @@ import android.util.Log;
 import com.abandiak.alerta.data.model.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class TaskRepository {
 
@@ -107,6 +110,55 @@ public class TaskRepository {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Delete failed: " + id, e);
                     listener.onDeleted(false);
+                });
+    }
+
+    public ListenerRegistration listenForTodayTasksIncludingTeams(List<String> userTeams,
+                                                                  OnTasksLoadedListener listener) {
+
+        String uid = getCurrentUserId();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(new Date());
+
+        return db.collection("tasks")
+                .whereEqualTo("date", today)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        listener.onError(e);
+                        return;
+                    }
+                    if (snapshots == null) {
+                        listener.onSuccess(new ArrayList<>());
+                        return;
+                    }
+
+                    List<Task> result = new ArrayList<>();
+
+                    for (DocumentSnapshot d : snapshots) {
+                        Task t = d.toObject(Task.class);
+                        if (t == null) continue;
+
+                        boolean isMine = uid.equals(t.getCreatedBy());
+                        boolean isTeamTask = t.getTeamId() != null &&
+                                userTeams.contains(t.getTeamId());
+
+                        boolean isToday =
+                                t.getDate() != null &&
+                                        t.getDate().equals(today);
+
+                        if (isMine && isToday) {
+                            result.add(t);
+                        }
+
+                        if (isTeamTask) {
+                            if (t.getDate() == null) t.setDate(today);
+                            result.add(t);
+                        }
+                    }
+
+                    listener.onSuccess(result);
                 });
     }
 

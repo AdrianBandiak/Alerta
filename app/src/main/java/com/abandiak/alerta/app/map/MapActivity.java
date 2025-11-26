@@ -801,17 +801,15 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                 dialogView.findViewById(R.id.btnCancel).setOnClickListener(x -> deleteDialog.dismiss());
 
-                dialogView.findViewById(R.id.btnConfirm).setOnClickListener(x -> {
-                    new IncidentRepository()
-                            .deleteIncident(item.getId())
-                            .addOnSuccessListener(unused -> {
-                                ToastUtils.show(this, "Incident deleted");
-                                deleteDialog.dismiss();
-                                dialog.dismiss(); // zamknij bottomsheet
-                            })
-                            .addOnFailureListener(e ->
-                                    ToastUtils.show(this, "Failed to delete: " + e.getMessage()));
-                });
+                dialogView.findViewById(R.id.btnConfirm).setOnClickListener(x -> new IncidentRepository()
+                        .deleteIncident(item.getId())
+                        .addOnSuccessListener(unused -> {
+                            ToastUtils.show(this, "Incident deleted");
+                            deleteDialog.dismiss();
+                            dialog.dismiss(); // zamknij bottomsheet
+                        })
+                        .addOnFailureListener(e ->
+                                ToastUtils.show(this, "Failed to delete: " + e.getMessage())));
 
                 deleteDialog.show();
             });

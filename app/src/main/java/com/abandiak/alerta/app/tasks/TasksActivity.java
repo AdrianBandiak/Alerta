@@ -568,13 +568,11 @@ public class TasksActivity extends BaseActivity {
 
             deleteView.findViewById(R.id.btnCancel).setOnClickListener(x -> deleteDialog.dismiss());
 
-            deleteView.findViewById(R.id.btnConfirm).setOnClickListener(x -> {
-                repo.deleteTask(task.getId(), success -> {
-                    ToastUtils.show(this, "Task deleted");
-                    deleteDialog.dismiss();
-                    dialog.dismiss();
-                });
-            });
+            deleteView.findViewById(R.id.btnConfirm).setOnClickListener(x -> repo.deleteTask(task.getId(), success -> {
+                ToastUtils.show(this, "Task deleted");
+                deleteDialog.dismiss();
+                dialog.dismiss();
+            }));
 
             deleteDialog.show();
         });
