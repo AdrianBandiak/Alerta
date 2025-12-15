@@ -13,18 +13,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
+import com.abandiak.alerta.data.repository.TaskRepositoryInterface;
 
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
+    public static TaskRepositoryInterface repoOverride = null;
+    private final TaskRepositoryInterface repo;
+
     private List<Task> items;
     private OnTaskClickListener listener;
     private OnTaskStatusChangedListener statusListener;
-    private final TaskRepository repo = new TaskRepository();
 
     public TaskAdapter(List<Task> items) {
         this.items = items;
+        this.repo = (repoOverride != null) ? repoOverride : new TaskRepository();
     }
 
     public void updateData(List<Task> newData) {
@@ -69,7 +73,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         if ("TEAM".equals(t.getType())) {
             h.icon.setImageResource(R.drawable.ic_shield);
-
             if (t.getTeamColor() != null) {
                 h.icon.setColorFilter(t.getTeamColor(), android.graphics.PorterDuff.Mode.SRC_IN);
             } else {
@@ -78,7 +81,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         android.graphics.PorterDuff.Mode.SRC_IN
                 );
             }
-
         } else {
             h.icon.setImageResource(R.drawable.ic_task);
             h.icon.setColorFilter(
@@ -100,9 +102,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (t.isCompleted() != isChecked) {
                 t.setCompleted(isChecked);
                 repo.updateTaskCompletion(t.getId(), isChecked);
-
                 applyTaskStyle(h, isChecked);
-
                 if (statusListener != null) statusListener.onStatusChanged();
             }
         });
@@ -110,7 +110,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     private void applyTaskStyle(TaskViewHolder h, boolean completed) {
         float alpha = completed ? 0.5f : 1f;
-
         h.itemView.setAlpha(alpha);
         h.textTitle.setAlpha(alpha);
         h.textMeta.setAlpha(alpha);

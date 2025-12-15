@@ -26,6 +26,7 @@ import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Team;
 import com.abandiak.alerta.data.repository.TeamRepository;
+import com.abandiak.alerta.data.repository.TeamRepositoryInterface;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,14 +41,20 @@ import java.util.Locale;
 
 public class TeamsActivity extends BaseActivity {
 
+    public static TeamRepositoryInterface repoOverride = null;
+
     private View emptyState;
     private RecyclerView recycler;
     private TeamListAdapter adapter;
-    private TeamRepository repo;
+    private TeamRepositoryInterface repo;
     private ListenerRegistration reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        int testTheme = getIntent().getIntExtra("theme", -1);
+        if (testTheme != -1) setTheme(testTheme);
+
         super.onCreate(savedInstanceState);
         SystemBars.apply(this);
 
@@ -65,12 +72,18 @@ public class TeamsActivity extends BaseActivity {
             return insets;
         });
 
-        repo = new TeamRepository();
+        repo = (repoOverride != null) ? repoOverride : new TeamRepository();
+
         emptyState = findViewById(R.id.emptyState);
+
         recycler = findViewById(R.id.recyclerTeams);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TeamListAdapter();
         recycler.setAdapter(adapter);
+
+        if (getIntent().getBooleanExtra("disable_anim", false)) {
+            recycler.setItemAnimator(null);
+        }
 
         adapter.setOnTeamClick(this::showTeamDetailsDialog);
 
@@ -104,11 +117,12 @@ public class TeamsActivity extends BaseActivity {
     }
 
 
-
     @Override
     protected void onStart() {
         super.onStart();
-        reg = repo.listenMyTeams(new TeamRepository.TeamsListener() {
+
+        reg = repo.listenMyTeams(new TeamRepositoryInterface.TeamsListener() {
+
             @Override
             public void onSuccess(List<Team> list) {
                 adapter.submit(list);
@@ -133,7 +147,6 @@ public class TeamsActivity extends BaseActivity {
             showJoinDialog();
         }
     }
-
 
     @Override
     protected void onStop() {
@@ -189,8 +202,7 @@ public class TeamsActivity extends BaseActivity {
             btnCancel.setOnClickListener(x -> pickerDialog.dismiss());
             btnOk.setOnClickListener(x -> {
                 selectedColor[0] = dialogColor[0];
-                ((GradientDrawable) colorPreview.getBackground().mutate())
-                        .setColor(selectedColor[0]);
+                ((GradientDrawable) colorPreview.getBackground().mutate()).setColor(selectedColor[0]);
                 pickerDialog.dismiss();
             });
 
@@ -231,6 +243,7 @@ public class TeamsActivity extends BaseActivity {
 
 
     private void showTeamDetailsDialog(Team team) {
+
         View view = getLayoutInflater().inflate(R.layout.dialog_team_details, null);
 
         TextView textName = view.findViewById(R.id.textTeamName);
@@ -244,6 +257,56 @@ public class TeamsActivity extends BaseActivity {
                 ? "No description provided."
                 : team.getDescription());
         textCode.setText("Code: " + (team.getCode() == null ? "—" : team.getCode()));
+
+        if (TeamsActivity.repoOverride != null) {
+            textCreatedBy.setText("Created by: Unknown (test)");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            Timestamp ts = team.getCreatedAt();
+            String date = (ts != null) ? sdf.format(ts.toDate()) : "—";
+            textCreatedAt.setText("Created at: " + date);
+
+            AlertDialog dialogTest = new AlertDialog.Builder(this)
+                    .setView(view)
+                    .create();
+
+            view.findViewById(R.id.btnClose).setOnClickListener(v -> dialogTest.dismiss());
+            view.findViewById(R.id.btnEdit).setOnClickListener(v -> {
+                dialogTest.dismiss();
+                showEditTeamDialog(team);
+            });
+
+            view.findViewById(R.id.btnDelete).setOnClickListener(v -> {
+                View confirmView = getLayoutInflater()
+                        .inflate(R.layout.dialog_confirm_delete, null);
+
+                AlertDialog confirmDialog = new AlertDialog.Builder(this)
+                        .setView(confirmView)
+                        .create();
+
+                confirmView.findViewById(R.id.btnCancel)
+                        .setOnClickListener(x -> confirmDialog.dismiss());
+
+                confirmView.findViewById(R.id.btnConfirm)
+                        .setOnClickListener(x ->
+                                repo.deleteTeam(team.getId(), success -> {
+                                    if (success) {
+                                        ToastUtils.show(this, "Team deleted.");
+                                        confirmDialog.dismiss();
+                                        dialogTest.dismiss();
+                                    } else {
+                                        ToastUtils.show(this, "Failed to delete team.");
+                                    }
+                                })
+                        );
+
+                confirmDialog.show();
+            });
+
+            dialogTest.show();
+            return;
+        }
+
         textCreatedBy.setText("Created by: ...");
 
         FirebaseFirestore.getInstance()
@@ -257,7 +320,7 @@ public class TeamsActivity extends BaseActivity {
                     }
 
                     String first = userDoc.getString("firstName");
-                    String last  = userDoc.getString("lastName");
+                    String last = userDoc.getString("lastName");
 
                     String full = ((first != null ? first : "") + " " +
                             (last != null ? last : "")).trim();
@@ -268,16 +331,10 @@ public class TeamsActivity extends BaseActivity {
                 })
                 .addOnFailureListener(e -> textCreatedBy.setText("Created by: Unknown"));
 
-
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         Timestamp ts = team.getCreatedAt();
-        String date = (ts != null)
-                ? sdf.format(ts.toDate())
-                : "—";
-
+        String date = (ts != null) ? sdf.format(ts.toDate()) : "—";
         textCreatedAt.setText("Created at: " + date);
-
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
@@ -295,16 +352,18 @@ public class TeamsActivity extends BaseActivity {
                     .setView(confirmView)
                     .create();
 
-            confirmView.findViewById(R.id.btnCancel).setOnClickListener(v2 -> confirmDialog.dismiss());
-            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(v2 -> repo.deleteTeam(team.getId(), success -> {
-                if (success) {
-                    ToastUtils.show(this, "Team deleted.");
-                    confirmDialog.dismiss();
-                    dialog.dismiss();
-                } else {
-                    ToastUtils.show(this, "Failed to delete team.");
-                }
-            }));
+            confirmView.findViewById(R.id.btnCancel).setOnClickListener(x -> confirmDialog.dismiss());
+            confirmView.findViewById(R.id.btnConfirm).setOnClickListener(x ->
+                    repo.deleteTeam(team.getId(), success -> {
+                        if (success) {
+                            ToastUtils.show(this, "Team deleted.");
+                            confirmDialog.dismiss();
+                            dialog.dismiss();
+                        } else {
+                            ToastUtils.show(this, "Failed to delete team.");
+                        }
+                    })
+            );
 
             confirmDialog.show();
         });
@@ -334,6 +393,7 @@ public class TeamsActivity extends BaseActivity {
 
         ((GradientDrawable) colorPreview.getBackground().mutate())
                 .setColor(selectedColor[0]);
+
 
         btnPickColor.setOnClickListener(v -> {
             View pickerView = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
@@ -380,8 +440,7 @@ public class TeamsActivity extends BaseActivity {
                 .setView(view)
                 .create();
 
-        view.findViewById(R.id.btnCancel)
-                .setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
 
         btnSave.setOnClickListener(v -> {
 
@@ -408,34 +467,30 @@ public class TeamsActivity extends BaseActivity {
         dialog.show();
     }
 
-
-    private int parseColorValue(String text) {
-        if (text == null || text.isEmpty()) return 0;
-        try {
-            int v = Integer.parseInt(text);
-            return Math.max(0, Math.min(255, v));
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
     private void showJoinDialog() {
+
         View view = getLayoutInflater().inflate(R.layout.dialog_join_team, null);
         EditText input = view.findViewById(R.id.inputCode);
 
         AlertDialog d = new AlertDialog.Builder(this).setView(view).create();
+
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> d.dismiss());
+
         view.findViewById(R.id.btnJoin).setOnClickListener(v -> {
+
             String code = input.getText() == null ? "" : input.getText().toString();
+
             if (code.trim().length() != 6) {
                 input.setError("Enter 6-char code");
                 return;
             }
+
             repo.joinByCode(code, (ok, msg) -> {
                 ToastUtils.show(this, ok ? "Joined team." : msg);
                 if (ok) d.dismiss();
             });
         });
+
         d.show();
     }
 }

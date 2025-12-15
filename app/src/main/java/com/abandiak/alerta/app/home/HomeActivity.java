@@ -81,9 +81,9 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
     private final IncidentRepository incidentRepo = new IncidentRepository();
     private ListenerRegistration registration;
-    private List<IncidentItem> allItems = new ArrayList<>();
+    private final List<IncidentItem> allItems = new ArrayList<>();
     private TaskAdapter taskAdapter;
-    private TaskRepository taskRepo = new TaskRepository();
+    private final TaskRepository taskRepo = new TaskRepository();
 
     private ListenerRegistration taskListener;
 

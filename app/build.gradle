@@ -56,12 +56,19 @@ dependencies {
     implementation(libs.play.services.location)
 
     implementation libs.glide
+    implementation libs.espresso.intents
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
     implementation libs.core.splashscreen
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.play.services.tasks)
+    testImplementation libs.robolectric
+
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
 
     implementation libs.colorpickerview
     implementation libs.circleimageview

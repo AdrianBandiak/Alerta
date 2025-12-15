@@ -22,7 +22,7 @@ public class TeamMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
 
-    private String currentUid;
+    private final String currentUid;
     private List<ChatMessage> messages = new ArrayList<>();
 
     private String currentUserAvatar = null;

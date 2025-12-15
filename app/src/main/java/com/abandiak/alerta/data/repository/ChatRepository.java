@@ -10,7 +10,15 @@ import java.util.*;
 
 public class ChatRepository {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db;
+
+    public ChatRepository() {
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public ChatRepository(FirebaseFirestore firestore) {
+        this.db = firestore;
+    }
 
     private String getCurrentUid() {
         return FirebaseAuth.getInstance().getUid();
@@ -66,7 +74,6 @@ public class ChatRepository {
 
                     Log.e("DM_DEBUG", "META = " + meta);
 
-                    // FIRST WRITE META
                     Log.e("DM_DEBUG", "Calling chatRef.set(meta)...");
 
                     chatRef.set(meta)
@@ -78,7 +85,7 @@ public class ChatRepository {
                                 message.put("text", text);
                                 message.put("createdAt", FieldValue.serverTimestamp());
 
-                                Log.e("DM_DEBUG", "Adding message to messages/...  BODY=" + message);
+                                Log.e("DM_DEBUG", "Adding message to messages/...");
 
                                 chatRef.collection("messages")
                                         .add(message)
@@ -92,7 +99,6 @@ public class ChatRepository {
                 })
                 .addOnFailureListener(e -> Log.e("DM_DEBUG", "ERROR chatRef.get(): " + e.getMessage(), e));
     }
-
 
     public interface OnDmCreated {
         void onCreated(boolean existedBefore);

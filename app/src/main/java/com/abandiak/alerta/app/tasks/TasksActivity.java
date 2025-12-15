@@ -25,6 +25,7 @@ import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.abandiak.alerta.data.model.Task;
 import com.abandiak.alerta.data.repository.TaskRepository;
+import com.abandiak.alerta.data.repository.TaskRepositoryInterface;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -43,9 +44,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class TasksActivity extends BaseActivity {
-
+    public static TaskRepositoryInterface repoOverride = null;
     private TaskAdapter adapter;
-    private TaskRepository repo;
+    private TaskRepositoryInterface repo;
     private RecyclerView recycler;
     private ListenerRegistration taskListener;
 
@@ -82,7 +83,7 @@ public class TasksActivity extends BaseActivity {
             });
         }
 
-        repo = new TaskRepository();
+        repo = (repoOverride != null) ? repoOverride : new TaskRepository();
         recycler = findViewById(R.id.recyclerTasks);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TaskAdapter(new ArrayList<>());

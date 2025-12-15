@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider;
 
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
+import com.abandiak.alerta.app.map.cluster.ClusterManagerInterface;
 import com.abandiak.alerta.app.map.cluster.IncidentItem;
 import com.abandiak.alerta.app.map.cluster.IncidentRenderer;
 import com.abandiak.alerta.app.messages.MessagesActivity;
@@ -65,6 +66,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
+import com.abandiak.alerta.app.map.cluster.RealClusterManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -74,16 +76,22 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
-
+    public static boolean TEST_MODE = false;
+    public static IncidentRepository TEST_INCIDENT_REPO = null;
+    public static ClusterManagerInterface TEST_CLUSTER_MANAGER = null;
+    public static MapInterface TEST_MAP = null;
     private GoogleMap map;
+    private MapInterface testMap;
     private BottomNavigationView bottomNav;
     private AppBarLayout appBar;
 
     private ClusterManager<IncidentItem> clusterManager;
+    private ClusterManagerInterface testClusterManager;
+
     private IncidentRepository incidentRepo;
     private ListenerRegistration registration;
 
-    private String currentRegion = "PL-MA";
+    private final String currentRegion = "PL-MA";
     private String currentType = "ALL";
 
     private FusedLocationProviderClient fused;
@@ -129,13 +137,25 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (!TEST_MODE) {
+            SupportMapFragment frag =
+                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            if (frag != null) frag.getMapAsync(this);
+        }
+
         super.onCreate(savedInstanceState);
 
         SystemBars.apply(this);
         setContentView(R.layout.activity_map);
 
+        if (TEST_MODE) {
+            this.testMap = TEST_MAP;
+        }
+
         fused = LocationServices.getFusedLocationProviderClient(this);
-        incidentRepo = new IncidentRepository();
+        incidentRepo = TEST_MODE && TEST_INCIDENT_REPO != null
+                ? TEST_INCIDENT_REPO
+                : new IncidentRepository();
 
         bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) {
@@ -175,9 +195,11 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             });
         }
 
-        SupportMapFragment frag =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (frag != null) frag.getMapAsync(this);
+        if (!TEST_MODE) {
+            SupportMapFragment frag =
+                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            if (frag != null) frag.getMapAsync(this);
+        }
 
         ChipGroup chips = findViewById(R.id.chips_filters);
         if (chips != null) {
@@ -216,6 +238,8 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
 
     private void filterByTypes(List<String> types) {
+        if (TEST_MODE) return;
+
         if (registration != null) {
             registration.remove();
             registration = null;
@@ -272,6 +296,11 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        if (TEST_MODE) {
+            this.testMap = TEST_MAP;
+            this.testClusterManager = MapActivity.TEST_CLUSTER_MANAGER;
+            return;
+        }
         map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(true);
@@ -317,6 +346,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     private void openCreateIncidentSheet() {
         pickedPhotoUri = null;
         final BottomSheetDialog dialog = new BottomSheetDialog(this);
+        rememberDialog(dialog);
         final View sheet = LayoutInflater.from(this).inflate(R.layout.dialog_incident_create, null, false);
         dialog.setContentView(sheet);
 
@@ -363,7 +393,9 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         });
 
 
-        LatLng target = map.getCameraPosition().target;
+        LatLng target = TEST_MODE
+                ? testMap.getCameraPosition().target
+                : map.getCameraPosition().target;
         inputLat.setText(String.format(Locale.US, "%.6f", target.latitude));
         inputLng.setText(String.format(Locale.US, "%.6f", target.longitude));
 
@@ -481,10 +513,13 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
 
     private void subscribeIncidents() {
+        if (TEST_MODE) return;
+
         if (registration != null) {
             registration.remove();
             registration = null;
         }
+
         if (map == null || clusterManager == null) return;
         clusterManager.clearItems();
         clusterManager.cluster();
@@ -651,7 +686,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
 
-    private void showIncidentDetails(@NonNull IncidentItem item) {
+     public void showIncidentDetails(@NonNull IncidentItem item) {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View content = getLayoutInflater().inflate(R.layout.bottomsheet_incident_details, null, false);
         dialog.setContentView(content);
@@ -806,7 +841,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                         .addOnSuccessListener(unused -> {
                             ToastUtils.show(this, "Incident deleted");
                             deleteDialog.dismiss();
-                            dialog.dismiss(); // zamknij bottomsheet
+                            dialog.dismiss();
                         })
                         .addOnFailureListener(e ->
                                 ToastUtils.show(this, "Failed to delete: " + e.getMessage())));
@@ -851,6 +886,50 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         Log.e("CHIP_DEBUG", "TOTAL chips+spacing width: " + totalWithSpacing);
         Log.e("CHIP_DEBUG", "AVAILABLE width (group - padding): " + availableWidth);
         Log.e("CHIP_DEBUG", "------------------------------------------");
+    }
+    public void showIncidentDetailsForTests(IncidentItem item) {
+        showIncidentDetails(item);
+    }
+
+    public void setPickedPhotoUriForTests(Uri uri) {
+        this.pickedPhotoUri = uri;
+    }
+    public void forcePreviewUpdateForTests() {
+        updatePreview();
+    }
+
+    public void openCreateIncidentSheetForTests() {
+        openCreateIncidentSheet();
+
+        BottomSheetDialog d = getLastDialogFromSupport();
+        if (d != null) {
+            View sheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (sheet != null) {
+                currentPhotoPreview = sheet.findViewById(R.id.img_preview);
+            }
+        }
+    }
+
+    public void initPreviewForTests() {
+        BottomSheetDialog d = getLastDialogFromSupport();
+        if (d == null) return;
+
+        View sheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        if (sheet == null) return;
+
+        ImageView preview = sheet.findViewById(R.id.img_preview);
+        this.currentPhotoPreview = preview;
+    }
+
+
+    private BottomSheetDialog lastDialog;
+
+    private void rememberDialog(BottomSheetDialog dialog) {
+        lastDialog = dialog;
+    }
+
+    public BottomSheetDialog getLastDialogFromSupport() {
+        return lastDialog;
     }
 
 

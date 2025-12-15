@@ -2,10 +2,10 @@ package com.abandiak.alerta.app.messages.teams;
 
 public class TeamMemberEntry {
 
-    private String uid;
-    private String fullName;
-    private String avatarUrl;
-    private long joinedAt;
+    private final String uid;
+    private final String fullName;
+    private final String avatarUrl;
+    private final long joinedAt;
 
     public TeamMemberEntry(String uid, String fullName, String avatarUrl, long joinedAt) {
         this.uid = uid;

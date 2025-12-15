@@ -22,17 +22,24 @@ import androidx.core.content.ContextCompat;
 import com.abandiak.alerta.R;
 import com.abandiak.alerta.app.home.HomeActivity;
 import com.abandiak.alerta.app.profile.CompleteProfileActivity;
+import com.abandiak.alerta.core.firebase.AuthProvider;
+import com.abandiak.alerta.core.firebase.FirebaseAuthProvider;
+import com.abandiak.alerta.core.firebase.FirebaseFirestoreProvider;
+import com.abandiak.alerta.core.firebase.FirestoreProvider;
 import com.abandiak.alerta.core.utils.BaseActivity;
 import com.abandiak.alerta.core.utils.SystemBars;
 import com.abandiak.alerta.core.utils.ToastUtils;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends BaseActivity {
 
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore db;
+    public static AuthProvider authOverride = null;
+    public static FirestoreProvider dbOverride = null;
+    public static boolean disableFinishForTests = false;
+
+    private AuthProvider firebaseAuth;
+    private FirestoreProvider firestore;
+
     private TextInputEditText editTextEmail, editTextPassword;
     private Button buttonLogin;
 
@@ -40,15 +47,23 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         SystemBars.apply(this);
-
         super.onCreate(savedInstanceState);
 
         if (getSupportActionBar() != null) getSupportActionBar().hide();
-
         setContentView(R.layout.activity_login);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        firebaseAuth = (authOverride != null)
+                ? authOverride
+                : new FirebaseAuthProvider();
+
+        firestore = (dbOverride != null)
+                ? dbOverride
+                : new FirebaseFirestoreProvider();
+
+        initUi();
+    }
+
+    private void initUi() {
 
         TextView textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -62,61 +77,14 @@ public class LoginActivity extends BaseActivity {
         SpannableString spannable = new SpannableString(baseText + boldText);
         int start = baseText.length();
         int end = start + boldText.length();
+
         spannable.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        int red = ContextCompat.getColor(this, R.color.alerta_primary);
-        spannable.setSpan(new ForegroundColorSpan(red), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(
+                ContextCompat.getColor(this, R.color.alerta_primary)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         textViewRegisterLink.setText(spannable);
 
-        buttonLogin.setOnClickListener(view -> {
-            String email = safeText(editTextEmail);
-            String password = safeText(editTextPassword);
-
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                ToastUtils.show(this, "Please enter email and password.");
-                return;
-            }
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                ToastUtils.show(this, "Invalid email format.");
-                return;
-            }
-
-            buttonLogin.setEnabled(false);
-
-            firebaseAuth.signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(authResult -> {
-                        String uid = firebaseAuth.getCurrentUser() != null
-                                ? firebaseAuth.getCurrentUser().getUid() : null;
-
-                        if (uid == null) {
-                            ToastUtils.show(this, "User not found.");
-                            buttonLogin.setEnabled(true);
-                            return;
-                        }
-
-                        db.collection("users").document(uid)
-                                .get()
-                                .addOnSuccessListener(doc -> {
-                                    boolean needsProfile = !doc.exists() || !Boolean.TRUE.equals(doc.getBoolean("profileCompleted"));
-                                    if (needsProfile) {
-                                        ToastUtils.show(this, "Please complete your profile.");
-                                        startActivity(new Intent(this, CompleteProfileActivity.class));
-                                    } else {
-                                        ToastUtils.show(this, "Login successful.");
-                                        startActivity(new Intent(this, HomeActivity.class));
-                                    }
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    ToastUtils.show(this, "Error checking profile.");
-                                    buttonLogin.setEnabled(true);
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        ToastUtils.show(this, "Login failed: Invalid credentials.");
-                        buttonLogin.setEnabled(true);
-                    });
-        });
-
+        buttonLogin.setOnClickListener(view -> handleLogin());
         textViewRegisterLink.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
@@ -124,6 +92,61 @@ public class LoginActivity extends BaseActivity {
         logo.setVisibility(View.VISIBLE);
         root.setVisibility(View.VISIBLE);
         root.startAnimation(fadeIn);
+    }
+
+    private void handleLogin() {
+
+        String email = safeText(editTextEmail);
+        String password = safeText(editTextPassword);
+
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            ToastUtils.show(this, "Please enter email and password.");
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            ToastUtils.show(this, "Invalid email format.");
+            return;
+        }
+
+        buttonLogin.setEnabled(false);
+
+        firebaseAuth.signIn(email, password)
+                .addOnSuccessListener(uid -> {
+
+                    if (uid == null) {
+                        ToastUtils.show(this, "User not found.");
+                        buttonLogin.setEnabled(true);
+                        return;
+                    }
+
+                    firestore.getUserDocument(uid)
+                            .addOnSuccessListener(map -> {
+
+                                boolean needsProfile =
+                                        map == null ||
+                                                !Boolean.TRUE.equals(map.get("profileCompleted"));
+
+                                if (needsProfile) {
+                                    ToastUtils.show(this, "Please complete your profile.");
+                                    startActivity(new Intent(this, CompleteProfileActivity.class));
+                                } else {
+                                    ToastUtils.show(this, "Login successful.");
+                                    startActivity(new Intent(this, HomeActivity.class));
+                                }
+
+                                if (!disableFinishForTests) finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                ToastUtils.show(this, "Error checking profile.");
+                                buttonLogin.setEnabled(true);
+                            });
+
+                })
+                .addOnFailureListener(e -> {
+                    ToastUtils.show(this, "Login failed: Invalid credentials.");
+                    buttonLogin.setEnabled(true);
+                });
     }
 
 

@@ -4,22 +4,30 @@ import android.util.Log;
 
 import com.abandiak.alerta.app.messages.teams.TeamMemberEntry;
 import com.abandiak.alerta.data.model.Team;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.*;
 
 import java.util.*;
 
-public class TeamRepository {
+public class TeamRepository implements TeamRepositoryInterface {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String uid = FirebaseAuth.getInstance().getUid();
+    private final FirebaseFirestore db;
+    private final String uid;
 
-    public interface TeamsListener {
-        void onSuccess(List<Team> list);
-        void onError(Exception e);
+    public TeamRepository() {
+        this(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance().getUid());
     }
 
+    public TeamRepository(FirebaseFirestore db, String uid) {
+        this.db = db;
+        this.uid = uid;
+    }
+
+    @Override
     public ListenerRegistration listenMyTeams(TeamsListener listener) {
         if (uid == null) return null;
 
@@ -31,11 +39,15 @@ public class TeamRepository {
                         listener.onError(err);
                         return;
                     }
-                    if (snap == null) return;
+
+                    if (snap == null) {
+                        listener.onSuccess(new ArrayList<>());
+                        return;
+                    }
 
                     List<Team> list = new ArrayList<>();
-                    for (DocumentSnapshot d : snap.getDocuments()) {
 
+                    for (DocumentSnapshot d : snap.getDocuments()) {
                         Team t = d.toObject(Team.class);
                         if (t != null) {
                             t.setId(d.getId());
@@ -46,10 +58,7 @@ public class TeamRepository {
                 });
     }
 
-    public interface CreateTeamCallback {
-        void onComplete(boolean success, String teamIdOrError);
-    }
-
+    @Override
     public void createTeam(String name, String desc, int color, String region,
                            CreateTeamCallback callback) {
 
@@ -68,22 +77,18 @@ public class TeamRepository {
         data.put("color", color);
         data.put("code", code);
         data.put("region", region);
-
         data.put("createdBy", uid);
-        data.put("createdByName", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
-        data.put("createdAt", Timestamp.now());
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        data.put("createdByName", user != null ? user.getDisplayName() : "");
+        data.put("createdAt", Timestamp.now());
         data.put("lastMessage", "");
         data.put("lastTimestamp", null);
-
         data.put("membersIndex", Collections.singletonList(uid));
 
         teamRef.set(data)
                 .continueWithTask(task -> {
-
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
+                    if (!task.isSuccessful()) throw task.getException();
 
                     Map<String, Object> member = new HashMap<>();
                     member.put("role", "owner");
@@ -94,24 +99,26 @@ public class TeamRepository {
                             .set(member);
                 })
                 .continueWithTask(task -> {
+                    if (!task.isSuccessful()) throw task.getException();
 
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    Map<String, Object> codeMap = new HashMap<>();
-                    codeMap.put("teamId", teamId);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("teamId", teamId);
 
                     return db.collection("team_codes")
                             .document(code)
-                            .set(codeMap);
+                            .set(map);
                 })
-                .addOnSuccessListener(aVoid -> callback.onComplete(true, teamId))
-                .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
+                .addOnSuccessListener(v -> callback.onComplete(true, teamId))
+                .addOnFailureListener(err -> {
+                    String msg = (err != null && err.getMessage() != null)
+                            ? err.getMessage()
+                            : "error";
+                    callback.onComplete(false, msg);
+                });
     }
 
+    @Override
     public void initializeTeamChat(String teamId) {
-
         Map<String, Object> msg = new HashMap<>();
         msg.put("text", "Chat created");
         msg.put("senderId", uid);
@@ -123,10 +130,7 @@ public class TeamRepository {
                 .add(msg);
     }
 
-    public interface UpdateTeamCallback {
-        void onComplete(boolean ok, String msg);
-    }
-
+    @Override
     public void updateTeam(Team team, UpdateTeamCallback callback) {
 
         if (team.getId() == null) {
@@ -143,16 +147,17 @@ public class TeamRepository {
         db.collection("teams")
                 .document(team.getId())
                 .update(update)
-                .addOnSuccessListener(aVoid -> callback.onComplete(true, "OK"))
-                .addOnFailureListener(e -> callback.onComplete(false, e.getMessage()));
+                .addOnSuccessListener(v -> callback.onComplete(true, "OK"))
+                .addOnFailureListener(err -> {
+                    String msg = (err != null && err.getMessage() != null)
+                            ? err.getMessage()
+                            : "error";
+                    callback.onComplete(false, msg);
+                });
     }
 
-    public interface DeleteTeamCallback {
-        void onComplete(boolean success);
-    }
-
+    @Override
     public void deleteTeam(String teamId, DeleteTeamCallback cb) {
-
         db.collection("teams")
                 .document(teamId)
                 .delete()
@@ -160,10 +165,7 @@ public class TeamRepository {
                 .addOnFailureListener(e -> cb.onComplete(false));
     }
 
-    public interface JoinCallback {
-        void onComplete(boolean ok, String msg);
-    }
-
+    @Override
     public void joinByCode(String code, JoinCallback callback) {
 
         db.collection("team_codes")
@@ -171,7 +173,7 @@ public class TeamRepository {
                 .get()
                 .addOnSuccessListener(doc -> {
 
-                    if (!doc.exists()) {
+                    if (doc == null || !doc.exists()) {
                         callback.onComplete(false, "Invalid code.");
                         return;
                     }
@@ -182,10 +184,11 @@ public class TeamRepository {
                         return;
                     }
 
-                    DocumentReference teamRef = db.collection("teams").document(teamId);
+                    DocumentReference teamRef = db.collection("teams")
+                            .document(teamId);
 
                     teamRef.update("membersIndex", FieldValue.arrayUnion(uid))
-                            .addOnSuccessListener(aVoid -> {
+                            .addOnSuccessListener(v -> {
 
                                 teamRef.collection("members")
                                         .document(uid)
@@ -193,135 +196,128 @@ public class TeamRepository {
 
                                 callback.onComplete(true, "OK");
                             })
-                            .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
+                            .addOnFailureListener(err -> {
+                                String msg = (err != null && err.getMessage() != null)
+                                        ? err.getMessage()
+                                        : "error";
+                                callback.onComplete(false, msg);
+                            });
+
                 })
-                .addOnFailureListener(err -> callback.onComplete(false, err.getMessage()));
+                .addOnFailureListener(err -> {
+                    String msg = (err != null && err.getMessage() != null)
+                            ? err.getMessage()
+                            : "error";
+                    callback.onComplete(false, msg);
+                });
     }
 
+    @Override
     public void getFullTeamMembers(String teamId, OnMembersLoaded callback) {
-
-        Log.e("MEMBERS_DEBUG", "------------------------------------------");
-        Log.e("MEMBERS_DEBUG", "getFullTeamMembers() CALLED");
-        Log.e("MEMBERS_DEBUG", "TEAM ID = " + teamId);
-        Log.e("MEMBERS_DEBUG", "Firestore instance = " + db);
 
         db.collection("teams")
                 .document(teamId)
                 .collection("members")
                 .get()
-                .addOnSuccessListener(memberSnap -> {
+                .continueWithTask(task -> {
 
-                    Log.e("MEMBERS_DEBUG", "Members found: " + memberSnap.size());
+                    if (!task.isSuccessful() ||
+                            task.getResult() == null ||
+                            task.getResult().isEmpty()) {
 
-                    if (memberSnap.isEmpty()) {
                         callback.onLoaded(new ArrayList<>());
-                        return;
+                        return Tasks.forResult(null);
                     }
+
+                    QuerySnapshot snap = task.getResult();
 
                     List<TeamMemberEntry> result = new ArrayList<>();
-                    int total = memberSnap.size();
+                    List<TeamMemberEntry>[] box = new List[]{result};
 
-                    for (DocumentSnapshot doc : memberSnap) {
+                    List<Task<Void>> userTasks = new ArrayList<>();
 
-                        String userId = doc.getId();
-                        Timestamp ts = doc.getTimestamp("joinedAt");
+                    for (QueryDocumentSnapshot d : snap) {
+
+                        String userId = d.getId();
+                        Timestamp ts = d.getTimestamp("joinedAt");
                         long joinedAt = ts != null ? ts.toDate().getTime() : 0;
 
-                        Log.e("MEMBERS_DEBUG", "------------------------------------------");
-                        Log.e("MEMBERS_DEBUG", "Member UID = " + userId);
-                        Log.e("MEMBERS_DEBUG", "Fetching from: /users/" + userId);
+                        Task<Void> userTask =
+                                db.collection("users")
+                                        .document(userId)
+                                        .get()
+                                        .continueWith(userSnap -> {
 
-                        db.collection("users")
-                                .document(userId)
-                                .get()
-                                .addOnSuccessListener(userDoc -> {
+                                            DocumentSnapshot userDoc =
+                                                    userSnap.isSuccessful()
+                                                            ? userSnap.getResult()
+                                                            : null;
 
-                                    if (!userDoc.exists()) {
-                                        Log.e("MEMBERS_DEBUG", "!!! USER DOC DOES NOT EXIST !!!");
-                                        result.add(new TeamMemberEntry(
-                                                userId,
-                                                userId.substring(0, 6) + "...",
-                                                "",
-                                                joinedAt
-                                        ));
-                                    } else {
+                                            if (userDoc == null || !userDoc.exists()) {
 
-                                        Log.e("MEMBERS_DEBUG", "UserDoc EXISTS");
+                                                String safe = userId.length() >= 6
+                                                        ? userId.substring(0, 6) + "..."
+                                                        : userId + "...";
 
-                                        String first = userDoc.getString("firstName");
-                                        String last = userDoc.getString("lastName");
-                                        String avatar = userDoc.getString("photoUrl");
+                                                box[0].add(new TeamMemberEntry(
+                                                        userId, safe, "", joinedAt
+                                                ));
 
-                                        Log.e("MEMBERS_DEBUG", "firstName = " + first);
-                                        Log.e("MEMBERS_DEBUG", "lastName  = " + last);
-                                        Log.e("MEMBERS_DEBUG", "avatar    = " + avatar);
+                                            } else {
 
-                                        String fullName = "";
+                                                String first = userDoc.getString("firstName");
+                                                String last = userDoc.getString("lastName");
+                                                String avatar = userDoc.getString("photoUrl");
 
-                                        if ((first != null && !first.isEmpty()) ||
-                                                (last != null && !last.isEmpty())) {
-                                            fullName = ((first != null ? first : "") + " " +
-                                                    (last != null ? last : "")).trim();
-                                        } else {
-                                            fullName = userId.substring(0, 6) + "...";
-                                        }
+                                                String full = ((first != null ? first : "") + " " +
+                                                        (last != null ? last : "")).trim();
 
-                                        result.add(new TeamMemberEntry(
-                                                userId,
-                                                fullName,
-                                                avatar,
-                                                joinedAt
-                                        ));
-                                    }
+                                                if (full.isEmpty()) {
+                                                    full = userId.length() >= 6
+                                                            ? userId.substring(0, 6) + "..."
+                                                            : userId + "...";
+                                                }
 
-                                    if (result.size() == total) {
-                                        result.sort(Comparator.comparingLong(TeamMemberEntry::getJoinedAt));
-                                        Log.e("MEMBERS_DEBUG", "ALL LOADED → CALLBACK");
-                                        callback.onLoaded(result);
-                                    }
-                                })
+                                                box[0].add(new TeamMemberEntry(
+                                                        userId, full, avatar, joinedAt
+                                                ));
+                                            }
 
-                                .addOnFailureListener(e -> {
-                                    Log.e("MEMBERS_DEBUG", "ERROR fetching user " + userId + ": " + e);
+                                            return null;
+                                        });
 
-                                    result.add(new TeamMemberEntry(
-                                            userId,
-                                            userId.substring(0, 6) + "...",
-                                            "",
-                                            joinedAt
-                                    ));
-
-                                    if (result.size() == total) {
-                                        result.sort(Comparator.comparingLong(TeamMemberEntry::getJoinedAt));
-                                        callback.onLoaded(result);
-                                    }
-                                });
+                        userTasks.add(userTask);
                     }
+
+                    return Tasks.whenAll(userTasks)
+                            .continueWith(t -> box[0]);
                 })
+                .addOnSuccessListener(list -> {
 
-                .addOnFailureListener(e -> {
-                    Log.e("MEMBERS_DEBUG", "ERROR → Cannot read members subcollection: ", e);
-                    callback.onLoaded(new ArrayList<>());
-                });
-    }
+                    if (list == null) return;
 
-
-    public interface OnMembersLoaded {
-        void onLoaded(List<TeamMemberEntry> list);
+                    list.sort(Comparator.comparingLong(TeamMemberEntry::getJoinedAt));
+                    callback.onLoaded(list);
+                })
+                .addOnFailureListener(e -> callback.onLoaded(new ArrayList<>()));
     }
 
     private String generateTeamCode() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random r = new Random();
         StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < 6; i++) {
-            sb.append(chars.charAt(r.nextInt(chars.length())));
-        }
+        for (int i = 0; i < 6; i++) sb.append(chars.charAt(r.nextInt(chars.length())));
         return sb.toString();
     }
 
-    public DocumentReference getTeamRef(String teamId) {
-        return db.collection("teams").document(teamId);
+    @Override
+    public DocumentReference getTeamRef(String id) {
+        return db.collection("teams").document(id);
+    }
+
+    @Override
+    public String getCurrentUserId() {
+        return uid;
     }
 }
+

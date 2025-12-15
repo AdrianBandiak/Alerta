@@ -16,15 +16,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class TaskRepository {
+public class TaskRepository implements TaskRepositoryInterface {
 
     private static final String TAG = "TaskRepository";
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference tasksRef = db.collection("tasks");
-    private final String currentUserId = FirebaseAuth.getInstance().getUid();
+    private final FirebaseFirestore db;
+    private final CollectionReference tasksRef;
+    private final String currentUserId;
 
+    public TaskRepository() {
+        this(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance().getUid());
+    }
 
+    public TaskRepository(FirebaseFirestore db, String uid) {
+        this.db = db;
+        this.tasksRef = db.collection("tasks");
+        this.currentUserId = uid;
+    }
+
+    @Override
     public void addTask(Task task, OnTaskAddedListener listener) {
 
         Log.d(TAG, "Adding task: id=" + task.getId()
@@ -33,7 +43,7 @@ public class TaskRepository {
                 + ", teamColor=" + task.getTeamColor());
 
         tasksRef.document(task.getId())
-                .set(task, SetOptions.merge())  // IMPORTANT FIX
+                .set(task, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to add task", e);
@@ -41,6 +51,7 @@ public class TaskRepository {
                 });
     }
 
+    @Override
     public void getTasksForToday(OnTasksLoadedListener listener) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -48,6 +59,10 @@ public class TaskRepository {
                 .whereEqualTo("date", today)
                 .get()
                 .addOnSuccessListener(snapshots -> {
+                    if (snapshots == null) {
+                        listener.onError(new Exception("Null snapshot"));
+                        return;
+                    }
                     List<Task> list = snapshots.toObjects(Task.class);
                     listener.onSuccess(list);
                 })
@@ -57,6 +72,7 @@ public class TaskRepository {
                 });
     }
 
+    @Override
     public ListenerRegistration listenForTodayTasks(OnTasksLoadedListener listener) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -64,7 +80,6 @@ public class TaskRepository {
                 .whereEqualTo("date", today)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.e(TAG, "Snapshot listener error", e);
                         listener.onError(e);
                         return;
                     }
@@ -75,6 +90,7 @@ public class TaskRepository {
                 });
     }
 
+    @Override
     public void updateTaskCompletion(String taskId, boolean completed) {
         tasksRef.document(taskId)
                 .update("completed", completed)
@@ -82,14 +98,14 @@ public class TaskRepository {
                         Log.e(TAG, "Failed to update completion", e));
     }
 
-    public void updateTask(Task task, OnTaskUpdatedListener listener) {
+    public void updateTask(Task task, TaskRepositoryInterface.OnTaskUpdatedListener listener) {
 
         Log.d(TAG, "Updating task: id=" + task.getId()
                 + ", type=" + task.getType()
                 + ", teamId=" + task.getTeamId());
 
         tasksRef.document(task.getId())
-                .set(task, SetOptions.merge())  // merge is important!
+                .set(task, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> listener.onUpdated(true))
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to update task", e);
@@ -97,6 +113,7 @@ public class TaskRepository {
                 });
     }
 
+    @Override
     public void deleteTask(String id, OnTaskDeletedListener listener) {
 
         Log.d(TAG, "Trying to delete task: " + id);
@@ -113,22 +130,23 @@ public class TaskRepository {
                 });
     }
 
-    public ListenerRegistration listenForTodayTasksIncludingTeams(List<String> userTeams,
-                                                                  OnTasksLoadedListener listener) {
+    public ListenerRegistration listenForTodayTasksIncludingTeams(
+            List<String> userTeams,
+            OnTasksLoadedListener listener) {
 
         String uid = getCurrentUserId();
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 .format(new Date());
 
         return db.collection("tasks")
                 .whereEqualTo("date", today)
                 .addSnapshotListener((snapshots, e) -> {
+
                     if (e != null) {
                         listener.onError(e);
                         return;
                     }
+
                     if (snapshots == null) {
                         listener.onSuccess(new ArrayList<>());
                         return;
@@ -143,10 +161,7 @@ public class TaskRepository {
                         boolean isMine = uid.equals(t.getCreatedBy());
                         boolean isTeamTask = t.getTeamId() != null &&
                                 userTeams.contains(t.getTeamId());
-
-                        boolean isToday =
-                                t.getDate() != null &&
-                                        t.getDate().equals(today);
+                        boolean isToday = today.equals(t.getDate());
 
                         if (isMine && isToday) {
                             result.add(t);
@@ -162,27 +177,8 @@ public class TaskRepository {
                 });
     }
 
-
+    @Override
     public String getCurrentUserId() {
         return currentUserId;
-    }
-
-
-    public interface OnTaskAddedListener {
-        void onSuccess();
-        void onError(Exception e);
-    }
-
-    public interface OnTasksLoadedListener {
-        void onSuccess(List<Task> tasks);
-        void onError(Exception e);
-    }
-
-    public interface OnTaskUpdatedListener {
-        void onUpdated(boolean success);
-    }
-
-    public interface OnTaskDeletedListener {
-        void onDeleted(boolean success);
     }
 }
